@@ -31,8 +31,8 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
-            Login
+          <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
+            <Link to="/login">Login</Link>
           </Button>
         </div>
 
