@@ -188,9 +188,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_workspace_ids: { Args: { uid: string }; Returns: string[] }
       get_user_workspace_role: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: string
+      }
+      has_workspace_role: {
+        Args: { min_role: string; uid: string; ws_id: string }
+        Returns: boolean
       }
     }
     Enums: {
