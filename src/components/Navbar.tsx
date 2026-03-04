@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -30,8 +31,8 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
-            Login
+          <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
+            <Link to="/login">Login</Link>
           </Button>
         </div>
 
@@ -47,7 +48,9 @@ const Navbar = () => {
           <a href="#about" className="block text-sm font-medium text-muted-foreground">About</a>
           <a href="#resources" className="block text-sm font-medium text-muted-foreground">Resources</a>
           <a href="#pricing" className="block text-sm font-medium text-muted-foreground">Pricing</a>
-          <Button className="w-full bg-primary text-primary-foreground rounded-full">Login</Button>
+          <Button asChild className="w-full bg-primary text-primary-foreground rounded-full">
+            <Link to="/login">Login</Link>
+          </Button>
         </div>
       )}
     </nav>
