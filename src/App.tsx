@@ -9,6 +9,12 @@ import Register from "./pages/Register";
 import Onboarding from "./pages/Onboarding";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import Signals from "./pages/Signals";
+import Pipeline from "./pages/Pipeline";
+import CRM from "./pages/CRM";
+import Workflows from "./pages/Workflows";
+import Compliance from "./pages/Compliance";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
