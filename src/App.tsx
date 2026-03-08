@@ -9,6 +9,12 @@ import Register from "./pages/Register";
 import Onboarding from "./pages/Onboarding";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import Signals from "./pages/Signals";
+import Pipeline from "./pages/Pipeline";
+import CRM from "./pages/CRM";
+import Workflows from "./pages/Workflows";
+import Compliance from "./pages/Compliance";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,12 +32,12 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="signals" element={<Dashboard />} />
-            <Route path="pipeline" element={<Dashboard />} />
-            <Route path="crm" element={<Dashboard />} />
-            <Route path="workflows" element={<Dashboard />} />
-            <Route path="compliance" element={<Dashboard />} />
-            <Route path="settings" element={<Dashboard />} />
+            <Route path="signals" element={<Signals />} />
+            <Route path="pipeline" element={<Pipeline />} />
+            <Route path="crm" element={<CRM />} />
+            <Route path="workflows" element={<Workflows />} />
+            <Route path="compliance" element={<Compliance />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
