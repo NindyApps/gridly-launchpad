@@ -1,0 +1,58 @@
+Saya sedang membangun OCTOPILOT — platform B2B SaaS Revenue Signal Intelligence di Replit.
+
+═══ PRODUK ═══
+OCTOPILOT memantau komunitas publik (Reddit, Hacker News) secara real-time,
+mengklasifikasi sinyal niat beli menggunakan AI berlapis, dan menginjeksikan
+peluang terverifikasi ke CRM tim sales — tanpa pernah posting ke platform
+manapun (Zero-Write Architecture, non-negotiable).
+
+═══ STATUS PROJECT SAAT INI ═══
+Platform build  : Replit (Agent + IDE manual)
+Kode asal       : Di-export dari Lovable.dev (nama lama: Copit)
+Database        : Supabase sudah di-connect ke Replit
+Landing page    : Sudah ada (dari Lovable)
+Design system   : Sudah ada (Tailwind + shadcn/ui dari Lovable)
+App layer       : BELUM dibangun (dashboard, auth, trackers, CRM, AI engine)
+
+═══ STACK TEKNIS (FIXED — jangan sarankan ganti) ═══
+Runtime         : Node.js di Replit
+Framework       : Next.js 14 App Router
+Language        : TypeScript (strict mode)
+Styling         : Tailwind CSS + shadcn/ui
+Database/Auth   : Supabase (PostgreSQL + Auth + RLS + Realtime + Edge Functions)
+AI Classifier   : OpenAI gpt-4o-mini
+CRM             : HubSpot OAuth API v3
+Ingestion       : Reddit OAuth API + HN Algolia API (free)
+Email           : Resend API
+Billing         : Stripe (subscriptions)
+Deploy          : Replit Deployments (Always On)
+Secrets         : Replit Secrets (bukan .env.local di production)
+
+═══ REPLIT-SPECIFIC SETUP ═══
+- Secrets disimpan di Replit Secrets panel, diakses via process.env
+- Replit Agent dipakai untuk generate kode per fase
+- IDE Replit dipakai untuk edit manual, debug, dan review kode
+- Run command: npm run dev (development), npm run build && npm start (production)
+- Port: Replit otomatis expose port 3000
+- File .env.local hanya untuk local dev — production pakai Replit Secrets
+- Replit DB tidak dipakai — semua data di Supabase
+
+═══ DATABASE SCHEMA (Supabase) ═══
+Tables: workspaces, profiles, trackers, intent_signals,
+        human_feedback_loop, compliance_logs
+Multi-tenant: Row Level Security ketat — semua query harus workspace-scoped
+Trigger aktif: handle_new_user() → auto-create workspace + profile saat signup
+
+═══ DOKUMEN REFERENSI YANG SUDAH ADA ═══
+1. OCTOPILOT 2.0 Blueprint      — strategic audit, arsitektur, 12-month roadmap
+2. Lovable Pre-Build Master Doc  — full schema, auth, routes, RLS policies
+3. Replit Launch Prompt Series   — 12 phase prompts (P01 setup → P12 deploy)
+   Current phase: P01 sudah selesai (kode dari Lovable), lanjut P02+
+
+═══ ICP & KONTEKS BISNIS ═══
+Target customer : Tim Sales/RevOps B2B SaaS $5M–$50M ARR
+Pain            : SDR buang 40–60% waktu prospecting manual di forum
+Solution        : Sinyal niat beli terverifikasi langsung masuk CRM queue
+Pricing         : Pro $299 / Growth $599 / Enterprise $1200 per bulan
+
+PERAN SAYA: Founder/CTO — keputusan arsitektur, produk, dan strategi ada di saya.
