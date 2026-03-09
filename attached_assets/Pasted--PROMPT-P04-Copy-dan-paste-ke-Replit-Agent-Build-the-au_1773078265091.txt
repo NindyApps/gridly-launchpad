@@ -1,0 +1,71 @@
+── PROMPT P04 — Copy dan paste ke Replit Agent ──
+Build the authenticated app layout shell for OCTOPILOT.
+This layout wraps all pages under app/(app)/.
+ 
+1. APP LAYOUT — app/(app)/layout.tsx:
+Flex row: sidebar (fixed left) + main content area (flex-1).
+The sidebar and top bar are always visible on all app pages.
+ 
+2. SIDEBAR — components/layout/AppSidebar.tsx:
+Desktop: 240px wide, dark slate background (#1E293B), always visible.
+Mobile: hidden by default, slide-in drawer on hamburger click.
+Collapsible: toggle button at bottom collapses to 64px icon-only mode.
+Collapsed state persisted in localStorage.
+ 
+SIDEBAR CONTENT (top to bottom):
+- Logo area: OCTOPILOT text logo (or icon when collapsed), version badge
+- Nav items (with icon + label, label hidden when collapsed):
+  • Dashboard → /dashboard (LayoutDashboard icon)
+  • Trackers → /trackers (Target icon)
+  • Analytics → /analytics (BarChart2 icon)
+  • Settings (ChevronDown expandable) →
+    - CRM Integrations → /settings/crm
+    - Alerts → /settings/alerts
+    - Team → /settings/team
+    - Billing → /settings/billing
+- Active state: indigo left border + lighter background on active route
+- Bottom section:
+  • Workspace name with plan badge (Pro/Growth/Enterprise)
+  • User avatar + name (hidden when collapsed)
+  • Logout button (LogOut icon)
+ 
+Use lucide-react for all icons.
+Use next/navigation usePathname() for active route detection.
+ 
+3. TOP BAR — components/layout/TopBar.tsx:
+Height: 56px, white background, bottom border.
+Left: Page title (dynamic, passed as prop or from route)
+Center: Search input (UI only, no backend) with search icon
+Right (left to right):
+  - Help icon (opens placeholder modal)
+  - Notification bell (with red badge showing unread count from state)
+  - User avatar dropdown:
+    • User name + email (non-clickable header)
+    • Separator
+    • Profile Settings → /settings/team
+    • Separator
+    • Sign Out (calls supabase.auth.signOut(), redirects to /login)
+ 
+4. BREADCRUMB — components/layout/Breadcrumb.tsx:
+Show current location path as breadcrumb below top bar.
+e.g.: OCTOPILOT > Dashboard, OCTOPILOT > Settings > CRM
+ 
+5. MOBILE RESPONSIVE:
+Below md breakpoint: sidebar hidden, hamburger icon in top bar to toggle drawer.
+Drawer uses shadcn Sheet component from the right on mobile, left on tablet.
+ 
+6. PAGE TITLE SYSTEM:
+Create a metadata config object that maps routes to page titles:
+{ '/dashboard': 'Dashboard', '/trackers': 'Trackers', '/analytics': 'Analytics', etc. }
+TopBar reads current route and shows correct title.
+ 
+7. EMPTY PLACEHOLDER PAGES:
+Create minimal placeholder content for:
+- /dashboard: 'Dashboard coming in next phase'
+- /trackers: 'Trackers coming in next phase'
+- /analytics: 'Analytics coming in next phase'
+- /settings/*: 'Settings coming in next phase'
+These will be replaced in later phases.
+ 
+Ensure layout renders correctly before moving on.
+Test: login → should see sidebar + top bar on all /app/* routes.

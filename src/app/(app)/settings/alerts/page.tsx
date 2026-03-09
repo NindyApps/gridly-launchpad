@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -27,7 +26,6 @@ export default function AlertsSettingsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <TopBar title="Alerts" subtitle="Configure when and how you're notified" />
       <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-2xl">
         <Card className="border border-white/10 bg-white/5">
           <CardHeader>

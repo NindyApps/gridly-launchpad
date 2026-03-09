@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,7 +47,6 @@ export default function TeamSettingsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <TopBar title="Team" subtitle="Manage your workspace members and permissions" />
       <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-2xl">
         <Card className="border border-white/10 bg-white/5">
           <CardHeader>

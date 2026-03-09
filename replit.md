@@ -156,6 +156,15 @@ npm start       # Production server on port 5000
 - [x] Onboarding updates workspace via UPDATE (not INSERT)
 - [x] `CreateTrackerInput` type + `created_by: user.id` in useTrackers
 
+### P04
+- [x] `(app)/layout.tsx` upgraded: `isLoading` fix, mobile drawer state, wires TopBar + Breadcrumb
+- [x] `AppSidebar.tsx` rebuilt: collapsible to 64px icon-only (localStorage persisted), workspace name + plan badge, indigo left-border active state, Tooltip hints when collapsed, mobile Sheet drawer, version badge
+- [x] `TopBar.tsx` rebuilt: route-based dynamic title, hamburger for mobile, search input, Help modal, notification bell with red badge count, user avatar dropdown (name/email header, Profile Settings, Sign Out)
+- [x] `Breadcrumb.tsx` created: route-aware breadcrumb trail (OCTOPILOT > Section > Sub-page)
+- [x] `(app)/dashboard/page.tsx` placeholder created with quick-link cards to Trackers / Analytics / CRM
+- [x] Removed old `(dashboard)/dashboard/page.tsx` to eliminate Next.js route conflict
+- [x] TopBar removed from all individual pages — layout now owns the header
+
 ### P03
 - [x] `app/auth/callback/route.ts` — OAuth + magic link callback, detects new vs returning users
 - [x] Login upgraded: Google OAuth, forgot password (resetPasswordForEmail), show/hide password, inline errors

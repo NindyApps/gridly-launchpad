@@ -1,6 +1,5 @@
 "use client";
 
-import { TopBar } from '@/components/layout/TopBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSignals } from '@/hooks/useSignals';
@@ -37,7 +36,6 @@ export default function AnalyticsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <TopBar title="Analytics" subtitle="Signal performance and trends" />
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { TrackerCard } from '@/components/trackers/TrackerCard';
 import { TrackerForm } from '@/components/trackers/TrackerForm';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -52,7 +51,6 @@ export default function TrackersPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <TopBar title="Trackers" subtitle="Monitor keywords and competitors across platforms" />
       <div className="flex-1 overflow-y-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-zinc-400">{trackers.length} tracker{trackers.length !== 1 ? 's' : ''} configured</p>
