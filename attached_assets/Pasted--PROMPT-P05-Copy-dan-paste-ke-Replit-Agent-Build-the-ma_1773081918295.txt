@@ -1,0 +1,112 @@
+── PROMPT P05 — Copy dan paste ke Replit Agent ──
+Build the main Dashboard page for OCTOPILOT at /dashboard.
+This is the primary daily-use page for SDR teams.
+ 
+1. SIGNAL CARD COMPONENT — components/signals/SignalCard.tsx:
+ 
+Each card is a bordered container with these sections:
+ 
+LEFT BORDER (4px): color based on intent_level:
+  high → red (#DC2626)
+  medium → amber (#D97706)
+  low → slate (#64748B)
+ 
+HEADER ROW:
+  Left: Platform badge (icon + platform name)
+    Reddit: orange circle with 'r/subredditname'
+    Hacker News: orange 'Y' with 'Hacker News'
+  Center: Time ago (e.g. '2h ago', '3d ago') using date-fns formatDistanceToNow
+  Right: Urgency badge (red pill 'URGENT') — only if urgency_tag === 'urgent'
+         Confidence score pill:
+           >0.8 → green background 'High 0.92'
+           0.6-0.8 → amber background 'Med 0.73'
+           <0.6 → slate background 'Low 0.48'
+ 
+BODY:
+  Pain domain tag (small grey pill, e.g. 'CRM Pricing')
+  Intent category tag (e.g. 'Vendor Switch')
+  AI Summary text (2-3 lines, font-normal)
+  Collapsible 'Suggested outreach opener' section:
+    - Toggle with ChevronDown/Up icon
+    - Italic text showing suggested_opener
+    - 'Copy' button to clipboard
+ 
+ACTION ROW (bottom of card):
+  'View Source' (ExternalLink icon, ghost variant) → opens post_url in new tab
+  'Inject to HubSpot' (primary button, Zap icon):
+    - If crm_injected: show 'Injected ✓' (green, disabled)
+    - If not: show 'Inject to HubSpot'
+    - On click: POST to /api/crm/hubspot/inject with {signal_id}
+    - Loading state while injecting
+    - On success: UPDATE card to show injected state, show success toast
+    - On error (no CRM connected): show 'Connect HubSpot first' toast with link
+  Feedback buttons (ghost, small):
+    - 'Useful' (ThumbsUp icon, green on hover)
+    - 'Not Useful' (ThumbsDown icon, red on hover)
+    - On click: POST to /api/feedback, INSERT human_feedback_loop record
+    - 'Not Useful' also sets dismissed=true, card animates out
+  'Dismiss' (X icon, ghost) → sets dismissed=true, card slides out with animation
+ 
+2. SIGNAL FEED — components/signals/SignalFeed.tsx:
+ 
+Fetches: SELECT * FROM intent_signals
+  WHERE workspace_id = current AND dismissed = false
+  ORDER BY confidence_score DESC, created_at DESC
+  LIMIT 50
+ 
+Apply filters from filter bar state.
+Show skeleton loading cards (3 of them) while loading.
+ 
+REALTIME UPDATES:
+  Subscribe to Supabase Realtime on intent_signals table,
+  filter: workspace_id = current workspace.
+  When INSERT event received:
+    - Increment newSignalsCount state
+    - Show banner at top: '3 new signals — Click to refresh'
+    - On banner click: reload feed, reset newSignalsCount
+ 
+EMPTY STATES:
+  No trackers: illustration + 'Create your first tracker' CTA → /trackers
+  Has trackers, no signals: illustration + 'Signals appear within 15 minutes'
+  All dismissed: 'You're all caught up!' with refresh button
+ 
+3. FILTER BAR — components/signals/SignalFilters.tsx:
+ 
+Sticky bar below top bar with these controls:
+  Intent Level pills: All | High | Medium | Low (toggle, active = filled)
+  Category dropdown: All / Vendor Switch / New Purchase / Evaluation / Complaint
+  Tracker dropdown: All / [list of workspace trackers]
+  Platform dropdown: All / Reddit / Hacker News
+  Toggle switch: 'Urgent only'
+  Sort dropdown: 'Confidence ↓' (default) / 'Newest' / 'Oldest'
+  'Clear filters' button (only shows when any filter is active)
+ 
+Filters are applied client-side on the loaded signals array.
+Show result count: '12 signals matching filters'
+ 
+4. DASHBOARD STATS ROW:
+4 compact stat cards at the top of dashboard (above filter bar):
+  - Signals Today (count from today)
+  - High Intent (count with intent_level='high')
+  - CRM Injected Today (count)
+  - Acceptance Rate (useful / total feedback × 100%)
+ 
+5. API ROUTE — app/api/feedback/route.ts:
+POST handler:
+  - Validate: signal_id, feedback_type in body
+  - Get current user workspace from Supabase session
+  - INSERT human_feedback_loop record
+  - If feedback_type is 'not_useful' or 'false_positive':
+    UPDATE intent_signals SET dismissed=true WHERE id=signal_id
+  - INSERT compliance_logs record
+  - Return 200 with {success: true}
+ 
+6. SEED SIGNALS FOR TESTING:
+Create a utility function lib/seed-signals.ts that inserts 8 sample signals.
+Call this from a /api/dev/seed route (only works in development mode).
+Sample signals should cover all combinations:
+  - 2 high intent, reddit, vendor_switch, confidence 0.91
+  - 2 high intent, hackernews, new_purchase, confidence 0.85
+  - 2 medium intent, reddit, evaluation, confidence 0.67
+  - 2 low intent, reddit, complaint, confidence 0.43
+Use realistic ai_summary text about CRM/SaaS pain points.

@@ -94,6 +94,8 @@ export interface ComplianceLog {
   created_at: string;
 }
 
+export type SignalSort = 'confidence_desc' | 'newest' | 'oldest';
+
 export interface SignalFeedFilters {
   intent_level?: IntentLevel | 'all';
   intent_category?: IntentCategory | 'all';
@@ -101,6 +103,8 @@ export interface SignalFeedFilters {
   tracker_id?: string | 'all';
   dismissed?: boolean;
   crm_injected?: boolean;
+  urgent_only?: boolean;
+  sort?: SignalSort;
 }
 
 export interface PaginatedResponse<T> {

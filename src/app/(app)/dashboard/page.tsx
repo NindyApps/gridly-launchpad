@@ -1,89 +1,92 @@
 "use client";
 
-import { Zap, Radio, BarChart2, ArrowRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useState, useMemo, useCallback } from 'react';
+import { isToday } from 'date-fns';
+import { TrendingUp, Zap, Target, BarChart3 } from 'lucide-react';
+import { SignalFeed } from '@/components/signals/SignalFeed';
+import { SignalFilters } from '@/components/signals/SignalFilters';
+import { useSignals } from '@/hooks/useSignals';
+import { useTrackers } from '@/hooks/useTrackers';
+import { useWorkspaces } from '@/hooks/use-workspaces';
+import type { SignalFeedFilters } from '@/types/app';
 
-const QUICK_LINKS = [
-  {
-    href: '/trackers',
-    icon: Radio,
-    title: 'Trackers',
-    description: 'Set up keyword and competitor monitors to detect buying intent across Reddit and Hacker News.',
-    color: 'text-indigo-400',
-    bg: 'bg-indigo-500/10',
-  },
-  {
-    href: '/analytics',
-    icon: BarChart2,
-    title: 'Analytics',
-    description: 'View signal performance, intent distribution by platform, and CRM injection rates.',
-    color: 'text-violet-400',
-    bg: 'bg-violet-500/10',
-  },
-  {
-    href: '/settings/crm',
-    icon: Zap,
-    title: 'Connect HubSpot',
-    description: 'Integrate your CRM to automatically push high-intent signals as tasks to your sales team.',
-    color: 'text-orange-400',
-    bg: 'bg-orange-500/10',
-  },
-];
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  color: string;
+}) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4" data-testid={`stat-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-xs text-zinc-400">{label}</p>
+        <Icon className={`h-3.5 w-3.5 ${color}`} />
+      </div>
+      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
+  const { activeWorkspace } = useWorkspaces();
+  const workspaceId = activeWorkspace?.id ?? null;
+  const { signals } = useSignals(workspaceId);
+  const { trackers } = useTrackers(workspaceId);
+
+  const [filters, setFilters] = useState<SignalFeedFilters>({});
+  const [resultCount, setResultCount] = useState(0);
+
+  const stats = useMemo(() => {
+    const today = signals.filter((s) => isToday(new Date(s.created_at)));
+    const highIntent = signals.filter((s) => s.intent_level === 'high').length;
+    const injectedToday = today.filter((s) => s.crm_injected).length;
+    const totalFeedback = signals.filter((s) => s.dismissed).length;
+    const acceptanceRate = totalFeedback > 0
+      ? Math.round(((signals.length / (signals.length + totalFeedback)) * 100))
+      : 100;
+
+    return {
+      today: today.length,
+      highIntent,
+      injectedToday,
+      acceptanceRate,
+    };
+  }, [signals]);
+
+  const handleResultCount = useCallback((count: number) => {
+    setResultCount(count);
+  }, []);
+
   return (
-    <div className="p-6 space-y-8 max-w-4xl">
-      <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-white">Welcome to OCTOPILOT</h2>
-        <p className="text-sm text-zinc-400">
-          Your real-time B2B revenue signal intelligence platform. Full dashboard coming in the next phase.
-        </p>
+    <div className="h-full flex flex-col">
+      {/* Stats row */}
+      <div className="px-4 pt-4 pb-2 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-indigo-400" />
+        <StatCard label="High Intent" value={stats.highIntent} icon={TrendingUp} color="text-red-400" />
+        <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-green-400" />
+        <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-amber-400" />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        {QUICK_LINKS.map((item) => (
-          <Card
-            key={item.href}
-            className="border border-white/10 bg-white/5 hover:bg-white/8 transition-colors group"
-            data-testid={`card-quick-link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
-          >
-            <CardContent className="pt-5 pb-4 space-y-3">
-              <div className={`h-9 w-9 rounded-lg ${item.bg} flex items-center justify-center`}>
-                <item.icon className={`h-5 w-5 ${item.color}`} />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">{item.title}</p>
-                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{item.description}</p>
-              </div>
-              <Link href={item.href}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="px-0 text-xs text-zinc-400 hover:text-white gap-1 group-hover:gap-2 transition-all"
-                >
-                  Go to {item.title}
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Sticky filter bar */}
+      <SignalFilters
+        filters={filters}
+        onChange={setFilters}
+        trackers={trackers}
+        resultCount={resultCount}
+      />
 
-      <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6 space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <Zap className="h-4 w-4 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-white">Full dashboard coming soon</p>
-            <p className="text-xs text-zinc-400">
-              Signal feed, pipeline view, CRM injection logs, and compliance audit trail — all in one place.
-            </p>
-          </div>
-        </div>
+      {/* Signal feed */}
+      <div className="flex-1 overflow-y-auto">
+        <SignalFeed
+          workspaceId={workspaceId}
+          filters={filters}
+          onResultCount={handleResultCount}
+        />
       </div>
     </div>
   );

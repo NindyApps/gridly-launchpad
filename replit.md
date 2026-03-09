@@ -156,6 +156,16 @@ npm start       # Production server on port 5000
 - [x] Onboarding updates workspace via UPDATE (not INSERT)
 - [x] `CreateTrackerInput` type + `created_by: user.id` in useTrackers
 
+### P05
+- [x] `SignalCard.tsx` rebuilt: colored left border (red/amber/slate by intent), platform badges (Reddit `r/sub` pill, HN orange-Y), confidence pill (green/amber/slate), urgency URGENT badge, collapsible suggested opener with clipboard copy, Useful/Not Useful feedback buttons, Dismiss → framer-motion slide-out animation
+- [x] `SignalFilters.tsx` rebuilt: intent level pills (All/High/Medium/Low), Category/Tracker/Platform/Sort dropdowns, Urgent Only toggle, result count, Clear filters button — all client-side
+- [x] `SignalFeed.tsx` created: applies filters client-side, Supabase Realtime INSERT subscription → "N new signals — click to refresh" banner, 3-card skeleton loading, empty states (no trackers / monitoring / no matches)
+- [x] `dashboard/page.tsx` rebuilt: 4 stat cards (Signals Today / High Intent / Injected Today / Acceptance Rate) + sticky SignalFilters + SignalFeed
+- [x] `useSignals.ts` updated: always filters `dismissed=false`, order by confidence_score DESC; `useFeedback` mutation added
+- [x] `api/feedback/route.ts` created: POST validates signal_id + feedback_type, INSERTs human_feedback_loop, auto-dismisses on not_useful/false_positive, logs to compliance_logs
+- [x] `lib/seed-signals.ts` created: 8 sample signals covering all intent/platform/category combos with realistic CRM SaaS copy
+- [x] `api/dev/seed/route.ts` created: POST seeds signals for authenticated user's workspace (dev only, requires tracker to exist first)
+
 ### P04
 - [x] `(app)/layout.tsx` upgraded: `isLoading` fix, mobile drawer state, wires TopBar + Breadcrumb
 - [x] `AppSidebar.tsx` rebuilt: collapsible to 64px icon-only (localStorage persisted), workspace name + plan badge, indigo left-border active state, Tooltip hints when collapsed, mobile Sheet drawer, version badge
