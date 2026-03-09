@@ -87,7 +87,7 @@ src/
 
 - **Protected**: `/dashboard`, `/trackers`, `/analytics`, `/settings/*`, `/onboarding` → redirect to `/login` if no session
 - **Auth redirect**: `/login`, `/signup` → redirect to `/dashboard` if session exists
-- **Public**: `/`, `/accept-invite`, `/api/*`
+- **Public**: `/`, `/accept-invite`, `/api/*`, `/auth/*`
 
 ## Environment Variables (`.env.local`)
 
@@ -137,15 +137,33 @@ npm start       # Production server on port 5000
 - `"use client"` required on all components using framer-motion, hooks, or event handlers
 - HubSpot token is stored in `workspaces.hubspot_token_enc` — should be encrypted in production using `ENCRYPTION_KEY`
 
-## P01 Spec Completion Status
+## Completion Status
 
+### P01
 - [x] TypeScript types (`types/app.ts`, `types/database.ts`)
 - [x] Middleware route protection (`src/middleware.ts`)
 - [x] All auth routes: login, signup, accept-invite
-- [x] Onboarding wizard (3-step: workspace → first tracker → done)
 - [x] App routes: trackers, analytics, settings (crm/alerts/team/billing)
 - [x] API routes: HubSpot OAuth connect/callback/inject, Stripe webhook
 - [x] Component folders: layout/, signals/, trackers/, auth/, shared/
 - [x] Hooks: useAuth, useSignals, useTrackers
-- [x] Landing page: Navbar, HeroSection, HowItWorks, Features, Testimonials, Pricing, FAQ, CTASection, Footer
-- [x] All env vars scaffolded in .env.local
+- [x] Landing page: all sections including Testimonials, Pricing, FAQ
+
+### P02
+- [x] `supabase/schema.sql` — 6 tables + RLS + trigger (run manually in Supabase SQL Editor)
+- [x] TypeScript types synced to schema exactly
+- [x] `handle_new_user()` trigger: auto-creates workspace + admin profile on signup
+- [x] Onboarding updates workspace via UPDATE (not INSERT)
+- [x] `CreateTrackerInput` type + `created_by: user.id` in useTrackers
+
+### P03
+- [x] `app/auth/callback/route.ts` — OAuth + magic link callback, detects new vs returning users
+- [x] Login upgraded: Google OAuth, forgot password (resetPasswordForEmail), show/hide password, inline errors
+- [x] Signup upgraded: confirm password, 5-point strength indicator, ToS checkbox, Google OAuth
+- [x] Accept-invite upgraded: verifyOtp with type='invite', shows workspace name
+- [x] `hooks/useAuth.ts`: now returns user, session, profile, workspace, role, isLoading, signOut
+- [x] `lib/auth.ts`: thin re-export of hooks/useAuth.ts for backward compatibility
+- [x] Middleware: added `/auth/*` to public routes
+- [x] Onboarding rebuilt as 4-step wizard: Welcome → Connect CRM → Create Tracker → Invite Team
+- [x] `components/shared/TagInput.tsx`: reusable tag pill input (Enter/comma to add, backspace/×  to remove)
+- [x] `api/team/invite/route.ts`: uses Supabase admin.inviteUserByEmail, validates admin role

@@ -1,8 +1,21 @@
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ['/', '/login', '/signup', '/accept-invite'];
-const AUTH_PATHS = ['/login', '/signup'];
+const AUTH_PATHS = ["/login", "/signup"];
+const ALWAYS_PUBLIC = ["/", "/accept-invite"];
+
+const isProtected = (pathname: string) =>
+  pathname.startsWith("/dashboard") ||
+  pathname.startsWith("/trackers") ||
+  pathname.startsWith("/analytics") ||
+  pathname.startsWith("/settings") ||
+  pathname.startsWith("/onboarding");
+
+const isPublic = (pathname: string) =>
+  ALWAYS_PUBLIC.includes(pathname) ||
+  AUTH_PATHS.includes(pathname) ||
+  pathname.startsWith("/api/") ||
+  pathname.startsWith("/auth/");
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -31,22 +44,15 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
   const pathname = request.nextUrl.pathname;
 
-  const isPublicPath = PUBLIC_PATHS.includes(pathname);
-  const isAuthPath = AUTH_PATHS.includes(pathname);
-  const isApiPath = pathname.startsWith('/api/');
-  const isAppPath = pathname.startsWith('/dashboard') || pathname.startsWith('/trackers') || pathname.startsWith('/analytics') || pathname.startsWith('/settings') || pathname.startsWith('/onboarding');
-
-  if (isApiPath) return supabaseResponse;
-
-  if (isAuthPath && session) {
+  if (AUTH_PATHS.includes(pathname) && session) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/dashboard';
+    redirectUrl.pathname = "/dashboard";
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isAppPath && !session) {
+  if (isProtected(pathname) && !session) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
+    redirectUrl.pathname = "/login";
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -55,6 +61,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -1,0 +1,86 @@
+── PROMPT P03 — Copy dan paste ke Replit Agent ──
+Build the complete authentication system for OCTOPILOT.
+ 
+1. AUTH CALLBACK ROUTE — app/auth/callback/route.ts:
+Handle Supabase auth callback (OAuth + magic links).
+Exchange code for session, redirect to /dashboard or /onboarding for new users.
+ 
+2. LOGIN PAGE — app/(auth)/login/page.tsx:
+- Clean centered card layout, OCTOPILOT logo at top
+- Email + password fields with validation
+- 'Continue with Google' button (calls Supabase signInWithOAuth)
+- 'Forgot password?' link → calls Supabase resetPasswordForEmail, show success toast
+- 'Don't have an account? Sign up' link
+- Error handling: show inline error messages (wrong password, user not found)
+- On success: redirect to /dashboard
+ 
+3. SIGNUP PAGE — app/(auth)/signup/page.tsx:
+- Full name, email, password, confirm password fields
+- Password strength indicator
+- 'Continue with Google' button
+- Terms of service checkbox (required)
+- On success: Supabase trigger auto-creates workspace + profile
+  Redirect to /onboarding
+- Error handling: email already exists, password too weak
+ 
+4. ACCEPT INVITE PAGE — app/(auth)/accept-invite/page.tsx:
+- Read token from URL query param
+- Show: 'You've been invited to join [workspace name]'
+- Password + confirm password fields
+- On submit: call Supabase verifyOtp with type='invite'
+- Redirect to /dashboard on success
+ 
+5. AUTH HOOK — hooks/useAuth.ts:
+Create a React hook that provides:
+- user: Supabase User object
+- profile: Profile record from profiles table
+- workspace: Workspace record
+- role: UserRole
+- isLoading: boolean
+- signOut: function
+Use createClient from lib/supabase/client.ts
+Fetch profile + workspace on session change
+ 
+6. MIDDLEWARE — middleware.ts:
+- Protect all routes under /(app)/* and /onboarding
+- Redirect unauthenticated users to /login
+- Redirect authenticated users away from /login and /signup to /dashboard
+- Allow: /, /login, /signup, /accept-invite, /api/*, /auth/*
+- Use createServerClient from @supabase/ssr
+ 
+7. AUTH CONTEXT — app/layout.tsx:
+Wrap the entire app with a Supabase auth provider.
+Listen to onAuthStateChange to keep session fresh.
+ 
+8. ONBOARDING WIZARD — app/onboarding/page.tsx:
+4-step wizard with progress bar (shadcn Progress component).
+State management: useState for currentStep (0-3).
+ 
+Step 0 — Welcome:
+  'Welcome to OCTOPILOT, [first name]' heading
+  Brief description of what they'll set up
+  'Get Started' button
+ 
+Step 1 — Connect CRM:
+  'Connect HubSpot' button with HubSpot logo
+  onClick: redirect to /api/crm/hubspot/connect
+  If already connected: show green checkmark + 'Connected to HubSpot'
+  'Skip for now' link → nextStep()
+ 
+Step 2 — Create First Tracker:
+  Form with: Tracker Name (required), Keywords (tag input),
+  Competitor Names (tag input), Subreddits (tag input, auto-prefix r/)
+  On submit: INSERT to trackers table, nextStep()
+  'Skip' link → nextStep()
+ 
+Step 3 — Invite Your Team:
+  Email input + role selector (analyst/sdr/viewer)
+  'Send Invite' → Supabase admin.inviteUserByEmail() via API route
+  Show sent invitations list
+  'Go to Dashboard' button → UPDATE profiles.onboarding_completed=true
+    → redirect to /dashboard
+ 
+Tag input component (for keywords/subreddits):
+- Input field where user types and presses Enter or comma to add tag
+- Tags shown as removable pills
+- Build as reusable component: components/shared/TagInput.tsx

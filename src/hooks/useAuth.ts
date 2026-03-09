@@ -1,15 +1,17 @@
 "use client";
 
-import { createClient } from '@/lib/supabase/client';
-import { useEffect, useState, useCallback } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
-import type { Profile } from '@/types/app';
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState, useCallback } from "react";
+import type { User, Session } from "@supabase/supabase-js";
+import type { Profile, Workspace, UserRole } from "@/types/app";
 
 interface AuthState {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
-  loading: boolean;
+  workspace: Workspace | null;
+  role: UserRole | null;
+  isLoading: boolean;
 }
 
 export function useAuth() {
@@ -17,42 +19,64 @@ export function useAuth() {
     user: null,
     session: null,
     profile: null,
-    loading: true,
+    workspace: null,
+    role: null,
+    isLoading: true,
   });
 
   const supabase = createClient();
 
-  const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
+  const fetchProfileAndWorkspace = useCallback(async (userId: string) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
       .single();
-    return data as Profile | null;
+
+    if (!profile) return { profile: null, workspace: null, role: null };
+
+    const { data: workspace } = await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("id", profile.workspace_id)
+      .single();
+
+    return {
+      profile: profile as Profile,
+      workspace: workspace as Workspace | null,
+      role: profile.role as UserRole,
+    };
   }, []);
 
   useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const user = session?.user ?? null;
+      if (user) {
+        const { profile, workspace, role } = await fetchProfileAndWorkspace(user.id);
+        setState({ user, session, profile, workspace, role, isLoading: false });
+      } else {
+        setState({ user: null, session: null, profile: null, workspace: null, role: null, isLoading: false });
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         const user = session?.user ?? null;
-        let profile = null;
-        if (user) profile = await fetchProfile(user.id);
-        setState({ user, session, profile, loading: false });
+        if (user) {
+          const { profile, workspace, role } = await fetchProfileAndWorkspace(user.id);
+          setState({ user, session, profile, workspace, role, isLoading: false });
+        } else {
+          setState({ user: null, session: null, profile: null, workspace: null, role: null, isLoading: false });
+        }
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const user = session?.user ?? null;
-      let profile = null;
-      if (user) profile = await fetchProfile(user.id);
-      setState({ user, session, profile, loading: false });
-    });
-
     return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+  }, [fetchProfileAndWorkspace]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setState({ user: null, session: null, profile: null, workspace: null, role: null, isLoading: false });
   };
 
   return { ...state, signOut };
