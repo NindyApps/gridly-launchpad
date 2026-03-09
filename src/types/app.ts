@@ -3,7 +3,8 @@ export type IntentCategory = 'vendor_switch' | 'new_purchase' | 'evaluation' | '
 export type UrgencyTag = 'urgent' | 'standard' | 'monitor';
 export type UserRole = 'admin' | 'analyst' | 'sdr' | 'viewer';
 export type FeedbackType = 'useful' | 'not_useful' | 'false_positive' | 'already_known';
-export type Platform = 'reddit' | 'hackernews' | 'slack';
+export type Platform = 'reddit' | 'hackernews' | 'slack' | 'linkedin';
+export type WorkspacePlan = 'pro' | 'growth' | 'enterprise';
 
 export interface IntentSignal {
   id: string;
@@ -30,12 +31,17 @@ export interface Workspace {
   id: string;
   name: string;
   slug: string;
-  plan: 'pro' | 'growth' | 'enterprise';
+  plan: WorkspacePlan;
   hubspot_token_enc: string | null;
+  hubspot_refresh_token_enc: string | null;
+  hubspot_token_expires_at: string | null;
   slack_webhook_url: string | null;
   alert_confidence_threshold: number;
   seats_limit: number;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Profile {
@@ -45,12 +51,16 @@ export interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   notification_prefs: Record<string, boolean>;
+  onboarding_completed: boolean;
+  onboarding_step: number;
+  last_seen_at: string | null;
   created_at: string;
 }
 
 export interface Tracker {
   id: string;
   workspace_id: string;
+  created_by: string;
   name: string;
   keywords: string[];
   competitor_names: string[];
@@ -58,6 +68,29 @@ export interface Tracker {
   platforms: string[];
   is_active: boolean;
   confidence_override: number | null;
+  signal_count_7d: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HumanFeedback {
+  id: string;
+  signal_id: string;
+  user_id: string;
+  workspace_id: string;
+  feedback_type: FeedbackType;
+  comment: string | null;
+  created_at: string;
+}
+
+export interface ComplianceLog {
+  id: string;
+  workspace_id: string | null;
+  actor_id: string | null;
+  event_type: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 

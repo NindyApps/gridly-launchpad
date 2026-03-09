@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useTrackers, useCreateTracker, useUpdateTracker, useDeleteTracker } from '@/hooks/useTrackers';
+import { useTrackers, useCreateTracker, useUpdateTracker, useDeleteTracker, type CreateTrackerInput } from '@/hooks/useTrackers';
 import { useWorkspaces } from '@/hooks/use-workspaces';
 import { Radio, Plus } from 'lucide-react';
 import type { Tracker } from '@/types/app';
@@ -25,7 +25,7 @@ export default function TrackersPage() {
   const [editing, setEditing] = useState<Tracker | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleCreate = (data: Omit<Tracker, 'id' | 'created_at'>) => {
+  const handleCreate = (data: CreateTrackerInput) => {
     createTracker.mutate(data, { onSuccess: () => setSheetOpen(false) });
   };
 
@@ -34,13 +34,15 @@ export default function TrackersPage() {
     setSheetOpen(true);
   };
 
-  const handleUpdate = (data: Omit<Tracker, 'id' | 'created_at'>) => {
+  const handleUpdate = (data: CreateTrackerInput) => {
     if (!editing) return;
-    updateTracker.mutate({ id: editing.id, ...data }, { onSuccess: () => { setSheetOpen(false); setEditing(null); } });
+    updateTracker.mutate({ id: editing.id, workspace_id: editing.workspace_id, ...data }, { onSuccess: () => { setSheetOpen(false); setEditing(null); } });
   };
 
   const handleToggle = (id: string, active: boolean) => {
-    updateTracker.mutate({ id, is_active: active });
+    const tracker = trackers.find((t) => t.id === id);
+    if (!tracker) return;
+    updateTracker.mutate({ id, workspace_id: tracker.workspace_id, is_active: active });
   };
 
   const handleDelete = () => {

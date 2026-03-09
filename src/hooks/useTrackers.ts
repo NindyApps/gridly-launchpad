@@ -4,6 +4,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import type { Tracker } from '@/types/app';
 
+export type CreateTrackerInput = {
+  workspace_id: string;
+  name: string;
+  keywords: string[];
+  competitor_names: string[];
+  subreddits: string[];
+  platforms: string[];
+  is_active: boolean;
+  confidence_override: number | null;
+};
+
 export function useTrackers(workspaceId: string | null) {
   const supabase = createClient();
 
@@ -30,10 +41,13 @@ export function useCreateTracker() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (tracker: Omit<Tracker, 'id' | 'created_at'>) => {
+    mutationFn: async (input: CreateTrackerInput) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('trackers')
-        .insert(tracker)
+        .insert({ ...input, created_by: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -50,7 +64,7 @@ export function useUpdateTracker() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Tracker> & { id: string }) => {
+    mutationFn: async ({ id, workspace_id, ...updates }: Partial<Omit<Tracker, 'created_by'>> & { id: string; workspace_id: string }) => {
       const { data, error } = await supabase
         .from('trackers')
         .update(updates)

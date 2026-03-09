@@ -7,11 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
-import type { Tracker } from '@/types/app';
+import type { CreateTrackerInput } from '@/hooks/useTrackers';
 
 interface TrackerFormProps {
-  initial?: Partial<Tracker>;
-  onSubmit: (data: Omit<Tracker, 'id' | 'created_at'>) => void;
+  initial?: Partial<CreateTrackerInput>;
+  onSubmit: (data: CreateTrackerInput) => void;
   onCancel?: () => void;
   workspaceId: string;
   isPending?: boolean;
@@ -52,7 +52,7 @@ export function TrackerForm({ initial, onSubmit, onCancel, workspaceId, isPendin
       keywords,
       competitor_names: competitors,
       subreddits,
-      platforms: subreddits.length > 0 ? ['reddit'] : [],
+      platforms: subreddits.length > 0 ? ['reddit'] : ['reddit', 'hackernews'],
       is_active: isActive,
       confidence_override: null,
     });
