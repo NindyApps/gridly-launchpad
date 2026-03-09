@@ -1,13 +1,16 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
 
 export function useWorkspaces() {
   const { user } = useAuth();
-  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(() =>
-    localStorage.getItem("active_workspace_id")
-  );
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("active_workspace_id");
+  });
 
   const { data: workspaces = [], isLoading } = useQuery({
     queryKey: ["workspaces", user?.id],
@@ -22,7 +25,6 @@ export function useWorkspaces() {
     enabled: !!user,
   });
 
-  // Auto-select first workspace if none active
   useEffect(() => {
     if (workspaces.length > 0 && !activeWorkspaceId) {
       setActiveWorkspaceId(workspaces[0].id);

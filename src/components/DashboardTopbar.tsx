@@ -1,4 +1,6 @@
-import { Bell, Check, ChevronDown, LogOut, Plus, User } from "lucide-react";
+"use client";
+
+import { Bell, Check, ChevronDown, LogOut, User } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,17 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/auth";
 import { useWorkspaces } from "@/hooks/use-workspaces";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardTopbar() {
   const { user, signOut } = useAuth();
   const { workspaces, activeWorkspace, switchWorkspace, isLoading } = useWorkspaces();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/login");
+    router.push("/login");
   };
 
   return (
@@ -28,7 +30,6 @@ export function DashboardTopbar() {
       <div className="flex items-center gap-3">
         <SidebarTrigger />
 
-        {/* Workspace switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground">
@@ -69,13 +70,11 @@ export function DashboardTopbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
         </Button>
 
-        {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -89,7 +88,7 @@ export function DashboardTopbar() {
               {user?.email}
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
+            <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />

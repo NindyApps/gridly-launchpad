@@ -1,10 +1,12 @@
-import redditLogo from "@/assets/reddit-logo.png";
-import linkedinLogo from "@/assets/linkedin-logo.png";
+"use client";
+
+
+
 
 const StatsMarquee = () => {
   const items = [
-    { logo: redditLogo, label: "Reddit", stat: "100K+ posts/day" },
-    { logo: linkedinLogo, label: "LinkedIn", stat: "2M+ posts/day" },
+    { logo: "/reddit-logo.png", label: "Reddit", stat: "100K+ posts/day" },
+    { logo: "/linkedin-logo.png", label: "LinkedIn", stat: "2M+ posts/day" },
     { text: "𝕏", label: "X", stat: "500M+ posts/day" },
   ];
 

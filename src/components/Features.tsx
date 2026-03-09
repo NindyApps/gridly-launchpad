@@ -1,35 +1,32 @@
+"use client";
+
 import { motion } from "framer-motion";
-import xLeadsView from "@/assets/x-leads-view.png";
-import linkedinLeadsFeature from "@/assets/linkedin-leads-feature.png";
-import competitorMonitor from "@/assets/competitor-monitor-feature.png";
-import dashboardView from "@/assets/dashboard-view.png";
-import xLeadsOutreach from "@/assets/x-leads-outreach.png";
 
 const features = [
   {
     label: "Discover leads on",
     title: "X (Twitter)",
-    image: xLeadsView,
+    image: "/x-leads-view.png",
   },
   {
     label: "Discover leads on",
     title: "LinkedIn",
-    image: linkedinLeadsFeature,
+    image: "/linkedin-leads-feature.png",
   },
   {
     label: "Monitor Competitors to",
     title: "Steal Leads",
-    image: competitorMonitor,
+    image: "/competitor-monitor-feature.png",
   },
   {
     label: "Track performance with",
     title: "Analytics",
-    image: dashboardView,
+    image: "/dashboard-view.png",
   },
   {
     label: "Intelligent Targeting &",
     title: "AI Outreach",
-    image: xLeadsOutreach,
+    image: "/x-leads-outreach.png",
   },
 ];
 

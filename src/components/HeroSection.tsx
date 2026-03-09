@@ -1,36 +1,50 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import redditLogo from "@/assets/reddit-logo.png";
-import linkedinLogo from "@/assets/linkedin-logo.png";
+
+
 
 const platforms = [
-  { name: "LinkedIn", logo: linkedinLogo },
-  { name: "Reddit", logo: redditLogo },
+  { name: "LinkedIn", logo: "/linkedin-logo.png" },
+  { name: "Reddit", logo: "/reddit-logo.png" },
   { name: "𝕏", logo: null },
 ];
 
+const DOT_DATA = Array.from({ length: 30 }, (_, i) => {
+  return {
+    width: 2 + (Math.abs(Math.sin(i * 2.3)) * 8),
+    height: 2 + (Math.abs(Math.cos(i * 1.7)) * 8),
+    left: 25 + (Math.abs(Math.sin(i * 3.1)) * 50),
+    top: 30 + (Math.abs(Math.cos(i * 2.7)) * 30),
+    opacity: 0.2 + (Math.abs(Math.sin(i * 1.9)) * 0.5),
+    animationDelay: Math.abs(Math.sin(i * 4.1)) * 4,
+    animationDuration: 2 + Math.abs(Math.cos(i * 5.3)) * 3,
+  };
+});
+
 const FloatingDots = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {Array.from({ length: 30 }).map((_, i) => (
+    {DOT_DATA.map((dot, i) => (
       <div
         key={i}
         className="absolute rounded-full animate-pulse-dot"
         style={{
-          width: `${2 + Math.random() * 8}px`,
-          height: `${2 + Math.random() * 8}px`,
-          left: `${25 + Math.random() * 50}%`,
-          top: `${30 + Math.random() * 30}%`,
-          backgroundColor: i % 3 === 0 
-            ? "hsl(var(--accent))" 
-            : i % 3 === 1 
-              ? "hsl(var(--muted-foreground))" 
+          width: `${dot.width}px`,
+          height: `${dot.height}px`,
+          left: `${dot.left}%`,
+          top: `${dot.top}%`,
+          backgroundColor: i % 3 === 0
+            ? "hsl(var(--accent))"
+            : i % 3 === 1
+              ? "hsl(var(--muted-foreground))"
               : "hsl(var(--foreground) / 0.3)",
-          opacity: 0.2 + Math.random() * 0.5,
-          animationDelay: `${Math.random() * 4}s`,
-          animationDuration: `${2 + Math.random() * 3}s`,
+          opacity: dot.opacity,
+          animationDelay: `${dot.animationDelay}s`,
+          animationDuration: `${dot.animationDuration}s`,
         }}
       />
     ))}

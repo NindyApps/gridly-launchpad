@@ -1,47 +1,90 @@
 # OCTOPILOT — Replit Project
 
 ## Overview
-OCTOPILOT is an AI-powered social listening and lead generation platform. It is a pure frontend SPA built with React + Vite + TypeScript, using Supabase for authentication and database, and styled with Tailwind CSS + shadcn/ui.
+OCTOPILOT is a B2B SaaS Revenue Signal Intelligence platform. It monitors public communities (Reddit, Hacker News) in real-time, classifies buying intent signals using AI, and injects verified opportunities directly into the sales team's CRM — without ever posting to any platform (Zero-Write Architecture).
 
 ## Architecture
 
-- **Frontend**: React 18 + TypeScript + Vite (port 5000)
+- **Framework**: Next.js 14 App Router (migrated from Vite + React Router)
+- **Language**: TypeScript
 - **Auth & Database**: Supabase (external — project ID: `pmhybixfrspmmspipfhi`)
-- **UI**: shadcn/ui components, Tailwind CSS, Radix UI primitives
-- **State**: TanStack React Query
-- **Routing**: React Router DOM v6
+- **UI**: shadcn/ui components, Tailwind CSS, Radix UI, framer-motion
+- **State**: TanStack React Query v5
+- **Routing**: Next.js App Router (file-based)
 
-## Key Files
+## Directory Structure
 
-- `src/App.tsx` — root component with routes
-- `src/integrations/supabase/client.ts` — Supabase client setup
-- `src/lib/auth.ts` — `useAuth` hook (Supabase auth state)
-- `src/hooks/use-workspaces.ts` — workspace data hook
-- `src/layouts/DashboardLayout.tsx` — protected dashboard shell
-- `src/pages/` — all page components (Login, Register, Onboarding, Dashboard, Signals, Pipeline, CRM, Workflows, Compliance, Settings)
-- `supabase/` — DB migrations and Edge Functions (deployed to Supabase, not Replit)
+```
+src/app/                          # Next.js App Router
+  layout.tsx                      # Root layout (providers, global CSS)
+  page.tsx                        # Landing page (/)
+  not-found.tsx                   # 404 page
+  providers.tsx                   # TanStack Query + Toaster providers
+  globals.css                     # Global styles + Tailwind + CSS vars
+  (auth)/                         # Auth route group (no dashboard chrome)
+    login/page.tsx
+    register/page.tsx
+    onboarding/page.tsx
+  (dashboard)/                    # Dashboard route group (protected)
+    layout.tsx                    # Auth guard + sidebar/topbar shell
+    dashboard/page.tsx            # /dashboard
+    dashboard/signals/page.tsx    # /dashboard/signals
+    dashboard/pipeline/page.tsx   # /dashboard/pipeline
+    dashboard/crm/page.tsx        # /dashboard/crm
+    dashboard/workflows/page.tsx  # /dashboard/workflows
+    dashboard/compliance/page.tsx # /dashboard/compliance
+    dashboard/settings/page.tsx   # /dashboard/settings
+
+src/components/                   # Shared components
+  Navbar.tsx                      # Landing page navbar (Next.js Link)
+  NavLink.tsx                     # Active-aware link (usePathname)
+  DashboardSidebar.tsx            # Collapsible sidebar
+  DashboardTopbar.tsx             # Topbar with workspace switcher + user menu
+  HeroSection.tsx, Features.tsx,  # Landing page sections
+  ...etc
+
+src/lib/
+  auth.ts                         # useAuth hook (Supabase auth state)
+  supabase/client.ts              # Browser Supabase client (@supabase/ssr)
+  supabase/server.ts              # Server Supabase client (@supabase/ssr)
+
+src/hooks/
+  use-workspaces.ts               # Workspace data + active workspace state
+
+src/integrations/supabase/
+  types.ts                        # Generated DB types
+  client.ts                       # Re-exports from lib/supabase/client
+```
 
 ## Environment Variables
 
-Set in `.env` (VITE_ prefix required for Vite client access):
-- `VITE_SUPABASE_URL` — Supabase project URL
-- `VITE_SUPABASE_PUBLISHABLE_KEY` — Supabase anon/public key
+Stored in `.env.local` (never committed):
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon/public key
 
 ## Running the App
 
 ```bash
-npm run dev   # starts Vite dev server on port 5000
-npm run build # production build
+npm run dev     # Next.js dev server on port 5000
+npm run build   # Production build
+npm start       # Production server on port 5000
 ```
 
-## Supabase Notes
+## Supabase Setup
 
 - Uses Row Level Security (RLS) on all tables
-- `create-workspace` Edge Function runs server-side on Supabase (service role key never exposed to client)
-- DB schema defined in `supabase/migrations/`
+- `create-workspace` Edge Function creates workspace + owner membership (service role)
+- DB schema in `supabase/migrations/`
+- Tables: `workspaces`, `workspace_members`, `user_profiles`, `audit_logs`
 
-## Migration Notes (Lovable → Replit)
+## Public Assets
 
-- Removed `lovable-tagger` devDependency and plugin from `vite.config.ts`
-- Updated Vite server to bind `0.0.0.0` on port `5000` with `allowedHosts: true` for Replit proxy compatibility
-- No backend server needed — all data operations go through Supabase client SDK with RLS
+Static images are in `/public/` and referenced as `/image-name.png`.
+
+## Migration History
+
+- Originally built in Lovable.dev (Vite + React Router)
+- Migrated to Next.js 14 App Router on Replit
+- Supabase remains as auth/database backend (no change)
+- All routing replaced from react-router-dom → next/navigation + next/link
+- Asset imports replaced with public folder paths

@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -9,7 +11,6 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-accent-foreground">
@@ -18,10 +19,9 @@ const Navbar = () => {
               <path d="M8 18L6 22M16 18L18 22M10 19L9 22M14 19L15 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
           </div>
-          <span className="font-display font-bold text-lg text-foreground tracking-tight">COPIT</span>
+          <span className="font-display font-bold text-lg text-foreground tracking-tight">OCTOPILOT</span>
         </div>
 
-        {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
           <a href="#about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</a>
           <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
@@ -32,24 +32,22 @@ const Navbar = () => {
 
         <div className="hidden md:block">
           <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
-            <Link to="/login">Login</Link>
+            <Link href="/login">Login</Link>
           </Button>
         </div>
 
-        {/* Mobile toggle */}
         <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-3">
           <a href="#about" className="block text-sm font-medium text-muted-foreground">About</a>
           <a href="#resources" className="block text-sm font-medium text-muted-foreground">Resources</a>
           <a href="#pricing" className="block text-sm font-medium text-muted-foreground">Pricing</a>
           <Button asChild className="w-full bg-primary text-primary-foreground rounded-full">
-            <Link to="/login">Login</Link>
+            <Link href="/login">Login</Link>
           </Button>
         </div>
       )}

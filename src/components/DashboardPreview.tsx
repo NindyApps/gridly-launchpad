@@ -1,5 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-import dashboardView from "@/assets/dashboard-view.png";
+const dashboardView = "/dashboard-view.png";
 
 const DashboardPreview = () => {
   return (

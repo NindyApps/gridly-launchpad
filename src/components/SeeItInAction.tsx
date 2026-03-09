@@ -1,13 +1,12 @@
+"use client";
+
 import { useState } from "react";
 import { motion } from "framer-motion";
-import redditLeadsView from "@/assets/reddit-leads-view.png";
-import linkedinLeadsView from "@/assets/linkedin-leads-view.png";
-
 const SeeItInAction = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tabs = [
-    { label: "Reddit", image: redditLeadsView },
-    { label: "LinkedIn", image: linkedinLeadsView },
+    { label: "Reddit", image: "/reddit-leads-view.png" },
+    { label: "LinkedIn", image: "/linkedin-leads-view.png" },
   ];
 
   return (
