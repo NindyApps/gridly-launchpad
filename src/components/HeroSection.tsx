@@ -14,17 +14,16 @@ const platforms = [
   { name: "𝕏", logo: null },
 ];
 
-const DOT_DATA = Array.from({ length: 30 }, (_, i) => {
-  return {
-    width: 2 + (Math.abs(Math.sin(i * 2.3)) * 8),
-    height: 2 + (Math.abs(Math.cos(i * 1.7)) * 8),
-    left: 25 + (Math.abs(Math.sin(i * 3.1)) * 50),
-    top: 30 + (Math.abs(Math.cos(i * 2.7)) * 30),
-    opacity: 0.2 + (Math.abs(Math.sin(i * 1.9)) * 0.5),
-    animationDelay: Math.abs(Math.sin(i * 4.1)) * 4,
-    animationDuration: 2 + Math.abs(Math.cos(i * 5.3)) * 3,
-  };
-});
+const r = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
+const DOT_DATA = Array.from({ length: 30 }, (_, i) => ({
+  width: r(2 + Math.abs(Math.sin(i * 2.3)) * 8),
+  height: r(2 + Math.abs(Math.cos(i * 1.7)) * 8),
+  left: r(25 + Math.abs(Math.sin(i * 3.1)) * 50),
+  top: r(30 + Math.abs(Math.cos(i * 2.7)) * 30),
+  opacity: r(0.2 + Math.abs(Math.sin(i * 1.9)) * 0.5),
+  animationDelay: r(Math.abs(Math.sin(i * 4.1)) * 4),
+  animationDuration: r(2 + Math.abs(Math.cos(i * 5.3)) * 3),
+}));
 
 const FloatingDots = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">

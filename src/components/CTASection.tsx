@@ -4,25 +4,36 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+const r = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
+const CTA_DOTS = Array.from({ length: 25 }, (_, i) => ({
+  width: r(2 + Math.abs(Math.sin(i * 2.7)) * 7),
+  height: r(2 + Math.abs(Math.cos(i * 1.3)) * 7),
+  left: r(15 + Math.abs(Math.sin(i * 3.7)) * 70),
+  top: r(20 + Math.abs(Math.cos(i * 2.1)) * 60),
+  opacity: r(0.15 + Math.abs(Math.sin(i * 1.5)) * 0.4),
+  animationDelay: r(Math.abs(Math.sin(i * 5.1)) * 4),
+  animationDuration: r(2 + Math.abs(Math.cos(i * 4.3)) * 3),
+}));
+
 const FloatingDots = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {Array.from({ length: 25 }).map((_, i) => (
+    {CTA_DOTS.map((dot, i) => (
       <div
         key={i}
         className="absolute rounded-full animate-pulse-dot"
         style={{
-          width: `${2 + Math.random() * 7}px`,
-          height: `${2 + Math.random() * 7}px`,
-          left: `${15 + Math.random() * 70}%`,
-          top: `${20 + Math.random() * 60}%`,
+          width: `${dot.width}px`,
+          height: `${dot.height}px`,
+          left: `${dot.left}%`,
+          top: `${dot.top}%`,
           backgroundColor: i % 3 === 0
             ? "hsl(var(--accent))"
             : i % 3 === 1
               ? "hsl(var(--muted-foreground))"
               : "hsl(var(--foreground) / 0.25)",
-          opacity: 0.15 + Math.random() * 0.4,
-          animationDelay: `${Math.random() * 4}s`,
-          animationDuration: `${2 + Math.random() * 3}s`,
+          opacity: dot.opacity,
+          animationDelay: `${dot.animationDelay}s`,
+          animationDuration: `${dot.animationDuration}s`,
         }}
       />
     ))}

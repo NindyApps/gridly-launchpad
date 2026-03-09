@@ -1,0 +1,203 @@
+── PROMPT P01 — Copy dan paste ke Replit Agent ──
+Create a new full-stack web application called OCTOPILOT.
+This is a B2B SaaS platform for revenue signal intelligence.
+ 
+TECH STACK:
+- Framework: Next.js 14 with App Router (NOT pages router)
+- Language: TypeScript with strict mode enabled
+- Styling: Tailwind CSS v3 + shadcn/ui component library
+- Database/Auth: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
+- Package manager: npm
+ 
+FOLDER STRUCTURE — create exactly this:
+octopilot/
+├── app/                     # Next.js App Router pages
+│   ├── (auth)/              # Route group: public auth pages
+│   │   ├── login/page.tsx
+│   │   ├── signup/page.tsx
+│   │   └── accept-invite/page.tsx
+│   ├── (app)/               # Route group: protected app pages
+│   │   ├── layout.tsx       # App shell with sidebar
+│   │   ├── dashboard/page.tsx
+│   │   ├── trackers/page.tsx
+│   │   ├── analytics/page.tsx
+│   │   └── settings/
+│   │       ├── crm/page.tsx
+│   │       ├── alerts/page.tsx
+│   │       ├── team/page.tsx
+│   │       └── billing/page.tsx
+│   ├── onboarding/page.tsx
+│   ├── api/                 # API routes
+│   │   ├── crm/
+│   │   │   └── hubspot/
+│   │   │       ├── connect/route.ts
+│   │   │       ├── callback/route.ts
+│   │   │       └── inject/route.ts
+│   │   └── webhooks/
+│   │       └── stripe/route.ts
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Landing page
+│   └── globals.css
+├── components/
+│   ├── ui/                  # shadcn/ui components (auto-generated)
+│   ├── layout/              # AppSidebar, TopBar, AppLayout
+│   ├── signals/             # SignalCard, SignalFeed, SignalFilters
+│   ├── trackers/            # TrackerCard, TrackerForm, TrackerList
+│   ├── auth/                # LoginForm, SignupForm
+│   └── shared/              # EmptyState, LoadingSpinner, ConfirmDialog
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts        # Browser client
+│   │   ├── server.ts        # Server client (uses service role)
+│   │   └── middleware.ts    # Auth middleware
+│   ├── openai.ts            # OpenAI client
+│   ├── hubspot.ts           # HubSpot API helpers
+│   └── utils.ts             # cn(), formatDate(), etc
+├── hooks/
+│   ├── useAuth.ts           # Auth context and user state
+│   ├── useSignals.ts        # Signal feed with realtime
+│   └── useTrackers.ts       # Tracker CRUD operations
+├── types/
+│   ├── database.ts          # Supabase generated types
+│   └── app.ts               # App-specific TypeScript types
+├── middleware.ts             # Next.js route protection
+├── .env.local               # All environment variables
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
+ 
+ENVIRONMENT VARIABLES — create .env.local with these keys (empty values):
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+OPENAI_API_KEY=
+HUBSPOT_CLIENT_ID=
+HUBSPOT_CLIENT_SECRET=
+HUBSPOT_REDIRECT_URI=http://localhost:3000/api/crm/hubspot/callback
+REDDIT_CLIENT_ID=
+REDDIT_CLIENT_SECRET=
+REDDIT_USER_AGENT=OCTOPILOT/1.0
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=noreply@octopilot.io
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+ENCRYPTION_KEY=
+ 
+DEPENDENCIES TO INSTALL:
+npm install @supabase/supabase-js @supabase/ssr
+npm install openai
+npm install @stripe/stripe-js stripe
+npm install resend
+npm install recharts
+npm install date-fns
+npm install zod
+npm install react-hook-form @hookform/resolvers
+ 
+SHADCN/UI — initialize and install these components:
+npx shadcn@latest init (use: Default style, Slate base color, CSS variables yes)
+npx shadcn@latest add button card input label badge
+npx shadcn@latest add dialog drawer sheet
+npx shadcn@latest add dropdown-menu navigation-menu
+npx shadcn@latest add table tabs toast
+npx shadcn@latest add slider switch progress
+npx shadcn@latest add avatar separator skeleton
+ 
+TYPESCRIPT TYPES — create types/app.ts with these types:
+ 
+export type IntentLevel = 'high' | 'medium' | 'low';
+export type IntentCategory = 'vendor_switch' | 'new_purchase' | 'evaluation' | 'complaint';
+export type UrgencyTag = 'urgent' | 'standard' | 'monitor';
+export type UserRole = 'admin' | 'analyst' | 'sdr' | 'viewer';
+export type FeedbackType = 'useful' | 'not_useful' | 'false_positive' | 'already_known';
+export type Platform = 'reddit' | 'hackernews' | 'slack';
+ 
+export interface IntentSignal {
+  id: string;
+  workspace_id: string;
+  tracker_id: string;
+  platform: Platform;
+  post_url: string;
+  author_handle: string | null;
+  post_timestamp: string | null;
+  intent_category: IntentCategory;
+  intent_level: IntentLevel;
+  confidence_score: number;
+  pain_domain: string | null;
+  ai_summary: string;
+  suggested_opener: string | null;
+  urgency_tag: UrgencyTag;
+  crm_injected: boolean;
+  crm_task_id: string | null;
+  dismissed: boolean;
+  created_at: string;
+}
+ 
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  plan: 'pro' | 'growth' | 'enterprise';
+  hubspot_token_enc: string | null;
+  slack_webhook_url: string | null;
+  alert_confidence_threshold: number;
+  seats_limit: number;
+  created_at: string;
+}
+ 
+export interface Profile {
+  id: string;
+  workspace_id: string;
+  role: UserRole;
+  full_name: string | null;
+  avatar_url: string | null;
+  notification_prefs: Record<string, boolean>;
+  created_at: string;
+}
+ 
+export interface Tracker {
+  id: string;
+  workspace_id: string;
+  name: string;
+  keywords: string[];
+  competitor_names: string[];
+  subreddits: string[];
+  platforms: string[];
+  is_active: boolean;
+  confidence_override: number | null;
+  created_at: string;
+}
+ 
+SUPABASE CLIENT — create lib/supabase/client.ts:
+import { createBrowserClient } from '@supabase/ssr'
+export const createClient = () => createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+ 
+Create lib/supabase/server.ts for server-side usage with createServerClient.
+ 
+MIDDLEWARE — create middleware.ts that:
+- Protects all /(app)/* routes: redirect to /login if no session
+- Redirects authenticated users from /login and /signup to /dashboard
+- Allows public access to: /, /login, /signup, /accept-invite, /api/*
+ 
+LANDING PAGE — app/page.tsx:
+Build a complete landing page with these sections:
+1. Navbar: OCTOPILOT logo (left), nav links (Features, Pricing, About), 
+   Login button + Get Started button (right, primary color)
+2. Hero: Large headline 'Find B2B Buyers The Moment They Say They Need You'
+   Subheadline about AI signal detection from Reddit/HN, CTA buttons
+   Hero image/mockup placeholder showing signal card UI
+3. How It Works: 3-step process (Monitor → Classify → Inject to CRM)
+4. Features: 6 feature cards with icons
+5. Social Proof: 3 testimonial cards (placeholder content)
+6. Pricing: 3 tier cards (Pro $299, Growth $599, Enterprise $1200)
+7. FAQ: 5 questions accordion
+8. CTA Banner: Full-width dark background with Get Started button
+9. Footer: Logo, links, copyright
+ 
+Design: Dark theme. Primary color indigo #4F46E5. Use Tailwind classes.
+All components must be TypeScript with proper prop types.
+Ensure npm run dev starts without errors before finishing.

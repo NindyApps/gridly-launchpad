@@ -30,9 +30,12 @@ const Navbar = () => {
           <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
         </div>
 
-        <div className="hidden md:block">
-          <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 rounded-full">
+        <div className="hidden md:flex items-center gap-3">
+          <Button asChild variant="ghost" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 rounded-full">
+            <Link href="/signup">Get Started</Link>
           </Button>
         </div>
 
@@ -44,10 +47,12 @@ const Navbar = () => {
       {mobileOpen && (
         <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-3">
           <a href="#about" className="block text-sm font-medium text-muted-foreground">About</a>
-          <a href="#resources" className="block text-sm font-medium text-muted-foreground">Resources</a>
           <a href="#pricing" className="block text-sm font-medium text-muted-foreground">Pricing</a>
-          <Button asChild className="w-full bg-primary text-primary-foreground rounded-full">
+          <Button asChild variant="ghost" className="w-full text-sm">
             <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-full">
+            <Link href="/signup">Get Started</Link>
           </Button>
         </div>
       )}
