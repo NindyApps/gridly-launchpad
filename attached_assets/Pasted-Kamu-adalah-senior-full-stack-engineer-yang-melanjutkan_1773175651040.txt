@@ -1,0 +1,429 @@
+Kamu adalah senior full-stack engineer yang melanjutkan pengembangan 
+OCTOPILOT — platform intelijen sinyal pembelian untuk tim sales B2B.
+
+Sebelum menulis satu baris kode pun, baca dulu file replit.md di root 
+project untuk memahami konvensi, aturan kerja, dan checkpoint yang berlaku.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KONTEKS PROJECT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OCTOPILOT memantau Reddit & Hacker News secara real-time untuk menemukan 
+postingan yang menunjukkan sinyal beli (misalnya "looking to switch from 
+Salesforce", "anyone recommend a CRM?"). Sinyal diklasifikasi dengan AI 
+(GPT-4o-mini), lalu didorong ke HubSpot CRM sebagai task follow-up.
+
+Target user: Tim sales & marketing B2B SaaS.
+
+STACK TEKNOLOGI:
+- Framework  : Next.js 14.2.35 (App Router)
+- Language   : TypeScript 5.8 (strict mode)
+- Styling    : Tailwind CSS 3.4.17 + shadcn/ui (Radix UI)
+- Animation  : motion/react 12.35.2
+- Icons      : lucide-react 0.462.0
+- Auth + DB  : Supabase (@supabase/ssr 0.9.0)
+- State      : TanStack Query v5
+- Forms      : react-hook-form + zod
+- Charts     : Recharts 2.15.4
+- AI         : OpenAI SDK (GPT-4o-mini)
+- Email      : Resend (installed, belum dipakai)
+- Billing    : Stripe 20.4.1
+- CRM        : HubSpot REST API
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATUS FITUR SAAT INI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SUDAH BERJALAN (JANGAN DIUBAH/DIRUSAK):
+- Landing page marketing (src/sections/)
+- Auth: login, signup, Google OAuth, password reset (src/app/(auth)/)
+- Middleware proteksi route (src/middleware.ts)
+- Onboarding 4 langkah dengan state ke DB (src/app/onboarding/)
+- Dashboard stat cards real-time (src/app/(app)/dashboard/)
+- Signal feed dengan filter + Supabase Realtime (src/components/signals/)
+- Feedback loop per signal (src/app/api/feedback/)
+- HubSpot inject + OAuth connect/disconnect (src/app/api/crm/hubspot/)
+- Tracker CRUD (src/app/(app)/trackers/)
+- Analytics charts (src/app/(app)/analytics/)
+- Settings: Alerts config, Team invite (src/app/(app)/settings/)
+- Stripe webhook handler (src/app/api/webhooks/stripe/)
+- OpenAI classification (src/lib/openai.ts)
+- Dev seed tool (src/app/api/dev/seed/)
+
+⚠️ SETENGAH JALAN (perlu dilengkapi logikanya):
+- Billing UI ada tapi tombol Upgrade tidak terhubung Stripe Checkout
+- Usage counter di billing hardcoded (harusnya dari DB)
+- Config alerts tersimpan ke DB tapi notifikasi belum dikirim
+- HubSpot token disimpan tapi auto-refresh belum ada
+
+❌ BELUM ADA (harus dibuat dari nol):
+- Signal Ingestion Engine (PALING KRITIS)
+- Stripe Checkout flow
+- HubSpot token refresh otomatis
+- Alert notification delivery (email/Slack)
+- Email transaksional via Resend
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ATURAN KERJA WAJIB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. SELALU baca replit.md sebelum mulai
+2. Kerjakan SATU langkah dalam satu waktu
+3. Setelah setiap langkah: jalankan `npm run dev` dan pastikan tidak ada error
+4. Jika build sukses, catat sebagai checkpoint sebelum lanjut
+5. JANGAN menghapus atau memodifikasi fitur yang sudah ✅ berjalan
+6. Setiap file baru atau yang dimodifikasi harus disebutkan eksplisit
+7. Jika perlu environment variable baru, tambahkan ke .env.example dan 
+   beritahu user variable apa yang perlu diisi
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+URUTAN IMPLEMENTASI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Kerjakan dalam urutan ini — jangan loncat:
+
+═══════════════════════════════════════
+LANGKAH 1 — Signal Ingestion Engine
+(PRIORITAS TERTINGGI — tanpa ini produk tidak berguna)
+═══════════════════════════════════════
+
+Tujuan: Membuat sistem yang secara otomatis mengambil postingan dari 
+Reddit dan Hacker News, mencocokkan dengan tracker aktif, 
+mengklasifikasi dengan OpenAI, dan menyimpan ke DB.
+
+1a. Buat file src/lib/scrapers/reddit.ts
+    - Fungsi: fetchRedditPosts(subreddit: string, keywords: string[])
+    - Gunakan Reddit JSON API: https://www.reddit.com/r/{sub}/new.json
+    - Filter postingan yang mengandung salah satu keyword di title/body
+    - Return array posts dengan field: id, title, body, url, author, 
+      created_at, subreddit, score
+    - Handle rate limit dengan exponential backoff
+    - JANGAN gunakan library scraping berat — cukup fetch + JSON
+
+1b. Buat file src/lib/scrapers/hackernews.ts
+    - Fungsi: fetchHNPosts(keywords: string[])
+    - Gunakan Algolia HN Search API: 
+      https://hn.algolia.com/api/v1/search_by_date
+    - Query parameter: query="{keyword}", tags=story, 
+      numericFilters=created_at_i>{unix_24h_ago}
+    - Return format sama seperti reddit.ts
+    - Handle pagination (hitsPerPage: 20)
+
+1c. Buat file src/lib/ingest.ts
+    - Fungsi utama: runIngestionForTracker(trackerId: string)
+    - Alur:
+      1. Ambil tracker dari DB berdasarkan trackerId (include keywords, 
+         competitor_names, subreddits, platform)
+      2. Jalankan scraper sesuai platform tracker (reddit/hn/keduanya)
+      3. Untuk setiap post yang ditemukan, cek apakah sudah ada di tabel 
+         intent_signals berdasarkan external_id (hindari duplikat)
+      4. Kirim post ke fungsi classifySignal() di src/lib/openai.ts
+      5. Simpan hasil ke tabel intent_signals di Supabase
+    - Fungsi pendukung: runIngestionForAllTrackers()
+      → Ambil semua tracker aktif (is_active = true) dari semua workspace
+      → Jalankan runIngestionForTracker() untuk masing-masing
+      → Log hasil ke console: berapa post ditemukan, berapa disimpan
+
+1d. Buat API route src/app/api/ingest/run/route.ts
+    - Method: POST
+    - Auth: Cek header Authorization dengan nilai dari env CRON_SECRET
+    - Body (optional): { trackerId?: string }
+    - Jika trackerId ada → jalankan untuk satu tracker
+    - Jika tidak ada → jalankan untuk semua tracker aktif
+    - Response: { success: true, processed: number, saved: number }
+    - Tambahkan CRON_SECRET ke .env.example
+
+1e. Buat Supabase Edge Function (opsional tapi direkomendasikan)
+    - File: supabase/functions/ingest-signals/index.ts
+    - Schedule: setiap 15 menit via pg_cron atau Supabase cron
+    - Isi: POST ke /api/ingest/run dengan header CRON_SECRET
+    - Alternatif jika Edge Function tidak tersedia: dokumentasikan cara 
+      setup cron job eksternal (misalnya via cron-job.org) yang hit 
+      endpoint /api/ingest/run
+
+VERIFIKASI LANGKAH 1:
+- `npm run dev` → tidak ada TypeScript error
+- Hit POST /api/ingest/run dengan Postman/curl + header Authorization yang benar
+- Cek tabel intent_signals di Supabase → harus ada data baru masuk
+- Buka /dashboard → signal feed harus menampilkan sinyal nyata (bukan seed)
+- `npm run build` → sukses tanpa error
+
+CHECKPOINT 1: Jika semua verifikasi lewat, commit/catat sebagai 
+"feat: signal ingestion engine"
+
+═══════════════════════════════════════
+LANGKAH 2 — Stripe Checkout Flow
+═══════════════════════════════════════
+
+Tujuan: Menghubungkan tombol "Upgrade" di halaman Billing ke 
+Stripe Checkout Session yang nyata.
+
+2a. Buat API route src/app/api/billing/checkout/route.ts
+    - Method: POST
+    - Auth: user harus login (cek session Supabase)
+    - Body: { priceId: string, planName: string }
+    - Logic:
+      1. Ambil atau buat Stripe Customer dari user email
+         → Simpan stripe_customer_id ke tabel workspaces atau profiles
+      2. Buat Stripe Checkout Session:
+         - mode: 'subscription'
+         - success_url: {origin}/settings/billing?success=true
+         - cancel_url: {origin}/settings/billing?canceled=true
+         - customer: stripe_customer_id
+         - line_items: [{ price: priceId, quantity: 1 }]
+         - metadata: { workspaceId: workspace.id }
+      3. Return { url: session.url }
+    - Tambahkan STRIPE_SECRET_KEY ke .env.example (mungkin sudah ada)
+
+2b. Definisikan Stripe Price IDs di src/lib/constants/plans.ts
+    - Buat file baru dengan struktur:
+      export const PLANS = {
+        pro: {
+          name: 'Pro',
+          price: 299,
+          priceId: process.env.STRIPE_PRO_PRICE_ID!,
+          features: [...],
+          limits: { signals: 500, trackers: 10, members: 5 }
+        },
+        growth: {
+          name: 'Growth', 
+          price: 599,
+          priceId: process.env.STRIPE_GROWTH_PRICE_ID!,
+          features: [...],
+          limits: { signals: 2000, trackers: 50, members: 20 }
+        },
+        enterprise: {
+          name: 'Enterprise',
+          price: 1200,
+          priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID!,
+          features: [...],
+          limits: { signals: -1, trackers: -1, members: -1 } // unlimited
+        }
+      }
+    - Tambahkan STRIPE_PRO_PRICE_ID, STRIPE_GROWTH_PRICE_ID, 
+      STRIPE_ENTERPRISE_PRICE_ID ke .env.example
+
+2c. Update halaman billing src/app/(app)/settings/billing/page.tsx
+    - Ganti tombol "Upgrade" yang tidak berfungsi dengan fungsi async:
+      1. Call POST /api/billing/checkout dengan priceId yang sesuai
+      2. Redirect user ke session.url (Stripe hosted checkout)
+    - Tambahkan loading state di tombol saat checkout sedang dibuat
+    - Tampilkan toast error jika checkout gagal
+    - Handle query params ?success=true dan ?canceled=true:
+      → success: tampilkan toast "Subscription activated! 🎉"
+      → canceled: tampilkan toast "Checkout was canceled"
+
+2d. Hitung usage dinamis dari DB
+    - Ganti angka hardcoded (127 / 500) dengan query real:
+      → Total signals bulan ini: COUNT dari intent_signals WHERE 
+         workspace_id = X AND created_at >= start_of_month
+      → Active trackers: COUNT dari trackers WHERE workspace_id = X 
+         AND is_active = true
+      → Team members: COUNT dari workspace_members WHERE workspace_id = X
+    - Buat fungsi helper di src/lib/usage.ts: getWorkspaceUsage(workspaceId)
+    - Tampilkan progress bar dengan data dinamis
+
+2e. Update Stripe webhook di src/app/api/webhooks/stripe/route.ts
+    - Pastikan event checkout.session.completed sudah ditangani:
+      → Update kolom subscription_status dan plan_name di tabel workspaces
+      → Simpan stripe_subscription_id
+    - Pastikan customer.subscription.deleted sudah ditangani:
+      → Reset workspace ke plan free/inactive
+
+VERIFIKASI LANGKAH 2:
+- `npm run dev` → tidak ada error
+- Buka /settings/billing → tombol Upgrade tidak lagi disabled/kosong
+- Klik "Upgrade to Pro" → harus redirect ke Stripe Checkout (gunakan 
+  test mode keys)
+- Selesaikan checkout dengan kartu test Stripe (4242 4242 4242 4242)
+- Cek tabel workspaces di Supabase → subscription_status harus terupdate
+- Usage counter harus menampilkan angka dari DB, bukan hardcoded
+- `npm run build` → sukses
+
+CHECKPOINT 2: "feat: stripe checkout flow"
+
+═══════════════════════════════════════
+LANGKAH 3 — HubSpot Token Refresh
+═══════════════════════════════════════
+
+Tujuan: Token OAuth HubSpot kedaluwarsa ~30 menit. 
+Implementasi auto-refresh agar inject ke CRM tidak gagal.
+
+3a. Buat fungsi src/lib/hubspot.ts (extend file yang sudah ada)
+    - Tambahkan fungsi: refreshHubSpotToken(workspaceId: string)
+    - Logic:
+      1. Ambil hubspot_refresh_token_enc dari tabel workspaces
+      2. Dekripsi token (gunakan metode enkripsi yang sudah ada di project)
+      3. POST ke https://api.hubapi.com/oauth/v1/token dengan:
+         grant_type: 'refresh_token'
+         client_id: HUBSPOT_CLIENT_ID
+         client_secret: HUBSPOT_CLIENT_SECRET
+         redirect_uri: HUBSPOT_REDIRECT_URI
+         refresh_token: decryptedRefreshToken
+      4. Enkripsi access_token dan refresh_token baru
+      5. Update workspaces: hubspot_access_token_enc, 
+         hubspot_refresh_token_enc, hubspot_token_expires_at
+
+3b. Buat fungsi wrapper: getValidHubSpotToken(workspaceId: string)
+    - Cek hubspot_token_expires_at di DB
+    - Jika expires dalam < 5 menit → jalankan refreshHubSpotToken() dulu
+    - Return access token yang valid
+    - Gunakan fungsi ini di semua tempat yang butuh HubSpot token
+
+3c. Update src/app/api/crm/hubspot/inject/route.ts
+    - Ganti pengambilan token langsung dari DB dengan 
+      getValidHubSpotToken(workspaceId)
+    - Tangani error jika refresh gagal (tampilkan pesan yang jelas ke user)
+
+3d. Tambahkan kolom hubspot_token_expires_at ke tabel workspaces 
+    jika belum ada:
+    - Buat file migrasi SQL: supabase/migrations/add_hubspot_token_expiry.sql
+    - Isi: ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS 
+      hubspot_token_expires_at TIMESTAMPTZ;
+    - Update callback OAuth di src/app/api/crm/hubspot/callback/route.ts:
+      → Hitung dan simpan expires_at saat token pertama kali diterima
+      → expires_at = now() + expires_in detik (dari response HubSpot)
+
+VERIFIKASI LANGKAH 3:
+- `npm run dev` → tidak ada error
+- Connect HubSpot, tunggu 35 menit (atau manual set expires_at ke masa lalu 
+  di DB untuk simulasi), lalu coba inject signal
+- Inject harus tetap sukses (tidak gagal karena expired token)
+- Cek console log → harus ada log "HubSpot token refreshed for workspace X"
+- `npm run build` → sukses
+
+CHECKPOINT 3: "feat: hubspot token auto-refresh"
+
+═══════════════════════════════════════
+LANGKAH 4 — Alert Notification Delivery
+═══════════════════════════════════════
+
+Tujuan: Saat sinyal baru dengan confidence >= threshold tersimpan ke DB,
+kirim notifikasi ke email (via Resend) dan/atau Slack webhook.
+
+4a. Buat fungsi src/lib/notifications.ts
+    - Fungsi: sendAlertNotification(signal: Signal, workspace: Workspace)
+    - Logic:
+      1. Ambil config alerts workspace: confidence_threshold, 
+         slack_webhook_url, notification_email dari tabel alert_configs 
+         (atau kolom di workspaces — sesuaikan dengan struktur DB yang ada)
+      2. Cek apakah signal.confidence_score >= threshold
+      3. Jika ya, kirim ke channel yang aktif:
+         → Email jika notification_email ada
+         → Slack jika slack_webhook_url ada
+
+4b. Implementasi email via Resend (src/lib/email.ts — buat baru)
+    - Setup Resend client dengan RESEND_API_KEY
+    - Buat fungsi sendSignalAlertEmail(to: string, signal: Signal)
+    - Template email:
+      Subject: "🎯 New High-Intent Signal: {signal.title}"
+      Body HTML (inline, tidak perlu file terpisah):
+      - Judul sinyal
+      - Platform (Reddit/HN) + subreddit/thread
+      - Confidence score + intent level (High/Medium/Low)
+      - AI summary
+      - Suggested opener
+      - Link "View Signal" → {app_url}/dashboard?signal={signal.id}
+      - Link "Push to HubSpot" → tombol CTA
+    - Tambahkan RESEND_API_KEY dan RESEND_FROM_EMAIL ke .env.example
+
+4c. Implementasi Slack webhook (sudah ada URL di DB, tinggal kirim)
+    - Buat fungsi sendSlackAlert(webhookUrl: string, signal: Signal)
+    - Payload Slack Block Kit:
+      {
+        "blocks": [
+          { "type": "header", "text": "🎯 New High-Intent Signal" },
+          { "type": "section", fields: [Platform, Confidence, Intent] },
+          { "type": "section", "text": AI summary },
+          { "type": "actions", elements: [
+            "View Signal" button,
+            "Push to HubSpot" button
+          ]}
+        ]
+      }
+
+4d. Integrasi ke ingest pipeline di src/lib/ingest.ts
+    - Setelah berhasil menyimpan signal baru ke DB (langkah 1c):
+      → Panggil sendAlertNotification(newSignal, workspace)
+      → Wrap dalam try-catch — jika notifikasi gagal, 
+        JANGAN gagalkan proses ingest utama (log error saja)
+
+4e. Buat API route src/app/api/alerts/test/route.ts
+    - Method: POST, Auth: user harus login
+    - Kirim test notification ke config yang tersimpan
+    - Berguna untuk user memverifikasi setup Slack/email mereka
+    - Response: { sent: { email: boolean, slack: boolean }, errors: [] }
+    - Update UI Settings Alerts: tambahkan tombol "Send Test" 
+      yang hit endpoint ini
+
+VERIFIKASI LANGKAH 4:
+- `npm run dev` → tidak ada error
+- Set alert config di /settings/alerts dengan Slack webhook test 
+  (gunakan https://hooks.slack.com/... dari Slack App dev)
+- Trigger ingest manual via POST /api/ingest/run
+- Cek channel Slack → harus ada notifikasi masuk
+- Klik "Send Test" di settings → harus muncul toast + notif di Slack
+- Cek inbox email → harus ada email alert (jika email dikonfigurasi)
+- `npm run build` → sukses
+
+CHECKPOINT 4: "feat: alert notification delivery"
+
+═══════════════════════════════════════
+LANGKAH 5 — Polish & Stabilisasi
+═══════════════════════════════════════
+
+5a. Tambahkan email transaksional dasar via Resend:
+    - Welcome email saat user baru signup (trigger di auth callback)
+    - Invitation email saat invite team member (ganti placeholder di 
+      src/app/(app)/settings/team/page.tsx)
+    - File: src/lib/email.ts (extend dari langkah 4b)
+
+5b. Update dashboard usage counter
+    - Ganti semua angka hardcoded di billing/dashboard dengan 
+      data dari getWorkspaceUsage() (dari langkah 2d)
+
+5c. Error handling & UX improvements
+    - Semua API route harus return error yang informatif (bukan 500 kosong)
+    - Tambahkan loading skeleton di signal feed saat pertama load
+    - Pastikan empty state yang baik: "No signals yet. Make sure your 
+      trackers are active and ingest is running."
+
+5d. Environment variables checklist
+    - Update .env.example dengan semua variable baru:
+      CRON_SECRET=
+      RESEND_API_KEY=
+      RESEND_FROM_EMAIL=
+      STRIPE_PRO_PRICE_ID=
+      STRIPE_GROWTH_PRICE_ID=
+      STRIPE_ENTERPRISE_PRICE_ID=
+      NEXT_PUBLIC_APP_URL=
+
+VERIFIKASI FINAL:
+- `npm run build` → SUKSES TANPA ERROR (ini wajib)
+- `npm run dev` → semua halaman load tanpa error di console
+- Flow end-to-end: signup → onboarding → tracker → ingest → signal muncul 
+  di dashboard → push ke HubSpot → alert terkirim
+- Billing: klik upgrade → Stripe checkout → subscription aktif → usage 
+  counter terupdate
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CATATAN PENTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Reddit API: Gunakan endpoint publik /.json tanpa auth untuk 
+  development. Untuk production, daftarkan Reddit App di 
+  reddit.com/prefs/apps untuk OAuth (rate limit lebih tinggi).
+  
+- HN API: Algolia API tidak butuh auth key — langsung bisa dipakai.
+
+- Semua secret harus masuk ke environment variables, TIDAK boleh 
+  hardcoded di kode.
+
+- Jika ada konflik dengan kode yang sudah ada, SELALU prioritaskan 
+  kode yang sudah ada. Extend, jangan replace.
+
+- Jika menemukan bug di fitur yang sudah ✅, catat di TODO comment 
+  tapi JANGAN fix sekarang — fokus pada implementasi fitur baru.
+
+Mulai dengan LANGKAH 1 sekarang. Konfirmasi setiap checkpoint 
+sebelum lanjut ke langkah berikutnya.
