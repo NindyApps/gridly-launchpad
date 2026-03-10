@@ -1,0 +1,159 @@
+📋  PROMPT P01 — Audit & Setup  — copy semua teks di bawah ini, paste ke Replit Agent
+I have an existing Vite + React codebase exported from Lovable.dev.
+The project is called OCTOPILOT — a B2B Revenue Signal Intelligence SaaS.
+The existing code has: landing page, Tailwind CSS setup, shadcn/ui components.
+ 
+IMPORTANT RULES — follow these for the entire project:
+- Stack: Vite + React 18 + TypeScript strict mode (NO Next.js)
+- Database: Supabase PostgreSQL only (NO Replit internal DB, NO Replit KV)
+- Backend: Supabase Edge Functions only (NO Express, NO API routes)
+- All frontend env vars must use VITE_ prefix (Vite convention)
+- Zero-Write constraint: NEVER post, reply, or DM to any external platform
+ 
+TASK 1 — Audit existing code:
+List all existing files and folders. Identify:
+- What Tailwind/shadcn components are already installed
+- What dependencies are in package.json
+- What routing setup exists (React Router or other)
+- Any existing pages beyond the landing page
+ 
+TASK 2 — Install missing dependencies:
+Run: npm install @supabase/supabase-js
+Run: npm install react-router-dom
+Run: npm install zustand
+Run: npm install zod
+Run: npm install react-hook-form @hookform/resolvers
+Run: npm install date-fns
+Run: npm install recharts
+Run: npm install lucide-react (if not already installed)
+ 
+TASK 3 — Create folder structure (only create folders that don't exist):
+src/
+├── components/
+│   ├── ui/          (shadcn — already exists, DO NOT modify)
+│   ├── layout/      (AppSidebar, TopBar, AppLayout)
+│   ├── signals/     (SignalCard, SignalFeed, SignalFilters)
+│   ├── trackers/    (TrackerCard, TrackerForm, TrackerList)
+│   ├── auth/        (LoginForm, SignupForm)
+│   └── shared/      (EmptyState, LoadingSpinner, TagInput)
+├── pages/
+│   ├── auth/        (Login, Signup, AcceptInvite)
+│   ├── app/         (Dashboard, Trackers, Analytics)
+│   ├── settings/    (CRM, Alerts, Team, Billing)
+│   └── Onboarding.tsx
+├── lib/
+│   ├── supabase.ts
+│   ├── encryption.ts
+│   ├── utils.ts
+│   └── analytics.ts
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useSignals.ts
+│   └── useTrackers.ts
+├── stores/
+│   └── authStore.ts
+├── types/
+│   └── index.ts
+└── supabase/
+    └── functions/   (Edge Functions — created in later phases)
+ 
+TASK 4 — Create src/lib/supabase.ts:
+import { createClient } from '@supabase/supabase-js'
+ 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+ 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+ 
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+ 
+TASK 5 — Create src/types/index.ts with these TypeScript types:
+ 
+export type IntentLevel = 'high' | 'medium' | 'low'
+export type IntentCategory = 'vendor_switch' | 'new_purchase' | 'evaluation' | 'complaint'
+export type UrgencyTag = 'urgent' | 'standard' | 'monitor'
+export type UserRole = 'admin' | 'analyst' | 'sdr' | 'viewer'
+export type FeedbackType = 'useful' | 'not_useful' | 'false_positive' | 'already_known'
+export type Platform = 'reddit' | 'hackernews' | 'slack'
+export type Plan = 'pro' | 'growth' | 'enterprise'
+ 
+export interface Workspace {
+  id: string
+  name: string
+  slug: string
+  plan: Plan
+  hubspot_token_enc: string | null
+  hubspot_refresh_token_enc: string | null
+  hubspot_token_expires_at: string | null
+  slack_webhook_url: string | null
+  alert_confidence_threshold: number
+  seats_limit: number
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  created_at: string
+}
+ 
+export interface Profile {
+  id: string
+  workspace_id: string
+  role: UserRole
+  full_name: string | null
+  avatar_url: string | null
+  notification_prefs: { email: boolean; in_app: boolean; slack: boolean }
+  onboarding_completed: boolean
+  onboarding_step: number
+  created_at: string
+}
+ 
+export interface Tracker {
+  id: string
+  workspace_id: string
+  created_by: string
+  name: string
+  keywords: string[]
+  competitor_names: string[]
+  subreddits: string[]
+  platforms: string[]
+  is_active: boolean
+  confidence_override: number | null
+  signal_count_7d: number
+  created_at: string
+}
+ 
+export interface IntentSignal {
+  id: string
+  workspace_id: string
+  tracker_id: string
+  platform: Platform
+  post_url: string
+  author_handle: string | null
+  post_timestamp: string | null
+  intent_category: IntentCategory
+  intent_level: IntentLevel
+  confidence_score: number
+  pain_domain: string | null
+  ai_summary: string
+  suggested_opener: string | null
+  urgency_tag: UrgencyTag
+  crm_injected: boolean
+  crm_task_id: string | null
+  dismissed: boolean
+  created_at: string
+}
+ 
+TASK 6 — Create .env.example file listing all required env vars:
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_STRIPE_PUBLISHABLE_KEY=
+VITE_APP_URL=
+(Note: all other secrets go in Replit Secrets, not .env files)
+ 
+TASK 7 — Update React Router in main app:
+Wrap App with BrowserRouter from react-router-dom.
+Keep existing landing page route at '/'.
+Add placeholder routes for '/login', '/dashboard', '/onboarding'.
+These will be replaced in later phases.
+ 
+After all tasks complete: run npm run dev and confirm no errors.

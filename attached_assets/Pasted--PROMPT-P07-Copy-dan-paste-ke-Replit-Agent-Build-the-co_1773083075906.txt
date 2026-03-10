@@ -1,0 +1,89 @@
+── PROMPT P07 — Copy dan paste ke Replit Agent ──
+Build the complete HubSpot CRM integration for OCTOPILOT.
+ 
+1. HUBSPOT OAUTH CONNECT — app/api/crm/hubspot/connect/route.ts:
+GET handler:
+  - Build HubSpot OAuth URL with these scopes:
+    crm.objects.contacts.write crm.objects.contacts.read
+    crm.objects.deals.read crm.objects.tasks.write
+    oauth
+  - URL: https://app.hubspot.com/oauth/authorize?
+    client_id={HUBSPOT_CLIENT_ID}&
+    redirect_uri={HUBSPOT_REDIRECT_URI}&
+    scope=crm.objects.tasks.write+oauth&
+    state={random_state_token}
+  - Store state token in Supabase session to prevent CSRF
+  - Redirect to HubSpot OAuth URL
+ 
+2. HUBSPOT OAUTH CALLBACK — app/api/crm/hubspot/callback/route.ts:
+GET handler:
+  - Receive ?code= and ?state= from HubSpot
+  - Verify state token matches stored state
+  - Exchange code for tokens:
+    POST https://api.hubapi.com/oauth/v1/token
+    with: grant_type=authorization_code, code, redirect_uri,
+    client_id, client_secret
+  - Receive: access_token, refresh_token, expires_in
+  - Encrypt tokens using AES-256 with ENCRYPTION_KEY before storing
+  - UPDATE workspaces SET:
+    hubspot_token_enc = encrypted(access_token),
+    hubspot_refresh_token_enc = encrypted(refresh_token),
+    hubspot_token_expires_at = now() + expires_in seconds
+  - INSERT compliance_logs record (event_type: 'crm_connect')
+  - Redirect to /settings/crm?connected=true
+ 
+3. TOKEN ENCRYPTION HELPER — lib/encryption.ts:
+  encrypt(text: string): string → AES-256-CBC encryption, returns base64
+  decrypt(ciphertext: string): string → decryption
+  Use Node.js crypto module. Key from ENCRYPTION_KEY env var.
+ 
+4. TOKEN REFRESH HELPER — lib/hubspot.ts:
+  getValidHubSpotToken(workspaceId: string): Promise<string>
+    - Fetch workspace hubspot tokens
+    - If token expires in < 5 minutes, refresh:
+      POST https://api.hubapi.com/oauth/v1/token
+      grant_type=refresh_token, refresh_token, client_id, client_secret
+    - Re-encrypt and save new tokens
+    - Return valid access_token (decrypted)
+ 
+5. SIGNAL INJECTION — app/api/crm/hubspot/inject/route.ts:
+POST handler with body: { signal_id: string }
+ 
+  a. Get current user + workspace from Supabase session
+  b. Fetch signal from intent_signals (verify workspace_id matches)
+  c. Get valid HubSpot token via getValidHubSpotToken()
+  d. If no token: return 400 { error: 'HubSpot not connected' }
+  e. Build HubSpot Task payload:
+     {
+       properties: {
+         hs_task_subject: `[OCTOPILOT] ${intent_category} Signal: ${pain_domain}`,
+         hs_task_body: `Signal Summary: ${ai_summary}\n\nSource: ${post_url}\n\nSuggested opener: ${suggested_opener}\n\nConfidence: ${confidence_score}\nIntent: ${intent_level}\nPlatform: ${platform}`,
+         hs_task_status: 'NOT_STARTED',
+         hs_task_priority: intent_level === 'high' ? 'HIGH' : 'MEDIUM',
+         hs_timestamp: Date.now().toString(),
+       }
+     }
+  f. POST to https://api.hubapi.com/crm/v3/objects/tasks
+     Authorization: Bearer {access_token}
+     Content-Type: application/json
+  g. On success:
+     UPDATE intent_signals SET crm_injected=true, crm_task_id=response.id
+     INSERT compliance_logs (event_type: 'crm_inject', metadata: {crm_platform: 'hubspot', task_id: response.id})
+  h. Return 200: { success: true, task_id: response.id, task_url: 'https://app.hubspot.com/tasks/{portal_id}/view/{task_id}' }
+ 
+6. CRM SETTINGS PAGE — app/(app)/settings/crm/page.tsx:
+  HubSpot card:
+    - HubSpot logo (orange)
+    - Title: 'HubSpot CRM'
+    - Description: 'Inject buyer signals directly as tasks in HubSpot'
+    - If NOT connected:
+        'Connect HubSpot' button → GET /api/crm/hubspot/connect
+    - If connected:
+        Green 'Connected' badge
+        'Connected as [workspace name]'
+        'Last injected: [timestamp from compliance_logs]'
+        'Disconnect' link (clears tokens, confirmation dialog first)
+  Salesforce card (disabled):
+    - Salesforce logo (blue)
+    - 'Coming Soon' badge
+    - 'Join waitlist' link (placeholder)
