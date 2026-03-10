@@ -43,7 +43,8 @@ export async function sendSignalAlertEmail(to: string, signal: IntentSignal): Pr
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
       <a href="${viewUrl}" style="background:#7C3AED;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;display:inline-block;">View Signal</a>
-      <a href="${viewUrl}" style="background:rgba(255,255,255,0.05);color:#d4d4d8;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;display:inline-block;border:1px solid rgba(255,255,255,0.1);">Push to HubSpot</a>
+      <a href="${viewUrl}" style="background:rgba(255,255,255,0.05);color:#d4d4d8;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;display:inline-block;border:1px solid rgba(255,255,255,0.1);margin-right:8px;">Push to HubSpot</a>
+      <a href="${APP_URL}/dashboard?signal=${signal.id}&inject_sf=${signal.id}" style="background:#00A1E0;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;display:inline-block;">Push to Salesforce</a>
     </div>
 
     <p style="color:#52525b;font-size:12px;margin-top:32px;">You're receiving this because you enabled email alerts in OCTOPILOT. <a href="${APP_URL}/settings/alerts" style="color:#7C3AED;">Manage alerts</a></p>

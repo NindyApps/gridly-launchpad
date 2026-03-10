@@ -55,8 +55,14 @@ export async function sendSlackAlert(webhookUrl: string, signal: IntentSignal): 
           },
           {
             type: 'button',
-            text: { type: 'plain_text', text: 'Push to HubSpot', emoji: true },
+            text: { type: 'plain_text', text: '→ HubSpot', emoji: true },
             url: `${APP_URL}/dashboard?signal=${signal.id}&action=inject`,
+            style: 'primary',
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: '→ Salesforce', emoji: true },
+            url: `${APP_URL}/dashboard?signal=${signal.id}&inject_sf=${signal.id}`,
           },
         ],
       },

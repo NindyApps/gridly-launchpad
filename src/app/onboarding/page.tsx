@@ -28,6 +28,7 @@ export default function OnboardingPage() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [hubspotConnected, setHubspotConnected] = useState(false);
+  const [sfConnected, setSfConnected] = useState(false);
 
   const [trackerName, setTrackerName] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -63,10 +64,11 @@ export default function OnboardingPage() {
         setWorkspaceId(profile.workspace_id);
         const { data: ws } = await supabase
           .from("workspaces")
-          .select("hubspot_token_enc")
+          .select("hubspot_token_enc, sf_access_token_enc")
           .eq("id", profile.workspace_id)
           .single();
         setHubspotConnected(!!ws?.hubspot_token_enc);
+        setSfConnected(!!(ws as unknown as { sf_access_token_enc: string | null })?.sf_access_token_enc);
       }
 
       if (profile?.onboarding_step) setStep(profile.onboarding_step);
@@ -193,51 +195,80 @@ export default function OnboardingPage() {
             <CardHeader>
               <CardTitle className="text-white">Connect your CRM</CardTitle>
               <CardDescription className="text-zinc-400">
-                Connect HubSpot to auto-inject buying signals as tasks for your sales team.
+                Connect HubSpot or Salesforce to auto-inject buying signals into your sales pipeline.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
-              {hubspotConnected ? (
-                <div className="flex items-center gap-3 rounded-lg border border-green-500/30 bg-green-500/10 p-4">
-                  <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-green-400">Connected to HubSpot</p>
-                    <p className="text-xs text-zinc-400">Signals will be auto-injected as tasks.</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="rounded-lg border border-border bg-white/5 p-4 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-xl shrink-0">🔶</div>
-                    <div className="flex-1">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* HubSpot card */}
+                <div className={`rounded-lg border p-4 flex flex-col gap-3 ${hubspotConnected ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-white/5'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-orange-500/10 flex items-center justify-center text-lg shrink-0">🔶</div>
+                    <div>
                       <p className="text-sm font-medium text-white">HubSpot CRM</p>
-                      <p className="text-xs text-zinc-400">Auto-create contacts and task with AI openers</p>
+                      <p className="text-xs text-zinc-400">Auto-create contacts & tasks</p>
                     </div>
+                  </div>
+                  {hubspotConnected ? (
+                    <div className="flex items-center gap-1.5 text-xs text-green-400 font-medium">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Connected
+                    </div>
+                  ) : (
                     <Button
-                      className="bg-indigo-600 hover:bg-indigo-700 shrink-0"
+                      className="bg-indigo-600 hover:bg-indigo-700 w-full"
                       size="sm"
-                      onClick={() => window.location.href = "/api/crm/hubspot/connect"}
+                      onClick={() => { window.location.href = "/api/crm/hubspot/connect"; }}
                       data-testid="button-connect-hubspot"
                     >
-                      Connect
+                      Connect HubSpot
                     </Button>
-                  </div>
-                  <p className="text-xs text-zinc-500 text-center">
-                    You can always connect your CRM later in Settings.
-                  </p>
+                  )}
                 </div>
-              )}
+
+                {/* Salesforce card */}
+                <div className={`rounded-lg border p-4 flex flex-col gap-3 ${sfConnected ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-white/5'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(0,161,224,0.12)' }}>
+                      <span className="text-lg" style={{ color: '#00A1E0' }}>☁</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">Salesforce CRM</p>
+                      <p className="text-xs text-zinc-400">Push signals as Tasks or Leads</p>
+                    </div>
+                  </div>
+                  {sfConnected ? (
+                    <div className="flex items-center gap-1.5 text-xs text-green-400 font-medium">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Connected
+                    </div>
+                  ) : (
+                    <Button
+                      className="w-full text-white"
+                      style={{ background: '#00A1E0' }}
+                      size="sm"
+                      onClick={() => { window.location.href = "/api/crm/salesforce/connect"; }}
+                      data-testid="button-connect-salesforce"
+                    >
+                      Connect Salesforce
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-zinc-500 text-center">
+                Connect one, both, or skip — you can always change this in Settings.
+              </p>
+
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1 border-border text-zinc-400" onClick={() => saveStep(0)}>
                   ← Back
                 </Button>
                 <Button
-                  className={`flex-1 ${hubspotConnected ? "bg-indigo-600 hover:bg-indigo-700" : "border-border text-zinc-400"}`}
-                  variant={hubspotConnected ? "default" : "outline"}
+                  className={`flex-1 ${(hubspotConnected || sfConnected) ? "bg-indigo-600 hover:bg-indigo-700" : "border-border text-zinc-400"}`}
+                  variant={(hubspotConnected || sfConnected) ? "default" : "outline"}
                   onClick={() => saveStep(2)}
                   data-testid="button-next-or-skip"
                 >
-                  {hubspotConnected ? "Continue →" : "Skip for now"}
+                  {(hubspotConnected || sfConnected) ? "Continue →" : "Skip for now"}
                 </Button>
               </div>
             </CardContent>

@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/client';
 import { SignalCard } from './SignalCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { useSignals, useDismissSignal, useInjectToCRM, useFeedback } from '@/hooks/useSignals';
+import { useSignals, useDismissSignal, useInjectToCRM, useInjectToSalesforce, useFeedback } from '@/hooks/useSignals';
 import { useTrackers } from '@/hooks/useTrackers';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth';
 import type { IntentSignal, SignalFeedFilters, SignalSort } from '@/types/app';
 import { Radio, RefreshCw, Inbox, Bell } from 'lucide-react';
 import Link from 'next/link';
@@ -79,12 +80,17 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
 
   const { signals, isLoading } = useSignals(workspaceId);
   const { trackers } = useTrackers(workspaceId);
+  const { workspace } = useAuth();
   const dismissSignal = useDismissSignal();
   const injectCRM = useInjectToCRM();
+  const injectSF = useInjectToSalesforce();
   const feedback = useFeedback();
+
+  const sfConnected = !!workspace?.sf_access_token_enc;
 
   const [newCount, setNewCount] = useState(0);
   const [injectingId, setInjectingId] = useState<string | null>(null);
+  const [injectingSFId, setInjectingSFId] = useState<string | null>(null);
 
   const filtered = applyFilters(signals, filters);
 
@@ -140,6 +146,19 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
       }
     } finally {
       setInjectingId(null);
+    }
+  };
+
+  const handleInjectSF = async (signalId: string) => {
+    setInjectingSFId(signalId);
+    try {
+      await injectSF.mutateAsync({ signalId });
+      toast({ title: 'Pushed to Salesforce', description: 'Signal created as a record in Salesforce.' });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast({ title: 'Salesforce inject failed', description: msg, variant: 'destructive' });
+    } finally {
+      setInjectingSFId(null);
     }
   };
 
@@ -229,9 +248,12 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
           signal={signal}
           onDismiss={handleDismiss}
           onInjectCRM={handleInject}
+          onInjectSF={handleInjectSF}
           onFeedback={handleFeedback}
           isDismissing={dismissSignal.isPending}
           isInjecting={injectingId === signal.id}
+          isInjectingSF={injectingSFId === signal.id}
+          sfConnected={sfConnected}
         />
       ))}
     </div>

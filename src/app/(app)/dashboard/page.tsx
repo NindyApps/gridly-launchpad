@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const stats = useMemo(() => {
     const today = signals.filter((s) => isToday(new Date(s.created_at)));
     const highIntent = signals.filter((s) => s.intent_level === 'high').length;
-    const injectedToday = today.filter((s) => s.crm_injected).length;
+    const injectedToday = today.filter((s) => s.crm_injected || !!s.sf_injected_at).length;
     const totalFeedback = signals.filter((s) => s.dismissed).length;
     const acceptanceRate = totalFeedback > 0
       ? Math.round(((signals.length / (signals.length + totalFeedback)) * 100))

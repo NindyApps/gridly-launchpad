@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSignals } from '@/hooks/useSignals';
 import { useWorkspaces } from '@/hooks/use-workspaces';
-import { TrendingUp, Zap, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Zap, Target, BarChart3, Cloud } from 'lucide-react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -45,6 +45,8 @@ export default function AnalyticsPage() {
   const total = signals.length;
   const highIntent = signals.filter((s) => s.intent_level === 'high').length;
   const injected = signals.filter((s) => s.crm_injected).length;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+  const sfInjected = signals.filter((s) => s.sf_injected_at && new Date(s.sf_injected_at) >= sevenDaysAgo).length;
   const avgConfidence = total > 0
     ? Math.round((signals.reduce((acc, s) => acc + s.confidence_score, 0) / total) * 100)
     : 0;
@@ -52,7 +54,8 @@ export default function AnalyticsPage() {
   const stats = [
     { label: 'Total Signals', value: total, icon: BarChart3, color: 'text-primary' },
     { label: 'High Intent', value: highIntent, icon: TrendingUp, color: 'text-rose-400' },
-    { label: 'Pushed to CRM', value: injected, icon: Zap, color: 'text-emerald-400' },
+    { label: 'HubSpot Injected', value: injected, icon: Zap, color: 'text-emerald-400' },
+    { label: 'Salesforce (7d)', value: sfInjected, icon: Cloud, color: 'text-blue-400' },
     { label: 'Avg Confidence', value: `${avgConfidence}%`, icon: Target, color: 'text-amber-400' },
   ];
 
@@ -89,7 +92,7 @@ export default function AnalyticsPage() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {stats.map((stat) => (
             <Card key={stat.label} className="border border-border bg-card" data-testid={`stat-${stat.label.toLowerCase().replace(/ /g, '-')}`}>
               <CardContent className="pt-5">

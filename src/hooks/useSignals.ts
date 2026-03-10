@@ -68,6 +68,28 @@ export function useInjectToCRM() {
   });
 }
 
+export function useInjectToSalesforce() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ signalId }: { signalId: string }) => {
+      const res = await fetch('/api/crm/salesforce/inject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signalId }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to inject to Salesforce');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['signals'] });
+    },
+  });
+}
+
 export function useFeedback() {
   const queryClient = useQueryClient();
 

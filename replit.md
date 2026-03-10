@@ -233,15 +233,24 @@ Do NOT install or import `framer-motion` — it has been removed.
 - ✅ Auth system (email+password, Google OAuth, invite flow)
 - ✅ App shell (sidebar, topbar, breadcrumb, mobile drawer)
 - ✅ Dashboard page (stats cards, signal feed, filters)
-- ✅ Signal cards (intent badges, confidence, opener, feedback, dismiss, inject)
+- ✅ Signal cards (intent badges, confidence, opener, feedback, dismiss, inject to HubSpot/Salesforce)
 - ✅ Tracker CRUD (create, edit via sheet, toggle, delete)
-- ✅ Analytics page — Recharts AreaChart (7-day timeline) + BarCharts (platform + category)
-- ✅ Settings pages (CRM, Alerts, Team invite, Billing)
+- ✅ Analytics page — Recharts AreaChart (7-day timeline) + BarCharts + SF injections stat
+- ✅ Settings CRM page — HubSpot + Salesforce full UI (connect/disconnect/configure)
 - ✅ HubSpot OAuth flow (connect + callback + token storage + refresh token + expiry)
 - ✅ HubSpot auto token refresh — `getValidHubSpotToken()` refreshes if expires < 5 min
 - ✅ HubSpot inject — uses `getValidHubSpotToken()` instead of raw token
+- ✅ Salesforce OAuth flow — `connect` → `callback` → tokens + instance_url saved to DB
+- ✅ Salesforce auto token refresh — `getValidSalesforceToken()` refreshes if expires < 5 min
+- ✅ Salesforce inject — Task / Lead / Contact / Opportunity via `/api/crm/salesforce/inject`
+- ✅ Salesforce inject object setting — PATCH `/api/crm/salesforce/settings` persists to DB
+- ✅ Salesforce disconnect — revokes OAuth token + clears DB columns
+- ✅ Signal card SF button — "Salesforce" button (blue) shown if workspace.sf_access_token_enc set
+- ✅ Signal card SF badge — "Pushed ✓" clickable link shown after sf_injected_at set
+- ✅ Onboarding step 2 — side-by-side HubSpot + Salesforce connect cards
+- ✅ Dashboard injected today — counts both HubSpot (crm_injected) + Salesforce (sf_injected_at)
 - ✅ Alert settings — persist to DB + "Send Test" button hits `/api/alerts/test`
-- ✅ Alert delivery — email via Resend + Slack Block Kit webhook
+- ✅ Alert delivery — email via Resend + Slack Block Kit webhook (both include SF deep links)
 - ✅ Team settings — members list from DB + real invite API
 - ✅ Signal feedback API (`/api/feedback`)
 - ✅ Stripe webhook handler — updates `workspaces.plan` + `stripe_subscription_id` from events
@@ -260,6 +269,9 @@ See `.env.example` for complete list. Key additions:
 - `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — for email alerts
 - `STRIPE_PRO_PRICE_ID`, `STRIPE_GROWTH_PRICE_ID`, `STRIPE_ENTERPRISE_PRICE_ID` — Stripe price IDs
 - `NEXT_PUBLIC_APP_URL` — public URL for redirect links in emails
+- `SALESFORCE_CLIENT_ID` — Consumer Key from Salesforce Connected App
+- `SALESFORCE_CLIENT_SECRET` — Consumer Secret from Salesforce Connected App
+- `SALESFORCE_REDIRECT_URI` — must match exactly: `{APP_URL}/api/crm/salesforce/callback`
 
 ### CRITICAL MANUAL STEP REQUIRED
 **Run `supabase/schema.sql` in Supabase SQL Editor before ANY feature can work.**

@@ -1,0 +1,605 @@
+Kamu adalah senior full-stack engineer yang melanjutkan pengembangan 
+OCTOPILOT. Sebelum menulis satu baris kode, baca replit.md di root 
+project terlebih dahulu.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KONTEKS SPRINT INI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sprint sebelumnya sudah selesai:
+✅ Signal Ingestion Engine (Reddit + HN → GPT-4o-mini → DB)
+✅ Stripe Checkout Flow (Pro/Growth/Enterprise)
+✅ HubSpot Token Auto-Refresh
+✅ Alert Notifications (Slack + Resend email)
+✅ Welcome & Invite emails
+
+Sprint ini: SALESFORCE INTEGRATION
+Saat ini di UI hanya ada label "Coming Soon" untuk Salesforce.
+Tujuan sprint ini: implementasi Salesforce sebagai CRM kedua 
+yang setara dengan HubSpot — OAuth connect, inject signal sebagai 
+Task/Lead, token refresh, dan UI settings yang lengkap.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ATURAN KERJA WAJIB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Baca replit.md sebelum mulai
+2. Kerjakan SATU langkah dalam satu waktu
+3. Setelah tiap langkah: jalankan npm run dev — tidak boleh ada error
+4. Jika sukses, catat checkpoint sebelum lanjut
+5. JANGAN ubah atau hapus kode HubSpot yang sudah berjalan —
+   Salesforce adalah fitur TAMBAHAN, bukan pengganti
+6. Sebutkan eksplisit setiap file yang dibuat atau dimodifikasi
+7. Jika perlu env var baru, tambahkan ke .env.example sekaligus
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFERENSI POLA YANG SUDAH ADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ikuti pola HubSpot yang sudah terbukti berjalan:
+- OAuth connect  → src/app/api/crm/hubspot/connect/route.ts
+- OAuth callback → src/app/api/crm/hubspot/callback/route.ts
+- Token refresh  → src/lib/hubspot.ts (refreshHubSpotToken)
+- Inject signal  → src/app/api/crm/hubspot/inject/route.ts
+- UI settings    → src/app/(app)/settings/crm/ (halaman yang sudah ada)
+- DB columns     → tabel workspaces (hubspot_access_token_enc, dll)
+
+Semua pola Salesforce harus KONSISTEN dengan pola HubSpot di atas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DATABASE — PERSIAPAN AWAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sebelum menulis kode apapun, buat file migrasi SQL:
+
+FILE: supabase/migrations/add_salesforce_columns.sql
+
+Isi migrasi:
+  ALTER TABLE workspaces
+    ADD COLUMN IF NOT EXISTS sf_access_token_enc       TEXT,
+    ADD COLUMN IF NOT EXISTS sf_refresh_token_enc      TEXT,
+    ADD COLUMN IF NOT EXISTS sf_instance_url           TEXT,
+    ADD COLUMN IF NOT EXISTS sf_token_expires_at       TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS sf_connected_at           TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS sf_inject_object          TEXT 
+      DEFAULT 'Task' 
+      CHECK (sf_inject_object IN ('Task', 'Lead', 'Contact', 'Opportunity'));
+
+Lalu jalankan: supabase db push
+
+Penjelasan kolom:
+- sf_access_token_enc   : Access token OAuth, dienkripsi AES sama 
+                          seperti HubSpot
+- sf_refresh_token_enc  : Refresh token OAuth (Salesforce tidak expire 
+                          kecuali dicabut manual)
+- sf_instance_url       : URL unik per org Salesforce, 
+                          misal https://yourcompany.my.salesforce.com
+                          WAJIB disimpan — semua API call pakai URL ini
+- sf_token_expires_at   : Waktu kadaluarsa access token
+- sf_connected_at       : Kapan workspace pertama kali connect
+- sf_inject_object      : User pilih mau inject sinyal sebagai apa:
+                          Task / Lead / Contact / Opportunity
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 6A — Salesforce OAuth Flow
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tujuan: User bisa klik "Connect Salesforce" → authorize di Salesforce 
+→ kembali ke app dengan token tersimpan.
+
+─────────────────────────────────────
+6A-1. Buat src/lib/salesforce.ts
+─────────────────────────────────────
+
+Fungsi yang harus ada:
+
+a) getSalesforceAuthUrl(state: string): string
+   - Buat URL ke Salesforce OAuth 2.0 authorization endpoint
+   - URL: https://login.salesforce.com/services/oauth2/authorize
+   - Query params:
+     response_type: 'code'
+     client_id: process.env.SALESFORCE_CLIENT_ID
+     redirect_uri: process.env.SALESFORCE_REDIRECT_URI
+     scope: 'api refresh_token offline_access'
+     state: state (random string untuk CSRF protection)
+   - Return URL string lengkap
+
+b) exchangeSalesforceCode(code: string): Promise<SalesforceTokenResponse>
+   - POST ke https://login.salesforce.com/services/oauth2/token
+   - Body (x-www-form-urlencoded):
+     grant_type: 'authorization_code'
+     client_id: SALESFORCE_CLIENT_ID
+     client_secret: SALESFORCE_CLIENT_SECRET
+     redirect_uri: SALESFORCE_REDIRECT_URI
+     code: code
+   - Return: { access_token, refresh_token, instance_url, 
+               token_type, issued_at, expires_in? }
+
+c) refreshSalesforceToken(workspaceId: string): Promise<void>
+   - Ambil sf_refresh_token_enc dari DB, dekripsi
+   - POST ke https://login.salesforce.com/services/oauth2/token
+   - Body: grant_type: 'refresh_token', client_id, 
+           client_secret, refresh_token
+   - Enkripsi access_token baru
+   - Update DB: sf_access_token_enc, sf_token_expires_at
+   - CATATAN: Salesforce refresh token tidak pernah expired kecuali 
+     di-revoke manual, jadi tidak perlu refresh refresh_token
+
+d) getValidSalesforceToken(workspaceId: string): 
+   Promise<{ accessToken: string, instanceUrl: string }>
+   - Ambil sf_token_expires_at dari DB
+   - Jika expires dalam < 5 menit → panggil refreshSalesforceToken()
+   - Dekripsi dan return access token + instance_url
+   - Throw error dengan pesan jelas jika workspace belum connect 
+     Salesforce (sf_access_token_enc IS NULL)
+
+e) revokeSalesforceToken(workspaceId: string): Promise<void>
+   - POST ke {instance_url}/services/oauth2/revoke
+   - Body: token={access_token}
+   - Lalu clear semua kolom sf_* di DB (set NULL)
+
+Tambahkan TypeScript interface:
+  interface SalesforceTokenResponse {
+    access_token: string
+    refresh_token: string
+    instance_url: string
+    token_type: string
+    issued_at: string
+  }
+
+Enkripsi/dekripsi: gunakan fungsi yang SAMA dengan yang sudah dipakai 
+di HubSpot (cek src/lib/hubspot.ts atau src/lib/crypto.ts untuk 
+memastikan konsisten)
+
+─────────────────────────────────────
+6A-2. Buat src/app/api/crm/salesforce/connect/route.ts
+─────────────────────────────────────
+
+- Method: GET
+- Auth: user harus login (cek session Supabase)
+- Logic:
+  1. Generate random state string (crypto.randomUUID())
+  2. Simpan state ke Supabase cookie atau session untuk verifikasi 
+     di callback (cegah CSRF)
+  3. Redirect ke getSalesforceAuthUrl(state)
+- Tidak return JSON — langsung redirect
+
+─────────────────────────────────────
+6A-3. Buat src/app/api/crm/salesforce/callback/route.ts
+─────────────────────────────────────
+
+- Method: GET
+- Query params yang diterima: code, state, error (optional)
+- Logic:
+  1. Jika ada query param error → redirect ke 
+     /settings/crm?sf_error=access_denied
+  2. Verifikasi state cocok dengan yang disimpan di cookie/session
+  3. Panggil exchangeSalesforceCode(code)
+  4. Enkripsi access_token dan refresh_token
+  5. Hitung expires_at: 
+     new Date(parseInt(tokenResponse.issued_at) + 
+     (tokenResponse.expires_in ?? 7200) * 1000)
+     CATATAN: issued_at dari Salesforce dalam milliseconds (bukan detik)
+  6. Update tabel workspaces:
+     sf_access_token_enc = encryptedAccessToken
+     sf_refresh_token_enc = encryptedRefreshToken
+     sf_instance_url = tokenResponse.instance_url
+     sf_token_expires_at = expiresAt
+     sf_connected_at = new Date()
+  7. Redirect ke /settings/crm?sf_connected=true
+
+─────────────────────────────────────
+6A-4. Buat src/app/api/crm/salesforce/disconnect/route.ts
+─────────────────────────────────────
+
+- Method: POST
+- Auth: user harus login
+- Logic:
+  1. Panggil revokeSalesforceToken(workspaceId) — handle error 
+     dengan try-catch (jika revoke gagal di Salesforce, tetap 
+     lanjutkan clear DB)
+  2. Clear semua kolom sf_* di DB
+  3. Return { success: true }
+
+VERIFIKASI 6A:
+- npm run dev → tidak ada TypeScript error
+- Buka /settings/crm → klik "Connect Salesforce" 
+  → harus redirect ke halaman login Salesforce
+- Authorize → harus balik ke /settings/crm?sf_connected=true
+- Cek Supabase: kolom sf_access_token_enc, sf_instance_url 
+  harus terisi
+- CHECKPOINT 6A: "feat: salesforce oauth connect/disconnect"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 6B — Inject Signal ke Salesforce
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tujuan: Tombol "Push to Salesforce" di signal card berfungsi 
+dan membuat record di Salesforce sesuai pilihan user 
+(Task/Lead/Contact/Opportunity).
+
+─────────────────────────────────────
+6B-1. Tambahkan fungsi inject ke src/lib/salesforce.ts
+─────────────────────────────────────
+
+Tambahkan fungsi-fungsi berikut:
+
+a) injectAsTask(accessToken, instanceUrl, signal): Promise<string>
+   - POST ke {instanceUrl}/services/data/v59.0/sobjects/Task/
+   - Headers: Authorization: Bearer {accessToken}, 
+              Content-Type: application/json
+   - Body:
+     {
+       Subject: `[OCTOPILOT] ${signal.title}`,
+       Description: `Platform: ${signal.platform}\n` +
+                    `Confidence: ${signal.confidence_score}%\n` +
+                    `Intent: ${signal.intent_level}\n\n` +
+                    `AI Summary: ${signal.ai_summary}\n\n` +
+                    `Suggested Opener: ${signal.suggested_opener}\n\n` +
+                    `Original Post: ${signal.post_url}`,
+       Status: 'Not Started',
+       Priority: signal.intent_level === 'high' ? 'High' : 'Normal',
+       ActivityDate: new Date(Date.now() + 86400000)
+                     .toISOString().split('T')[0]  // tomorrow
+     }
+   - Return: Salesforce record ID (response.id)
+
+b) injectAsLead(accessToken, instanceUrl, signal): Promise<string>
+   - POST ke {instanceUrl}/services/data/v59.0/sobjects/Lead/
+   - Body:
+     {
+       LastName: signal.author ?? 'Unknown (Reddit/HN)',
+       Company: 'Unknown — via OCTOPILOT Signal',
+       LeadSource: 'Web',
+       Description: (same format as Task description above),
+       Rating: signal.intent_level === 'high' ? 'Hot' : 'Warm',
+       Website: signal.post_url
+     }
+   - Return: Salesforce record ID
+
+c) injectAsContact(accessToken, instanceUrl, signal): Promise<string>
+   - POST ke {instanceUrl}/services/data/v59.0/sobjects/Contact/
+   - Body:
+     {
+       LastName: signal.author ?? 'Unknown (Reddit/HN)',
+       Description: (same format),
+       LeadSource: 'Web'
+     }
+   - Return: Salesforce record ID
+
+d) injectAsOpportunity(accessToken, instanceUrl, signal): Promise<string>
+   - POST ke {instanceUrl}/services/data/v59.0/sobjects/Opportunity/
+   - Body:
+     {
+       Name: `[OCTOPILOT] ${signal.title}`,
+       StageName: 'Prospecting',
+       CloseDate: new Date(Date.now() + 30 * 86400000)
+                  .toISOString().split('T')[0],  // 30 days from now
+       Description: (same format),
+       LeadSource: 'Web'
+     }
+   - Return: Salesforce record ID
+
+e) injectSignalToSalesforce(
+     workspaceId: string, 
+     signal: Signal, 
+     objectType?: 'Task'|'Lead'|'Contact'|'Opportunity'
+   ): Promise<{ recordId: string, objectType: string, recordUrl: string }>
+   - Fungsi utama yang dipanggil dari API route
+   - Ambil { accessToken, instanceUrl } dari getValidSalesforceToken()
+   - Ambil objectType dari parameter ATAU dari workspace.sf_inject_object
+   - Panggil fungsi inject yang sesuai berdasarkan objectType
+   - Susun recordUrl: 
+     {instanceUrl}/lightning/r/{objectType}/{recordId}/view
+   - Return { recordId, objectType, recordUrl }
+
+─────────────────────────────────────
+6B-2. Buat src/app/api/crm/salesforce/inject/route.ts
+─────────────────────────────────────
+
+- Method: POST
+- Auth: user harus login
+- Body: { signalId: string, objectType?: string }
+- Logic:
+  1. Ambil signal dari tabel intent_signals by signalId
+     (pastikan signal milik workspace user ini)
+  2. Panggil injectSignalToSalesforce(workspaceId, signal, objectType)
+  3. Update tabel intent_signals:
+     sf_injected_at = new Date()
+     sf_record_id = result.recordId
+     sf_record_url = result.recordUrl
+  4. Return { 
+       success: true, 
+       recordId: result.recordId,
+       recordUrl: result.recordUrl,
+       objectType: result.objectType
+     }
+- Error handling:
+  → 400 jika signalId tidak ada di body
+  → 404 jika signal tidak ditemukan atau bukan milik workspace ini
+  → 422 jika Salesforce belum di-connect (sf_access_token_enc NULL)
+  → 502 jika Salesforce API error (forward pesan error dari SF)
+
+─────────────────────────────────────
+6B-3. Tambahkan kolom SF ke tabel intent_signals
+─────────────────────────────────────
+
+FILE: supabase/migrations/add_salesforce_signal_columns.sql
+
+  ALTER TABLE intent_signals
+    ADD COLUMN IF NOT EXISTS sf_injected_at  TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS sf_record_id    TEXT,
+    ADD COLUMN IF NOT EXISTS sf_record_url   TEXT;
+
+Jalankan: supabase db push
+
+VERIFIKASI 6B:
+- npm run dev → tidak ada error
+- Dengan Salesforce sudah terconnect, inject satu signal via curl:
+  curl -X POST http://localhost:3000/api/crm/salesforce/inject \
+    -H "Content-Type: application/json" \
+    -H "Cookie: [session cookie]" \
+    -d '{"signalId": "test-id"}'
+- Login ke Salesforce → cek Tasks → record baru harus muncul
+- Cek Supabase intent_signals → sf_injected_at dan sf_record_id terisi
+- CHECKPOINT 6B: "feat: salesforce signal inject"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 6C — Update UI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tujuan: Ganti label "Coming Soon" dengan UI Salesforce 
+yang lengkap dan fungsional.
+
+─────────────────────────────────────
+6C-1. Update halaman Settings CRM
+─────────────────────────────────────
+
+FILE: src/app/(app)/settings/crm/page.tsx 
+(atau path yang setara — cek dulu struktur yang ada)
+
+JANGAN hapus atau ubah bagian HubSpot. Tambahkan section Salesforce 
+di bawahnya (atau dalam tab/card terpisah).
+
+Tampilan section Salesforce harus memiliki 2 state:
+
+STATE A — Belum connect (sf_access_token_enc IS NULL):
+  - Logo Salesforce (warna biru Salesforce: #00A1E0)
+  - Judul "Salesforce CRM"
+  - Deskripsi singkat manfaatnya
+  - Tombol "Connect Salesforce" → GET /api/crm/salesforce/connect
+  - HAPUS label "Coming Soon" — ganti dengan tombol ini
+
+STATE B — Sudah connect (sf_access_token_enc NOT NULL):
+  - Badge hijau "Connected"
+  - Tampilkan instance_url (sf_instance_url) sebagai informasi
+  - Tampilkan sf_connected_at: "Connected since {tanggal}"
+  
+  - Dropdown "Inject signals as" dengan opsi:
+    • Task (default)
+    • Lead
+    • Contact  
+    • Opportunity
+    → onChange: PATCH /api/crm/salesforce/settings dengan 
+      body { sf_inject_object: value }
+    → Simpan ke DB langsung (optimistic update)
+  
+  - Tombol "Disconnect" (warna merah, minta konfirmasi):
+    → Tampilkan dialog konfirmasi: "This will remove Salesforce 
+      access from OCTOPILOT. Your Salesforce data will not be deleted."
+    → Jika confirm → POST /api/crm/salesforce/disconnect
+    → Setelah sukses → reload halaman atau update state ke "not connected"
+  
+Handle query params:
+  ?sf_connected=true  → tampilkan toast "Salesforce connected! ✅"
+  ?sf_error=access_denied → tampilkan toast error "Connection was 
+                             canceled or denied"
+
+─────────────────────────────────────
+6C-2. Buat src/app/api/crm/salesforce/settings/route.ts
+─────────────────────────────────────
+
+- Method: PATCH
+- Auth: user harus login
+- Body: { sf_inject_object: 'Task'|'Lead'|'Contact'|'Opportunity' }
+- Logic: UPDATE workspaces SET sf_inject_object = ? WHERE id = ?
+- Return: { success: true, sf_inject_object: value }
+
+─────────────────────────────────────
+6C-3. Update Signal Card — tombol "Push to Salesforce"
+─────────────────────────────────────
+
+FILE: src/components/signals/SignalCard.tsx 
+(atau komponen yang menampilkan signal feed — cek nama file yang ada)
+
+Tambahkan tombol/action "Push to Salesforce" di setiap signal card.
+Letakkan BERDAMPINGAN dengan tombol "Push to HubSpot" yang sudah ada.
+
+Tampilan tombol:
+  - Icon: cloud-upload atau zap dari lucide-react
+  - Label: "Salesforce"
+  - Warna: biru Salesforce (#00A1E0) atau biru Tailwind (blue-500)
+  - Hanya tampil jika workspace sudah connect Salesforce
+    (cek sf_access_token_enc dari workspace context/props)
+  
+State setelah inject:
+  - Jika sf_injected_at sudah ada di signal → tampilkan badge 
+    "Pushed ✓" berwarna biru dengan link ke sf_record_url
+    (buka di tab baru)
+  
+Loading state:
+  - Saat sedang inject → tombol disabled + spinner kecil
+  - Setelah sukses → toast "Signal pushed to Salesforce ✅"
+  - Setelah error → toast error dengan pesan dari API
+
+─────────────────────────────────────
+6C-4. Update Onboarding Step 2 (opsional tapi direkomendasikan)
+─────────────────────────────────────
+
+FILE: src/app/onboarding/page.tsx
+
+Step 2 onboarding saat ini hanya ada HubSpot. Tambahkan Salesforce 
+sebagai opsi kedua.
+
+Tampilan: 2 kartu berdampingan
+  [ Connect HubSpot ]    [ Connect Salesforce ]
+  
+Setiap kartu:
+  - Logo CRM
+  - Status: "Connected ✓" (hijau) atau "Not connected" (abu)
+  - Tombol connect masing-masing
+  - Teks "Skip for now" di bawah kedua kartu
+
+User bisa connect salah satu, keduanya, atau skip.
+
+VERIFIKASI 6C:
+- npm run dev → tidak ada error
+- Buka /settings/crm:
+  → Jika belum connect: tombol "Connect Salesforce" muncul 
+    (tidak ada "Coming Soon")
+  → Setelah connect: dropdown inject object muncul, bisa diubah
+  → Disconnect berfungsi dengan konfirmasi dialog
+- Buka signal feed → tombol "Salesforce" muncul di setiap card
+  (hanya jika workspace sudah connect SF)
+- Klik tombol → toast sukses → badge "Pushed ✓" muncul
+- npm run build → sukses tanpa error
+- CHECKPOINT 6C: "feat: salesforce ui complete"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 6D — Integrasi ke Notifikasi & Analytics
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+─────────────────────────────────────
+6D-1. Update notifikasi alert
+─────────────────────────────────────
+
+FILE: src/lib/notifications.ts
+
+Update template Slack Block Kit dan email HTML untuk menambahkan 
+tombol/link "Push to Salesforce" di samping "Push to HubSpot":
+
+Di Slack alert, update actions block:
+  {
+    "type": "actions",
+    "elements": [
+      { "type": "button", "text": "View Signal", "url": "..." },
+      { "type": "button", "text": "→ HubSpot", "url": "...",
+        "style": "primary" },
+      { "type": "button", "text": "→ Salesforce", 
+        "url": "{APP_URL}/dashboard?inject_sf={signalId}" }
+    ]
+  }
+
+Di email HTML, tambahkan CTA button Salesforce di samping HubSpot.
+Warna tombol Salesforce: #00A1E0
+
+─────────────────────────────────────
+6D-2. Update Analytics — hitung SF injections
+─────────────────────────────────────
+
+FILE: src/app/(app)/analytics/page.tsx (cek file yang ada)
+
+Tambahkan stat card baru "Injected to Salesforce":
+  - Query: COUNT dari intent_signals WHERE sf_injected_at IS NOT NULL 
+    AND workspace_id = X AND sf_injected_at >= 7 hari lalu
+  - Tampilkan di samping stat HubSpot yang sudah ada
+  - Icon: cloud dari lucide-react, warna biru SF
+
+─────────────────────────────────────
+6D-3. Update Dashboard stat cards
+─────────────────────────────────────
+
+FILE: src/app/(app)/dashboard/page.tsx
+
+Stat card "Injected Today" yang sudah ada menghitung HubSpot.
+Update agar menghitung GABUNGAN HubSpot + Salesforce:
+  COUNT signals yang hs_injected_at IS NOT NULL 
+  OR sf_injected_at IS NOT NULL
+  AND created_at >= today
+
+Atau buat 2 stat terpisah jika layout memungkinkan:
+  "HubSpot Today: N"
+  "Salesforce Today: N"
+
+VERIFIKASI 6D:
+- npm run dev → tidak ada error
+- Inject beberapa signal ke Salesforce
+- Buka /analytics → stat "Injected to Salesforce" muncul dengan 
+  angka yang benar
+- Trigger test notification → Slack message harus punya tombol 
+  Salesforce sekarang
+- npm run build → sukses
+- CHECKPOINT 6D: "feat: salesforce analytics and notifications"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ENVIRONMENT VARIABLES BARU
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tambahkan ke .env.example dan Replit Secrets:
+
+SALESFORCE_CLIENT_ID=
+  → Consumer Key dari Salesforce Connected App
+
+SALESFORCE_CLIENT_SECRET=
+  → Consumer Secret dari Salesforce Connected App
+
+SALESFORCE_REDIRECT_URI=
+  → https://yourapp.com/api/crm/salesforce/callback
+
+CARA SETUP SALESFORCE CONNECTED APP:
+1. Login ke Salesforce Setup
+2. App Manager → New Connected App
+3. Enable OAuth Settings:
+   - Callback URL: {SALESFORCE_REDIRECT_URI}
+   - Selected OAuth Scopes:
+     • Access and manage your data (api)
+     • Perform requests at any time (refresh_token, offline_access)
+4. Simpan → tunggu ~10 menit agar aktif
+5. Copy Consumer Key → SALESFORCE_CLIENT_ID
+6. Click "Click to reveal" → Consumer Secret → SALESFORCE_CLIENT_SECRET
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VERIFIKASI AKHIR SPRINT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Jalankan SEMUA verifikasi ini sebelum dinyatakan selesai:
+
+[ ] npm run build → sukses TANPA error atau warning kritis
+[ ] npm run dev → semua halaman load normal
+[ ] /settings/crm → tidak ada "Coming Soon", ada Connect button
+[ ] Connect Salesforce → OAuth flow berjalan end-to-end
+[ ] Dropdown "Inject as" → tersimpan ke DB dan persisten
+[ ] Signal card → tombol Salesforce muncul setelah connect
+[ ] Inject signal → record muncul di Salesforce org
+[ ] Disconnect → semua kolom sf_* cleared di DB
+[ ] Onboarding step 2 → opsi Salesforce tersedia
+[ ] Analytics → stat SF injections akurat
+[ ] Notifications → Slack/email punya link Salesforce
+[ ] HubSpot TIDAK terganggu — semua fitur lama tetap berjalan
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RINGKASAN FILE YANG DIBUAT/DIMODIFIKASI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BARU:
+  src/lib/salesforce.ts
+  src/app/api/crm/salesforce/connect/route.ts
+  src/app/api/crm/salesforce/callback/route.ts
+  src/app/api/crm/salesforce/disconnect/route.ts
+  src/app/api/crm/salesforce/inject/route.ts
+  src/app/api/crm/salesforce/settings/route.ts
+  supabase/migrations/add_salesforce_columns.sql
+  supabase/migrations/add_salesforce_signal_columns.sql
+
+DIMODIFIKASI:
+  src/app/(app)/settings/crm/page.tsx
+  src/components/signals/SignalCard.tsx
+  src/app/onboarding/page.tsx
+  src/lib/notifications.ts
+  src/app/(app)/analytics/page.tsx
+  src/app/(app)/dashboard/page.tsx
+  .env.example
+
+Mulai dari DATABASE MIGRATION sekarang, lalu kerjakan 
+6A → 6B → 6C → 6D secara berurutan.
+Konfirmasi setiap checkpoint sebelum lanjut ke sub-langkah berikutnya.

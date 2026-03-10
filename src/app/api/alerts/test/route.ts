@@ -22,6 +22,9 @@ const DUMMY_SIGNAL: Omit<IntentSignal, 'id' | 'workspace_id' | 'tracker_id' | 'c
   crm_injected: false,
   crm_task_id: null,
   dismissed: false,
+  sf_injected_at: null,
+  sf_record_id: null,
+  sf_record_url: null,
 };
 
 export async function POST() {

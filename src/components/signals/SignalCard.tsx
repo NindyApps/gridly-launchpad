@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, X, Zap, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { ExternalLink, X, Zap, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Copy, Check, Cloud } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -62,18 +62,24 @@ interface SignalCardProps {
   signal: IntentSignal;
   onDismiss?: (id: string) => void;
   onInjectCRM?: (id: string) => void;
+  onInjectSF?: (id: string) => void;
   onFeedback?: (id: string, type: 'useful' | 'not_useful') => void;
   isDismissing?: boolean;
   isInjecting?: boolean;
+  isInjectingSF?: boolean;
+  sfConnected?: boolean;
 }
 
 export function SignalCard({
   signal,
   onDismiss,
   onInjectCRM,
+  onInjectSF,
   onFeedback,
   isDismissing,
   isInjecting,
+  isInjectingSF,
+  sfConnected,
 }: SignalCardProps) {
   const { toast } = useToast();
   const [openerOpen, setOpenerOpen] = useState(false);
@@ -223,7 +229,7 @@ export function SignalCard({
 
                   {signal.crm_injected ? (
                     <span className="inline-flex items-center gap-1 text-xs text-green-400 font-medium">
-                      <Zap className="h-3.5 w-3.5" /> Injected ✓
+                      <Zap className="h-3.5 w-3.5" /> HubSpot ✓
                     </span>
                   ) : (
                     <Button
@@ -234,8 +240,35 @@ export function SignalCard({
                       data-testid={`inject-crm-${signal.id}`}
                     >
                       <Zap className="h-3 w-3 mr-1" />
-                      {isInjecting ? 'Injecting...' : 'Inject to HubSpot'}
+                      {isInjecting ? 'Injecting...' : 'HubSpot'}
                     </Button>
+                  )}
+
+                  {sfConnected && (
+                    signal.sf_injected_at ? (
+                      <a
+                        href={signal.sf_record_url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-medium"
+                        style={{ color: '#00A1E0' }}
+                        data-testid={`sf-injected-badge-${signal.id}`}
+                      >
+                        <Cloud className="h-3.5 w-3.5" /> Pushed ✓
+                      </a>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="h-7 text-white text-xs px-3"
+                        style={{ background: '#00A1E0' }}
+                        onClick={() => onInjectSF?.(signal.id)}
+                        disabled={isInjectingSF}
+                        data-testid={`inject-sf-${signal.id}`}
+                      >
+                        <Cloud className="h-3 w-3 mr-1" />
+                        {isInjectingSF ? 'Pushing...' : 'Salesforce'}
+                      </Button>
+                    )
                   )}
                 </div>
 

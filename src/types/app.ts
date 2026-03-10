@@ -24,6 +24,9 @@ export interface IntentSignal {
   crm_injected: boolean;
   crm_task_id: string | null;
   dismissed: boolean;
+  sf_injected_at: string | null;
+  sf_record_id: string | null;
+  sf_record_url: string | null;
   created_at: string;
 }
 
@@ -40,6 +43,12 @@ export interface Workspace {
   seats_limit: number;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  sf_access_token_enc: string | null;
+  sf_refresh_token_enc: string | null;
+  sf_instance_url: string | null;
+  sf_token_expires_at: string | null;
+  sf_connected_at: string | null;
+  sf_inject_object: 'Task' | 'Lead' | 'Contact' | 'Opportunity' | null;
   created_at: string;
   updated_at: string;
 }
