@@ -16,7 +16,7 @@ const INTENT_LEVELS: { value: IntentLevel | 'all'; label: string }[] = [
 ];
 
 const INTENT_PILL_COLORS: Record<string, string> = {
-  all: 'bg-white/10 text-zinc-300 border-white/20',
+  all: 'bg-white/10 text-zinc-300 border-border',
   high: 'bg-red-500/20 text-red-300 border-red-500/30',
   medium: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
   low: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
@@ -52,7 +52,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
 
   return (
     <div
-      className="sticky top-0 z-10 border-b border-white/5 bg-zinc-950/95 backdrop-blur-sm px-4 py-2.5"
+      className="sticky top-0 z-10 border-b border-border/50 bg-background/95 backdrop-blur-sm px-4 py-2.5"
       data-testid="signal-filters"
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -68,7 +68,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
                 'rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all',
                 (filters.intent_level ?? 'all') === value
                   ? INTENT_PILL_COLORS[value]
-                  : 'border-white/10 text-zinc-500 hover:text-zinc-300 hover:border-white/20'
+                  : 'border-border text-zinc-500 hover:text-zinc-300 hover:border-border'
               )}
               data-testid={`filter-intent-${value}`}
             >
@@ -82,7 +82,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
           value={filters.intent_category ?? 'all'}
           onValueChange={(v) => set('intent_category', v as SignalFeedFilters['intent_category'])}
         >
-          <SelectTrigger className="h-7 w-38 text-xs border-white/10 bg-white/5 text-zinc-300" data-testid="filter-category">
+          <SelectTrigger className="h-7 w-38 text-xs border-border bg-white/5 text-zinc-300" data-testid="filter-category">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -99,7 +99,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
           value={filters.tracker_id ?? 'all'}
           onValueChange={(v) => set('tracker_id', v)}
         >
-          <SelectTrigger className="h-7 w-36 text-xs border-white/10 bg-white/5 text-zinc-300" data-testid="filter-tracker">
+          <SelectTrigger className="h-7 w-36 text-xs border-border bg-white/5 text-zinc-300" data-testid="filter-tracker">
             <SelectValue placeholder="Tracker" />
           </SelectTrigger>
           <SelectContent>
@@ -115,7 +115,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
           value={filters.platform ?? 'all'}
           onValueChange={(v) => set('platform', v as SignalFeedFilters['platform'])}
         >
-          <SelectTrigger className="h-7 w-36 text-xs border-white/10 bg-white/5 text-zinc-300" data-testid="filter-platform">
+          <SelectTrigger className="h-7 w-36 text-xs border-border bg-white/5 text-zinc-300" data-testid="filter-platform">
             <SelectValue placeholder="Platform" />
           </SelectTrigger>
           <SelectContent>
@@ -130,7 +130,7 @@ export function SignalFilters({ filters, onChange, trackers = [], resultCount }:
           value={filters.sort ?? 'confidence_desc'}
           onValueChange={(v) => set('sort', v as SignalFeedFilters['sort'])}
         >
-          <SelectTrigger className="h-7 w-36 text-xs border-white/10 bg-white/5 text-zinc-300" data-testid="filter-sort">
+          <SelectTrigger className="h-7 w-36 text-xs border-border bg-white/5 text-zinc-300" data-testid="filter-sort">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

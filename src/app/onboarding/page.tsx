@@ -142,7 +142,7 @@ export default function OnboardingPage() {
   const progress = (step / (STEPS.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-4 py-10">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
       <div className="mb-8 flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
           <Zap className="h-5 w-5 text-white" />
@@ -163,7 +163,7 @@ export default function OnboardingPage() {
 
       <div className="w-full max-w-lg">
         {step === 0 && (
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-white/5">
             <CardContent className="pt-10 pb-8 text-center space-y-6">
               <div className="flex justify-center">
                 <div className="h-16 w-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
@@ -178,7 +178,7 @@ export default function OnboardingPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-left text-xs text-zinc-400 pt-2">
                 {["Connect HubSpot", "Monitor Reddit & HN", "Auto-inject signals"].map((f) => (
-                  <div key={f} className="rounded-lg border border-white/10 bg-white/5 p-3 text-center">{f}</div>
+                  <div key={f} className="rounded-lg border border-border bg-white/5 p-3 text-center">{f}</div>
                 ))}
               </div>
               <Button className="bg-indigo-600 hover:bg-indigo-700 w-full text-white font-semibold" onClick={() => saveStep(1)} data-testid="button-get-started">
@@ -189,7 +189,7 @@ export default function OnboardingPage() {
         )}
 
         {step === 1 && (
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-white/5">
             <CardHeader>
               <CardTitle className="text-white">Connect your CRM</CardTitle>
               <CardDescription className="text-zinc-400">
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-4 flex items-center gap-4">
+                  <div className="rounded-lg border border-border bg-white/5 p-4 flex items-center gap-4">
                     <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-xl shrink-0">🔶</div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-white">HubSpot CRM</p>
@@ -228,11 +228,11 @@ export default function OnboardingPage() {
                 </div>
               )}
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 border-white/10 text-zinc-400" onClick={() => saveStep(0)}>
+                <Button variant="outline" className="flex-1 border-border text-zinc-400" onClick={() => saveStep(0)}>
                   ← Back
                 </Button>
                 <Button
-                  className={`flex-1 ${hubspotConnected ? "bg-indigo-600 hover:bg-indigo-700" : "border-white/10 text-zinc-400"}`}
+                  className={`flex-1 ${hubspotConnected ? "bg-indigo-600 hover:bg-indigo-700" : "border-border text-zinc-400"}`}
                   variant={hubspotConnected ? "default" : "outline"}
                   onClick={() => saveStep(2)}
                   data-testid="button-next-or-skip"
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
         )}
 
         {step === 2 && (
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-white/5">
             <CardHeader>
               <CardTitle className="text-white">Create your first tracker</CardTitle>
               <CardDescription className="text-zinc-400">
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
                     value={trackerName}
                     onChange={(e) => setTrackerName(e.target.value)}
                     placeholder="e.g. CRM Buyers"
-                    className="border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                    className="border-border bg-white/5 text-white placeholder:text-zinc-500"
                     data-testid="input-tracker-name"
                   />
                 </div>
@@ -303,13 +303,13 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <Button type="button" variant="outline" className="flex-1 border-white/10 text-zinc-400" onClick={() => saveStep(1)}>
+                  <Button type="button" variant="outline" className="flex-1 border-border text-zinc-400" onClick={() => saveStep(1)}>
                     ← Back
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-white/10 text-zinc-400"
+                    className="border-border text-zinc-400"
                     onClick={() => saveStep(3)}
                   >
                     Skip
@@ -329,7 +329,7 @@ export default function OnboardingPage() {
         )}
 
         {step === 3 && (
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-white/5">
             <CardHeader>
               <CardTitle className="text-white">Invite your team</CardTitle>
               <CardDescription className="text-zinc-400">
@@ -349,11 +349,11 @@ export default function OnboardingPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="colleague@company.com"
-                    className="flex-1 border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                    className="flex-1 border-border bg-white/5 text-white placeholder:text-zinc-500"
                     data-testid="input-invite-email"
                   />
                   <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as UserRole)}>
-                    <SelectTrigger className="w-28 border-white/10 bg-white/5 text-white shrink-0" data-testid="select-invite-role">
+                    <SelectTrigger className="w-28 border-border bg-white/5 text-white shrink-0" data-testid="select-invite-role">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -379,7 +379,7 @@ export default function OnboardingPage() {
                 <div className="space-y-2">
                   <p className="text-xs text-zinc-500">Invitations sent</p>
                   {invites.map((inv, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2" data-testid={`invite-row-${i}`}>
+                    <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-white/5 px-3 py-2" data-testid={`invite-row-${i}`}>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
                         <span className="text-sm text-zinc-300">{inv.email}</span>
@@ -391,7 +391,7 @@ export default function OnboardingPage() {
               )}
 
               <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="border-white/10 text-zinc-400" onClick={() => saveStep(2)}>
+                <Button variant="outline" className="border-border text-zinc-400" onClick={() => saveStep(2)}>
                   ← Back
                 </Button>
                 <Button

@@ -91,7 +91,7 @@ export default function TrackersPage() {
       </div>
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="bg-zinc-950 border-white/10 text-white w-full sm:max-w-md overflow-y-auto">
+        <SheetContent className="bg-background border-border text-white w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="mb-6">
             <SheetTitle className="text-white">{editing ? 'Edit Tracker' : 'New Tracker'}</SheetTitle>
           </SheetHeader>

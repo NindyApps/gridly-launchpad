@@ -1,188 +1,253 @@
-# OCTOPILOT — Replit Project
+# OCTOPILOT — Project Rules & Architecture
 
-## Overview
-OCTOPILOT is a B2B SaaS Revenue Signal Intelligence platform. It monitors public communities (Reddit, Hacker News) in real-time to surface high-intent B2B buying signals and auto-inject them into the sales team's CRM — without ever posting to any platform (Zero-Write Architecture).
+## What This Product Does
+OCTOPILOT is a B2B Revenue Signal Intelligence SaaS. It monitors Reddit and Hacker News for public posts where users express buying intent (e.g., asking for CRM recommendations, complaining about competitors, evaluating tools). AI (OpenAI) classifies these signals by intent level and confidence score, then injects verified opportunities directly into HubSpot CRM as contacts and tasks.
 
-## Architecture
+**Zero-Write Constraint:** The platform NEVER posts, replies, or DMs to any external platform. It is a read-only intelligence tool.
 
-- **Framework**: Next.js 14 App Router (migrated from Vite + React Router)
-- **Language**: TypeScript (strict)
-- **Styling**: Tailwind CSS v3 + shadcn/ui + framer-motion
-- **Auth & Database**: Supabase (external — project ID: `pmhybixfrspmmspipfhi`)
-- **State**: TanStack React Query v5
-- **CRM**: HubSpot (OAuth + task injection via `lib/hubspot.ts`)
-- **AI**: OpenAI GPT-4o-mini (signal classification via `lib/openai.ts`)
-- **Payments**: Stripe (webhook handler at `api/webhooks/stripe`)
-- **Email**: Resend (`RESEND_API_KEY` env var)
+---
 
-## Directory Structure
+## Tech Stack
+
+| Layer | Tech | Version |
+|-------|------|---------|
+| Framework | Next.js App Router | 14.2.35 |
+| Language | TypeScript | 5.8.3 (strict) |
+| Styling | Tailwind CSS | 3.4.17 |
+| UI Components | shadcn/ui (Radix UI) | all @radix-ui/* |
+| Animation | framer-motion | 12.34.5 |
+| Icons | lucide-react | 0.462.0 |
+| Auth + DB | Supabase (@supabase/ssr) | 0.9.0 |
+| State / Fetching | TanStack Query v5 | 5.83.0 |
+| CRM | HubSpot REST API | via lib/hubspot.ts |
+| AI | OpenAI SDK | 6.27.0 |
+| Email | Resend | 6.9.3 |
+| Billing | Stripe | 20.4.1 |
+| Charts | Recharts | 2.15.4 |
+
+---
+
+## Folder Structure
 
 ```
 src/
-├── app/                          # Next.js App Router
-│   ├── layout.tsx                # Root layout
-│   ├── page.tsx                  # Landing page
-│   ├── globals.css
-│   ├── providers.tsx             # TanStack Query + Toaster
-│   ├── not-found.tsx
-│   ├── onboarding/page.tsx       # Post-signup onboarding wizard (protected)
-│   ├── (auth)/                   # Public auth pages
-│   │   ├── login/page.tsx        # Password + Magic Link
-│   │   ├── signup/page.tsx       # Registration
-│   │   ├── register/page.tsx     # Legacy alias → signup
-│   │   └── accept-invite/page.tsx
-│   ├── (app)/                    # Protected app pages (AppSidebar shell)
-│   │   ├── layout.tsx            # Auth guard + AppSidebar
-│   │   ├── trackers/page.tsx     # Tracker CRUD
-│   │   ├── analytics/page.tsx    # Signal analytics
-│   │   └── settings/
-│   │       ├── crm/page.tsx      # HubSpot OAuth connect
-│   │       ├── alerts/page.tsx   # Notification preferences
-│   │       ├── team/page.tsx     # Invite + manage members
-│   │       └── billing/page.tsx  # Plan management
-│   ├── (dashboard)/              # Legacy dashboard (existing signals, pipeline, etc.)
-│   │   ├── layout.tsx
-│   │   └── dashboard/           # /dashboard and sub-pages
-│   └── api/
-│       ├── crm/hubspot/
-│       │   ├── connect/route.ts  # Generate OAuth URL
-│       │   ├── callback/route.ts # Handle OAuth callback
-│       │   └── inject/route.ts   # Push signal to HubSpot
-│       └── webhooks/
-│           └── stripe/route.ts   # Stripe event handler
-│
+├── app/
+│   ├── (app)/              ← Protected app shell (sidebar + topbar)
+│   │   ├── dashboard/      ← Main signal feed page
+│   │   ├── trackers/       ← Tracker CRUD
+│   │   ├── analytics/      ← Analytics & charts
+│   │   ├── settings/
+│   │   │   ├── crm/        ← HubSpot OAuth connect
+│   │   │   ├── alerts/     ← Notification prefs
+│   │   │   ├── team/       ← Invite & manage members
+│   │   │   └── billing/    ← Stripe plans
+│   │   └── layout.tsx      ← Auth guard + AppSidebar + TopBar
+│   ├── (auth)/             ← Public auth pages (no sidebar)
+│   │   ├── login/
+│   │   ├── signup/
+│   │   └── accept-invite/
+│   ├── api/
+│   │   ├── crm/hubspot/    ← connect + callback + inject routes
+│   │   ├── feedback/       ← Signal feedback POST
+│   │   ├── team/invite/    ← Send Supabase invite
+│   │   ├── webhooks/stripe/← Stripe subscription events
+│   │   └── dev/seed/       ← Seed test signals (dev only)
+│   ├── auth/callback/      ← OAuth code exchange
+│   └── onboarding/         ← 4-step onboarding wizard
 ├── components/
-│   ├── ui/                       # shadcn/ui auto-generated
-│   ├── layout/                   # AppSidebar, TopBar
-│   ├── signals/                  # SignalCard, SignalFilters
-│   ├── trackers/                 # TrackerCard, TrackerForm
-│   ├── auth/                     # LoginForm, SignupForm
-│   ├── shared/                   # EmptyState, LoadingSpinner, ConfirmDialog
-│   └── [landing page components] # Navbar, HeroSection, HowItWorks, Features,
-│                                 # Testimonials, Pricing, FAQ, CTASection, Footer
-│
+│   ├── ui/                 ← shadcn/ui primitives (DO NOT MODIFY)
+│   │   ├── container.tsx   ← max-w-[1200px] wrapper
+│   │   └── section.tsx     ← py-20 md:py-28 section wrapper
+│   ├── layout/             ← App shell (sidebar, topbar, breadcrumb)
+│   ├── signals/            ← SignalCard, SignalFeed, SignalFilters
+│   ├── trackers/           ← TrackerCard, TrackerForm
+│   ├── auth/               ← LoginForm, SignupForm
+│   └── shared/             ← EmptyState, LoadingSpinner, TagInput,
+│                               FeatureCard, CTAButton, ConfirmDialog
+├── sections/               ← Landing page only components
+│   ├── Navbar.tsx
+│   ├── HeroSection.tsx
+│   ├── HowItWorks.tsx
+│   ├── Features.tsx
+│   ├── Pricing.tsx
+│   ├── FAQ.tsx
+│   ├── CTASection.tsx
+│   ├── Footer.tsx
+│   ├── Testimonials.tsx
+│   ├── StatsMarquee.tsx
+│   ├── SeeItInAction.tsx
+│   └── DashboardPreview.tsx
 ├── hooks/
-│   ├── useAuth.ts                # Supabase auth state + profile
-│   ├── useSignals.ts             # Signal feed + dismiss + CRM inject mutations
-│   ├── useTrackers.ts            # Tracker CRUD operations
-│   ├── use-workspaces.ts         # Workspace + active workspace state
-│   └── use-toast.ts
-│
+│   ├── useAuth.ts          ← user, profile, workspace, signOut, isLoading
+│   ├── useSignals.ts       ← signals list, useFeedback, useDismissSignal, useInjectToCRM
+│   ├── useTrackers.ts      ← trackers CRUD
+│   └── use-workspaces.ts   ← activeWorkspace
 ├── lib/
-│   ├── supabase/client.ts        # Browser Supabase client (@supabase/ssr)
-│   ├── supabase/server.ts        # Server Supabase client (@supabase/ssr)
-│   ├── openai.ts                 # classifySignal() using GPT-4o-mini
-│   ├── hubspot.ts                # OAuth, createContact, createTask, injectSignalToCRM
-│   ├── auth.ts                   # Legacy useAuth (thin wrapper)
-│   └── utils.ts                  # cn(), etc.
-│
+│   ├── supabase/client.ts  ← browser Supabase client
+│   ├── supabase/server.ts  ← server Supabase client (for API routes)
+│   ├── hubspot.ts          ← HubSpot REST API helpers
+│   ├── openai.ts           ← OpenAI client init
+│   ├── seed-signals.ts     ← 8 test signals (dev utility)
+│   └── utils.ts            ← cn() utility
 ├── types/
-│   ├── app.ts                    # IntentSignal, Workspace, Profile, Tracker, etc.
-│   └── database.ts               # Supabase DB type definitions
-│
-└── middleware.ts                 # Route protection (protects /dashboard, /trackers, /analytics, /settings, /onboarding)
+│   ├── app.ts              ← IntentSignal, Workspace, Profile, Tracker types
+│   └── database.ts         ← DB-level types
+└── middleware.ts            ← Session check, route protection
 ```
 
-## Route Protection (middleware.ts)
+---
 
-- **Protected**: `/dashboard`, `/trackers`, `/analytics`, `/settings/*`, `/onboarding` → redirect to `/login` if no session
-- **Auth redirect**: `/login`, `/signup` → redirect to `/dashboard` if session exists
-- **Public**: `/`, `/accept-invite`, `/api/*`, `/auth/*`
+## Design System Rules
 
-## Environment Variables (`.env.local`)
+### Color Tokens (ALWAYS use CSS variables — NEVER hardcode hex colors)
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://pmhybixfrspmmspipfhi.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
-SUPABASE_SERVICE_ROLE_KEY=<service role key — needed for API routes>
-NEXT_PUBLIC_APP_URL=http://localhost:5000
-OPENAI_API_KEY=<needed for classifySignal>
-HUBSPOT_CLIENT_ID=<HubSpot app client ID>
-HUBSPOT_CLIENT_SECRET=<HubSpot app client secret>
-HUBSPOT_REDIRECT_URI=http://localhost:5000/api/crm/hubspot/callback
-REDDIT_CLIENT_ID=<Reddit OAuth app>
-REDDIT_CLIENT_SECRET=<Reddit OAuth secret>
-REDDIT_USER_AGENT=OCTOPILOT/1.0
-RESEND_API_KEY=<for email alerts>
-RESEND_FROM_EMAIL=noreply@octopilot.io
-STRIPE_SECRET_KEY=<Stripe secret>
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<Stripe publishable>
-STRIPE_WEBHOOK_SECRET=<Stripe webhook signing secret>
-ENCRYPTION_KEY=<for encrypting HubSpot tokens at rest>
+| Token | Value | Usage |
+|-------|-------|-------|
+| `bg-background` | #0B0D0F | Page backgrounds, sidebar, topbar |
+| `bg-surface` / `bg-card` | #11151A | Card backgrounds, panels, dropdowns |
+| `bg-primary` | #7C3AED (violet) | CTA buttons, active states, badges |
+| `text-foreground` | #F8FAFC | Primary text |
+| `text-muted-foreground` | #94A3B8 | Secondary/helper text |
+| `border-border` | rgba(255,255,255,0.08) | All borders and dividers |
+
+### Typography
+- **Display/Headings:** `font-display` → Space Grotesk
+- **Body:** `font-sans` → Inter
+- **Font scale:** text-xs (10px) → text-sm (14px) → text-base (16px) → text-xl → text-2xl → text-3xl
+
+### Spacing
+- Section padding: `py-20 md:py-28` (use `<Section>` component)
+- Card padding: `p-4` (compact) or `p-6` (default)
+- Container width: max 1200px (use `<Container>` component)
+- Grid gaps: `gap-3` (compact) or `gap-4` (default) or `gap-6` (spacious)
+
+### Border Radius
+- `rounded-xs` — small pills, tiny chips
+- `rounded-md` — inputs, small cards
+- `rounded-lg` — standard cards (default `--radius`)
+- `rounded-xl` — feature cards
+- `rounded-2xl` — large hero cards
+- `rounded-full` — pills, avatars, buttons
+
+---
+
+## Coding Rules for Future AI Changes
+
+### DO:
+- Use `bg-background`, `bg-card`, `bg-surface`, `border-border`, `text-foreground`, `text-muted-foreground`, `bg-primary`, `text-primary` etc. from CSS variables
+- Import `Container` from `@/components/ui/container` for page-level width constraints
+- Import `Section` from `@/components/ui/section` for landing page sections
+- Import `FeatureCard` from `@/components/shared/FeatureCard` for feature display cards
+- Import `CTAButton` from `@/components/shared/CTAButton` for primary CTA buttons
+- Keep landing page components in `src/sections/`
+- Keep app UI components in `src/components/`
+- Use `data-testid` on all interactive and meaningful display elements
+- Use TanStack Query v5 object form: `useQuery({ queryKey: [...], ... })`
+- Use `apiRequest` from `@/lib/queryClient` for mutations
+- Always show loading states (`isPending`, `isLoading`) on async operations
+- Check auth in API routes using `createClient()` from `@/lib/supabase/server`
+
+### DON'T:
+- NEVER hardcode hex colors like `bg-[#0F172A]` or `bg-zinc-950` — use CSS vars
+- NEVER import landing components from `@/components/X` — use `@/sections/X`
+- NEVER import React explicitly — Vite/Next.js JSX transform handles it
+- NEVER modify `src/components/ui/` files (shadcn primitives)
+- NEVER add server-side logic to files with `"use client"` directive
+- NEVER use `process.env` on the frontend — use `NEXT_PUBLIC_` prefixed vars
+- NEVER create new schema files — all DB changes go via `supabase/schema.sql`
+- NEVER post/reply/DM on any external platform (Zero-Write Architecture)
+
+---
+
+## Database Schema
+
+**Supabase project:** `pmhybixfrspmmspipfhi`
+**Schema file:** `supabase/schema.sql` — MUST be run manually in Supabase SQL Editor
+
+### Tables
+1. `workspaces` — tenant root, stores HubSpot tokens (encrypted), Stripe IDs
+2. `profiles` — user profiles (1:1 with auth.users), role, onboarding state
+3. `trackers` — monitoring configs (keywords, subreddits, platforms)
+4. `intent_signals` — detected buying signals with AI scores
+5. `human_feedback_loop` — user feedback on signal quality
+6. `compliance_logs` — audit trail for all significant actions
+
+### Auth Flow
+1. User signs up → Supabase `handle_new_user()` trigger auto-creates workspace + admin profile
+2. Session managed via `@supabase/ssr` cookies
+3. Middleware protects: `/dashboard/*`, `/trackers/*`, `/analytics/*`, `/settings/*`, `/onboarding/*`
+4. OAuth (Google) redirect URL: `{APP_URL}/auth/callback`
+
+---
+
+## Environment Variables
+
+All are in `.env.local`. All are filled in Replit Secrets.
+
+```
+NEXT_PUBLIC_SUPABASE_URL         ← Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY    ← Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY        ← Service role (server-only, never expose)
+NEXT_PUBLIC_APP_URL              ← App URL for OAuth redirects
+OPENAI_API_KEY                   ← GPT-4o-mini for signal classification
+HUBSPOT_CLIENT_ID                ← HubSpot OAuth app client ID
+HUBSPOT_CLIENT_SECRET            ← HubSpot OAuth app client secret
+HUBSPOT_REDIRECT_URI             ← {APP_URL}/api/crm/hubspot/callback
+REDDIT_CLIENT_ID                 ← Reddit API app ID
+REDDIT_CLIENT_SECRET             ← Reddit API app secret
+REDDIT_USER_AGENT                ← e.g. "OCTOPILOT/1.0 by youruser"
+RESEND_API_KEY                   ← Resend for email alerts
+RESEND_FROM_EMAIL                ← e.g. "alerts@octopilot.io"
+STRIPE_SECRET_KEY                ← Stripe server-side key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ← Stripe client-side key
+STRIPE_WEBHOOK_SECRET            ← Stripe webhook signing secret
+ENCRYPTION_KEY                   ← 32-char key for encrypting HubSpot tokens
 ```
 
-## Supabase Database Schema
+---
 
-Tables expected (match `types/database.ts`):
-- `workspaces` — workspace config, plan, HubSpot token
-- `profiles` — user profiles with roles (admin/analyst/sdr/viewer)
-- `trackers` — keyword/subreddit/competitor monitoring configs
-- `intent_signals` — AI-classified buying signals
-- `human_feedback_loop` — SDR feedback on signal quality
-- `compliance_logs` — audit trail
+## Build Status (as of March 2026)
 
-## Running the App
+### Completed (functional)
+- ✅ Landing page (Navbar, Hero, HowItWorks, Features, Pricing, FAQ, CTA, Footer)
+- ✅ Auth system (email+password, Google OAuth, invite flow)
+- ✅ App shell (sidebar, topbar, breadcrumb, mobile drawer)
+- ✅ Dashboard page (stats cards, signal feed, filters)
+- ✅ Signal cards (intent badges, confidence, opener, feedback, dismiss, inject)
+- ✅ Tracker CRUD (create, toggle, delete)
+- ✅ Analytics page (stats cards, by-platform/category bars)
+- ✅ Settings pages (CRM, Alerts, Team invite, Billing UI)
+- ✅ HubSpot OAuth flow (connect + callback + token storage)
+- ✅ Signal feedback API (`/api/feedback`)
+- ✅ Stripe webhook handler
+- ✅ Team invite API
+- ✅ Dev seed route (`/api/dev/seed`)
+
+### Partially Done
+- 🔄 HubSpot inject — logic exists but CRM connection status not read from DB
+- 🔄 Analytics — uses simple bars, not Recharts charts
+- 🔄 Team settings — member list is mocked, not from DB
+- 🔄 Billing — usage and plan not read from Stripe/DB
+- 🔄 Alert settings — saves to state only, not persisted to DB
+
+### Not Started (next priorities)
+- ❌ Signal Ingestion Engine (P06) — Reddit crawler + HN crawler + OpenAI classify + scheduler
+- ❌ Email alerts via Resend when new high-confidence signals arrive
+- ❌ Recharts time-series charts in analytics
+- ❌ HubSpot token refresh logic
+- ❌ Edit tracker (update mutation)
+- ❌ Stripe checkout flow (create session, customer portal)
+
+### CRITICAL MANUAL STEP REQUIRED
+**Run `supabase/schema.sql` in Supabase SQL Editor before ANY feature can work.**
+Also: Enable Realtime for `intent_signals` table in Supabase Dashboard → Database → Replication.
+
+---
+
+## Running the Project
 
 ```bash
-npm run dev     # Next.js dev server on port 5000
-npm run build   # Production build
-npm start       # Production server on port 5000
+npm run dev    # starts Next.js on port 5000
 ```
 
-## Key Implementation Notes
-
-- FloatingDots in HeroSection and CTASection use deterministic Math.sin/cos with rounding to avoid SSR/client hydration mismatches
-- Dashboard layout uses `useAuth` hook with `useEffect` redirect (client component guard)
-- Old Vite files fully removed — pure Next.js 14 App Router
-- `"use client"` required on all components using framer-motion, hooks, or event handlers
-- HubSpot token is stored in `workspaces.hubspot_token_enc` — should be encrypted in production using `ENCRYPTION_KEY`
-
-## Completion Status
-
-### P01
-- [x] TypeScript types (`types/app.ts`, `types/database.ts`)
-- [x] Middleware route protection (`src/middleware.ts`)
-- [x] All auth routes: login, signup, accept-invite
-- [x] App routes: trackers, analytics, settings (crm/alerts/team/billing)
-- [x] API routes: HubSpot OAuth connect/callback/inject, Stripe webhook
-- [x] Component folders: layout/, signals/, trackers/, auth/, shared/
-- [x] Hooks: useAuth, useSignals, useTrackers
-- [x] Landing page: all sections including Testimonials, Pricing, FAQ
-
-### P02
-- [x] `supabase/schema.sql` — 6 tables + RLS + trigger (run manually in Supabase SQL Editor)
-- [x] TypeScript types synced to schema exactly
-- [x] `handle_new_user()` trigger: auto-creates workspace + admin profile on signup
-- [x] Onboarding updates workspace via UPDATE (not INSERT)
-- [x] `CreateTrackerInput` type + `created_by: user.id` in useTrackers
-
-### P05
-- [x] `SignalCard.tsx` rebuilt: colored left border (red/amber/slate by intent), platform badges (Reddit `r/sub` pill, HN orange-Y), confidence pill (green/amber/slate), urgency URGENT badge, collapsible suggested opener with clipboard copy, Useful/Not Useful feedback buttons, Dismiss → framer-motion slide-out animation
-- [x] `SignalFilters.tsx` rebuilt: intent level pills (All/High/Medium/Low), Category/Tracker/Platform/Sort dropdowns, Urgent Only toggle, result count, Clear filters button — all client-side
-- [x] `SignalFeed.tsx` created: applies filters client-side, Supabase Realtime INSERT subscription → "N new signals — click to refresh" banner, 3-card skeleton loading, empty states (no trackers / monitoring / no matches)
-- [x] `dashboard/page.tsx` rebuilt: 4 stat cards (Signals Today / High Intent / Injected Today / Acceptance Rate) + sticky SignalFilters + SignalFeed
-- [x] `useSignals.ts` updated: always filters `dismissed=false`, order by confidence_score DESC; `useFeedback` mutation added
-- [x] `api/feedback/route.ts` created: POST validates signal_id + feedback_type, INSERTs human_feedback_loop, auto-dismisses on not_useful/false_positive, logs to compliance_logs
-- [x] `lib/seed-signals.ts` created: 8 sample signals covering all intent/platform/category combos with realistic CRM SaaS copy
-- [x] `api/dev/seed/route.ts` created: POST seeds signals for authenticated user's workspace (dev only, requires tracker to exist first)
-
-### P04
-- [x] `(app)/layout.tsx` upgraded: `isLoading` fix, mobile drawer state, wires TopBar + Breadcrumb
-- [x] `AppSidebar.tsx` rebuilt: collapsible to 64px icon-only (localStorage persisted), workspace name + plan badge, indigo left-border active state, Tooltip hints when collapsed, mobile Sheet drawer, version badge
-- [x] `TopBar.tsx` rebuilt: route-based dynamic title, hamburger for mobile, search input, Help modal, notification bell with red badge count, user avatar dropdown (name/email header, Profile Settings, Sign Out)
-- [x] `Breadcrumb.tsx` created: route-aware breadcrumb trail (OCTOPILOT > Section > Sub-page)
-- [x] `(app)/dashboard/page.tsx` placeholder created with quick-link cards to Trackers / Analytics / CRM
-- [x] Removed old `(dashboard)/dashboard/page.tsx` to eliminate Next.js route conflict
-- [x] TopBar removed from all individual pages — layout now owns the header
-
-### P03
-- [x] `app/auth/callback/route.ts` — OAuth + magic link callback, detects new vs returning users
-- [x] Login upgraded: Google OAuth, forgot password (resetPasswordForEmail), show/hide password, inline errors
-- [x] Signup upgraded: confirm password, 5-point strength indicator, ToS checkbox, Google OAuth
-- [x] Accept-invite upgraded: verifyOtp with type='invite', shows workspace name
-- [x] `hooks/useAuth.ts`: now returns user, session, profile, workspace, role, isLoading, signOut
-- [x] `lib/auth.ts`: thin re-export of hooks/useAuth.ts for backward compatibility
-- [x] Middleware: added `/auth/*` to public routes
-- [x] Onboarding rebuilt as 4-step wizard: Welcome → Connect CRM → Create Tracker → Invite Team
-- [x] `components/shared/TagInput.tsx`: reusable tag pill input (Enter/comma to add, backspace/×  to remove)
-- [x] `api/team/invite/route.ts`: uses Supabase admin.inviteUserByEmail, validates admin role
+The "Start application" workflow runs this automatically.

@@ -45,10 +45,10 @@ const NAV_ITEMS = [
 ] as const;
 
 const PLAN_COLORS: Record<string, string> = {
-  free: 'bg-zinc-700 text-zinc-300',
-  pro: 'bg-indigo-600/30 text-indigo-300',
-  growth: 'bg-violet-600/30 text-violet-300',
-  enterprise: 'bg-amber-600/30 text-amber-300',
+  free: 'bg-muted text-muted-foreground',
+  pro: 'bg-primary/20 text-primary',
+  growth: 'bg-violet-600/20 text-violet-300',
+  enterprise: 'bg-amber-600/20 text-amber-300',
 };
 
 function SidebarContent({
@@ -79,25 +79,25 @@ function SidebarContent({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn(
-        'flex h-full flex-col border-r border-white/10 bg-[#1E293B] transition-all duration-300',
+        'flex h-full flex-col border-r border-border bg-background transition-all duration-300',
         collapsed ? 'w-16' : 'w-60'
       )}>
         {/* Logo */}
         <div className={cn(
-          'flex h-14 items-center border-b border-white/10 shrink-0',
+          'flex h-14 items-center border-b border-border shrink-0',
           collapsed ? 'justify-center px-0' : 'gap-2 px-4'
         )}>
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600">
-            <Zap className="h-4 w-4 text-white" />
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary">
+            <Zap className="h-4 w-4 text-primary-foreground" />
           </div>
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-sm font-bold text-white tracking-tight">OCTOPILOT</span>
-              <span className="text-[10px] text-zinc-500 border border-white/10 rounded px-1">v1.0</span>
+              <span className="text-sm font-bold text-foreground tracking-tight">OCTOPILOT</span>
+              <span className="text-[10px] text-muted-foreground border border-border rounded px-1">v1.0</span>
             </div>
           )}
           {onClose && (
-            <button onClick={onClose} className="ml-auto text-zinc-400 hover:text-white">
+            <button onClick={onClose} className="ml-auto text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -117,7 +117,7 @@ function SidebarContent({
                       <button
                         className={cn(
                           'flex w-full items-center justify-center rounded-lg p-2 text-sm transition-colors',
-                          isActive ? 'bg-indigo-600/20 text-indigo-300' : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                          isActive ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                         )}
                         onClick={() => setSettingsOpen(!settingsOpen)}
                         data-testid="nav-settings"
@@ -135,7 +135,7 @@ function SidebarContent({
                   <button
                     className={cn(
                       'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
-                      isActive ? 'text-white' : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
                     onClick={() => setSettingsOpen(!isOpen)}
                     data-testid="nav-settings"
@@ -155,8 +155,8 @@ function SidebarContent({
                             className={cn(
                               'block rounded-md px-3 py-1.5 text-xs transition-colors',
                               childActive
-                                ? 'bg-indigo-600/15 text-indigo-300 border-l-2 border-indigo-500'
-                                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-primary/15 text-primary border-l-2 border-primary'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                             )}
                             data-testid={`nav-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
@@ -178,8 +178,8 @@ function SidebarContent({
                   'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors relative',
                   collapsed ? 'justify-center px-0 py-2.5' : '',
                   isActive
-                    ? 'bg-indigo-600/15 text-indigo-300 border-l-2 border-indigo-500'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-primary/15 text-primary border-l-2 border-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 )}
                 data-testid={`nav-${item.label.toLowerCase()}`}
               >
@@ -202,10 +202,10 @@ function SidebarContent({
         </nav>
 
         {/* Bottom: workspace + user + signout */}
-        <div className="border-t border-white/10 p-2 space-y-1 shrink-0">
+        <div className="border-t border-border p-2 space-y-1 shrink-0">
           {!collapsed && workspace && (
             <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-xs text-zinc-300 truncate max-w-[120px]">{workspace.name}</span>
+              <span className="text-xs text-foreground/80 truncate max-w-[120px]">{workspace.name}</span>
               <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', PLAN_COLORS[plan] ?? PLAN_COLORS.free)}>
                 {planLabel}
               </span>
@@ -214,14 +214,14 @@ function SidebarContent({
 
           {!collapsed && (
             <div className="flex items-center gap-2.5 px-3 py-1.5">
-              <div className="h-6 w-6 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] text-white font-semibold">
+              <div className="h-6 w-6 shrink-0 rounded-full bg-primary flex items-center justify-center text-[10px] text-primary-foreground font-semibold">
                 {user?.email?.[0].toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-white truncate">
+                <p className="text-xs text-foreground truncate">
                   {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
                 </p>
-                <p className="text-[10px] text-zinc-500 truncate">{user?.email}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
               </div>
             </div>
           )}
@@ -231,7 +231,7 @@ function SidebarContent({
               <TooltipTrigger asChild>
                 <button
                   onClick={handleSignOut}
-                  className="flex w-full items-center justify-center rounded-lg p-2.5 text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                  className="flex w-full items-center justify-center rounded-lg p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                   data-testid="button-sign-out"
                 >
                   <LogOut className="h-5 w-5" />
@@ -242,7 +242,7 @@ function SidebarContent({
           ) : (
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               data-testid="button-sign-out"
             >
               <LogOut className="h-4 w-4 shrink-0" />
@@ -253,7 +253,7 @@ function SidebarContent({
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="flex w-full items-center justify-center rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+              className="flex w-full items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               data-testid="button-collapse-sidebar"
             >
               <ChevronLeft className={cn('h-4 w-4 transition-transform duration-300', collapsed && 'rotate-180')} />
@@ -293,7 +293,7 @@ export function AppSidebar({ mobileOpen, onMobileClose }: AppSidebarProps) {
 
       {/* Mobile drawer */}
       <Sheet open={mobileOpen} onOpenChange={onMobileClose}>
-        <SheetContent side="left" className="p-0 w-60 border-r border-white/10 bg-[#1E293B]">
+        <SheetContent side="left" className="p-0 w-60 border-r border-border bg-background">
           <SidebarContent collapsed={false} onClose={onMobileClose} />
         </SheetContent>
       </Sheet>

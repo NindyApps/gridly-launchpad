@@ -46,7 +46,7 @@ function applyFilters(signals: IntentSignal[], filters: SignalFeedFilters): Inte
 
 function SignalSkeleton() {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#0F172A] p-4 space-y-3">
+    <div className="rounded-xl border border-border bg-background p-4 space-y-3">
       <div className="flex items-center justify-between">
         <Skeleton className="h-5 w-32 rounded-full bg-white/5" />
         <Skeleton className="h-5 w-20 rounded-full bg-white/5" />

@@ -52,7 +52,7 @@ function PlatformBadge({ platform, postUrl }: { platform: string; postUrl: strin
     );
   }
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-zinc-300 capitalize">
+    <span className="inline-flex items-center rounded-full border border-border bg-white/5 px-2 py-0.5 text-xs text-zinc-300 capitalize">
       {platform}
     </span>
   );
@@ -121,7 +121,7 @@ export function SignalCard({
           data-testid={`signal-card-${signal.id}`}
         >
           <div
-            className="rounded-xl border border-white/10 bg-[#0F172A] hover:border-white/20 transition-colors"
+            className="rounded-xl border border-border bg-background hover:border-border transition-colors"
             style={{ borderLeft: `4px solid ${INTENT_BORDER[signal.intent_level] ?? '#64748B'}` }}
           >
             <div className="p-4 space-y-3">
@@ -156,7 +156,7 @@ export function SignalCard({
               {/* Tags */}
               <div className="flex flex-wrap gap-1.5">
                 {signal.pain_domain && (
-                  <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[11px] text-zinc-400">
+                  <span className="rounded-full bg-white/5 border border-border px-2 py-0.5 text-[11px] text-zinc-400">
                     {signal.pain_domain}
                   </span>
                 )}

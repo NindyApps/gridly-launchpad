@@ -5,6 +5,7 @@ export default {
   content: [
     "./src/app/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
+    "./src/sections/**/*.{ts,tsx}",
     "./src/pages/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
@@ -14,6 +15,7 @@ export default {
       center: true,
       padding: "2rem",
       screens: {
+        xl: "1200px",
         "2xl": "1400px",
       },
     },
@@ -28,6 +30,7 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: "hsl(var(--surface))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -68,9 +71,13 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        xs: "calc(var(--radius) - 6px)",
         sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+        "3xl": "calc(var(--radius) + 12px)",
       },
       keyframes: {
         "accordion-down": {

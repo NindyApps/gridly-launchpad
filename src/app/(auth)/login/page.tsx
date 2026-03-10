@@ -83,7 +83,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex">
+    <div className="min-h-screen bg-background flex">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-950 via-indigo-900 to-zinc-900 items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-500 rounded-full blur-3xl" />
@@ -132,7 +132,7 @@ export default function LoginPage() {
             onClick={handleGoogleLogin}
             disabled={googleLoading}
             variant="outline"
-            className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 gap-2"
+            className="w-full border-border bg-white/5 text-white hover:bg-white/10 gap-2"
             data-testid="button-google-login"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                  className="pl-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
                   data-testid="input-email"
                 />
               </div>
@@ -190,7 +190,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 pr-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                  className="pl-10 pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
                   data-testid="input-password"
                 />
                 <button

@@ -97,7 +97,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 mx-auto mb-4">
@@ -122,7 +122,7 @@ export default function SignupPage() {
           onClick={handleGoogleSignup}
           disabled={googleLoading}
           variant="outline"
-          className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 gap-2"
+          className="w-full border-border bg-white/5 text-white hover:bg-white/10 gap-2"
           data-testid="button-google-signup"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+              className="border-border bg-white/5 text-white placeholder:text-zinc-500"
               data-testid="input-full-name"
             />
           </div>
@@ -164,7 +164,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+              className="border-border bg-white/5 text-white placeholder:text-zinc-500"
               data-testid="input-email"
             />
           </div>
@@ -180,7 +180,7 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="pr-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                className="pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
                 data-testid="input-password"
               />
               <button
@@ -222,7 +222,7 @@ export default function SignupPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className={cn(
-                  "pr-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500",
+                  "pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500",
                   !passwordsMatch && "border-red-500/50"
                 )}
                 data-testid="input-confirm-password"
@@ -245,7 +245,7 @@ export default function SignupPage() {
               type="checkbox"
               checked={tosAccepted}
               onChange={(e) => setTosAccepted(e.target.checked)}
-              className="mt-0.5 rounded border-white/20 bg-white/5 accent-indigo-600"
+              className="mt-0.5 rounded border-border bg-white/5 accent-indigo-600"
               data-testid="checkbox-tos"
             />
             <span className="text-xs text-zinc-400 leading-relaxed">

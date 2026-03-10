@@ -97,7 +97,7 @@ export default function AcceptInvitePage() {
   if (checking) return <FullPageLoader />;
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
       <div className="mb-8 flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
           <Zap className="h-5 w-5 text-white" />
@@ -105,7 +105,7 @@ export default function AcceptInvitePage() {
         <span className="text-lg font-bold text-white tracking-tight">OCTOPILOT</span>
       </div>
 
-      <Card className="w-full max-w-md border border-white/10 bg-white/5 backdrop-blur-sm">
+      <Card className="w-full max-w-md border border-border bg-white/5 backdrop-blur-sm">
         <CardHeader className="space-y-2">
           {workspaceName && (
             <div className="flex items-center gap-2 mb-2 text-green-400 text-sm">
@@ -144,7 +144,7 @@ export default function AcceptInvitePage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="pr-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500"
+                  className="pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
                   data-testid="input-password"
                 />
                 <button
@@ -168,7 +168,7 @@ export default function AcceptInvitePage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   className={cn(
-                    "pr-10 border-white/10 bg-white/5 text-white placeholder:text-zinc-500",
+                    "pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500",
                     !passwordsMatch && "border-red-500/50"
                   )}
                   data-testid="input-confirm-password"

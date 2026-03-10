@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import HowItWorks from "@/components/HowItWorks";
-import Features from "@/components/Features";
-import Testimonials from "@/components/Testimonials";
-import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
-import CTASection from "@/components/CTASection";
-import Footer from "@/components/Footer";
+import Navbar from "@/sections/Navbar";
+import HeroSection from "@/sections/HeroSection";
+import HowItWorks from "@/sections/HowItWorks";
+import Features from "@/sections/Features";
+import Testimonials from "@/sections/Testimonials";
+import Pricing from "@/sections/Pricing";
+import FAQ from "@/sections/FAQ";
+import CTASection from "@/sections/CTASection";
+import Footer from "@/sections/Footer";
 
 export const metadata: Metadata = {
   title: 'OCTOPILOT — Find B2B Buyers The Moment They Say They Need You',
