@@ -35,16 +35,18 @@ export function useAuth() {
 
     if (!profile) return { profile: null, workspace: null, role: null };
 
+    const typedProfile = profile as unknown as Profile;
+
     const { data: workspace } = await supabase
       .from("workspaces")
       .select("*")
-      .eq("id", profile.workspace_id)
+      .eq("id", typedProfile.workspace_id)
       .single();
 
     return {
-      profile: profile as Profile,
-      workspace: workspace as Workspace | null,
-      role: profile.role as UserRole,
+      profile: typedProfile,
+      workspace: workspace as unknown as Workspace | null,
+      role: typedProfile.role as UserRole,
     };
   }, []);
 

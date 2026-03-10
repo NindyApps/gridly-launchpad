@@ -40,7 +40,21 @@ export interface Database {
           stripe_customer_id?: string | null;
           stripe_subscription_id?: string | null;
         };
-        Update: Partial<Database['public']['Tables']['workspaces']['Insert']>;
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          plan?: 'pro' | 'growth' | 'enterprise';
+          hubspot_token_enc?: string | null;
+          hubspot_refresh_token_enc?: string | null;
+          hubspot_token_expires_at?: string | null;
+          slack_webhook_url?: string | null;
+          alert_confidence_threshold?: number;
+          seats_limit?: number;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+        };
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -66,7 +80,24 @@ export interface Database {
           onboarding_step?: number;
           last_seen_at?: string | null;
         };
-        Update: Partial<Omit<Database['public']['Tables']['profiles']['Insert'], 'id'>>;
+        Update: {
+          role?: 'admin' | 'analyst' | 'sdr' | 'viewer';
+          full_name?: string | null;
+          avatar_url?: string | null;
+          notification_prefs?: Json;
+          onboarding_completed?: boolean;
+          onboarding_step?: number;
+          last_seen_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       trackers: {
         Row: {
@@ -96,7 +127,31 @@ export interface Database {
           is_active?: boolean;
           confidence_override?: number | null;
         };
-        Update: Partial<Omit<Database['public']['Tables']['trackers']['Insert'], 'workspace_id' | 'created_by'>>;
+        Update: {
+          name?: string;
+          keywords?: string[];
+          competitor_names?: string[];
+          subreddits?: string[];
+          platforms?: string[];
+          is_active?: boolean;
+          confidence_override?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trackers_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trackers_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       intent_signals: {
         Row: {
@@ -138,7 +193,38 @@ export interface Database {
           crm_task_id?: string | null;
           dismissed?: boolean;
         };
-        Update: Partial<Omit<Database['public']['Tables']['intent_signals']['Insert'], 'workspace_id' | 'tracker_id'>>;
+        Update: {
+          platform?: 'reddit' | 'hackernews' | 'slack' | 'linkedin';
+          post_url?: string;
+          author_handle?: string | null;
+          post_timestamp?: string | null;
+          intent_category?: 'vendor_switch' | 'new_purchase' | 'evaluation' | 'complaint';
+          intent_level?: 'high' | 'medium' | 'low';
+          confidence_score?: number;
+          pain_domain?: string | null;
+          ai_summary?: string;
+          suggested_opener?: string | null;
+          urgency_tag?: 'urgent' | 'standard' | 'monitor';
+          crm_injected?: boolean;
+          crm_task_id?: string | null;
+          dismissed?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'intent_signals_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'intent_signals_tracker_id_fkey';
+            columns: ['tracker_id'];
+            isOneToOne: false;
+            referencedRelation: 'trackers';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       human_feedback_loop: {
         Row: {
@@ -158,7 +244,8 @@ export interface Database {
           feedback_type: 'useful' | 'not_useful' | 'false_positive' | 'already_known';
           comment?: string | null;
         };
-        Update: never;
+        Update: Record<string, never>;
+        Relationships: [];
       };
       compliance_logs: {
         Row: {
@@ -180,9 +267,11 @@ export interface Database {
           entity_id?: string | null;
           metadata?: Json;
         };
-        Update: never;
+        Update: Record<string, never>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: Record<string, never>;
   };

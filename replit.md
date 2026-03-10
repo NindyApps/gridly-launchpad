@@ -15,7 +15,7 @@ OCTOPILOT is a B2B Revenue Signal Intelligence SaaS. It monitors Reddit and Hack
 | Language | TypeScript | 5.8.3 (strict) |
 | Styling | Tailwind CSS | 3.4.17 |
 | UI Components | shadcn/ui (Radix UI) | all @radix-ui/* |
-| Animation | framer-motion | 12.34.5 |
+| Animation | motion (motion/react) | 12.x |
 | Icons | lucide-react | 0.462.0 |
 | Auth + DB | Supabase (@supabase/ssr) | 0.9.0 |
 | State / Fetching | TanStack Query v5 | 5.83.0 |
