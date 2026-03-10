@@ -1,0 +1,96 @@
+📋  PROMPT P03 — Auth System  — copy semua teks di bawah ini, paste ke Replit Agent
+Build the complete authentication system for OCTOPILOT.
+Stack: Vite + React 18 + TypeScript + Supabase Auth (client SDK).
+NO server-side rendering. Pure client-side SPA.
+ 
+1. AUTH STORE — src/stores/authStore.ts:
+Use Zustand. Store:
+  user: User | null (Supabase User)
+  profile: Profile | null
+  workspace: Workspace | null
+  isLoading: boolean
+  isInitialized: boolean
+Actions: setUser, setProfile, setWorkspace, signOut, initialize
+initialize(): call supabase.auth.getSession()
+  If session exists: fetch profile + workspace from Supabase
+  Set isInitialized = true when done
+Listen to supabase.auth.onAuthStateChange for session changes
+ 
+2. REACT ROUTER SETUP — src/App.tsx:
+Routes:
+  / → Landing page (existing, DO NOT modify)
+  /login → LoginPage
+  /signup → SignupPage
+  /accept-invite → AcceptInvitePage
+  /onboarding → OnboardingPage (protected)
+  /dashboard → DashboardPage (protected)
+  /trackers → TrackersPage (protected)
+  /trackers/:id → TrackerDetailPage (protected)
+  /analytics → AnalyticsPage (protected)
+  /settings/crm → CRMSettingsPage (protected)
+  /settings/alerts → AlertsSettingsPage (protected)
+  /settings/team → TeamSettingsPage (protected)
+  /settings/billing → BillingSettingsPage (protected)
+ 
+Protected route wrapper component:
+  Check authStore.isInitialized — if false: show full-page spinner
+  Check authStore.user — if null: redirect to /login
+  Check profile.onboarding_completed — if false: redirect to /onboarding
+    (except if current route IS /onboarding)
+ 
+3. LOGIN PAGE — src/pages/auth/Login.tsx:
+Centered card layout, OCTOPILOT logo at top.
+Email + Password fields with validation (zod schema).
+'Continue with Google' button:
+  supabase.auth.signInWithOAuth({ provider: 'google',
+  options: { redirectTo: window.location.origin + '/dashboard' } })
+'Forgot password?' link:
+  Call supabase.auth.resetPasswordForEmail(email)
+  Show: 'Check your email for reset link' toast
+On success: update authStore → navigate to /dashboard
+Error handling: 'Invalid email or password' inline message
+ 
+4. SIGNUP PAGE — src/pages/auth/Signup.tsx:
+Fields: Full Name, Email, Password, Confirm Password.
+Password strength bar (weak/medium/strong).
+'Continue with Google' button.
+Terms of service checkbox (required).
+On submit: supabase.auth.signUp({
+  email, password,
+  options: { data: { full_name } }
+})
+On success: Supabase trigger auto-creates workspace + profile
+Navigate to /onboarding
+ 
+5. ACCEPT INVITE PAGE — src/pages/auth/AcceptInvite.tsx:
+Read token from URL: new URLSearchParams(window.location.search).get('token')
+Show: 'Set your password to join [workspace]'
+Password + confirm password fields.
+On submit: supabase.auth.verifyOtp({ token_hash: token, type: 'invite' })
+Then: supabase.auth.updateUser({ password })
+Navigate to /dashboard on success.
+ 
+6. ONBOARDING WIZARD — src/pages/Onboarding.tsx:
+4-step wizard with Progress bar (shadcn).
+ 
+Step 0 — Welcome: name greeting, 'Get Started' button
+Step 1 — Connect HubSpot: 'Connect' button (placeholder for Phase P07)
+  'Skip for now' link
+Step 2 — Create First Tracker:
+  Form: tracker name + TagInput for keywords + TagInput for subreddits
+  On submit: supabase.from('trackers').insert({...})
+  'Skip' link
+Step 3 — Invite Team:
+  Email + role selector
+  'Send Invitation' button (placeholder for Phase P09)
+  'Go to Dashboard' button:
+    supabase.from('profiles').update({ onboarding_completed: true })
+    navigate('/dashboard')
+ 
+7. TAG INPUT COMPONENT — src/components/shared/TagInput.tsx:
+Props: value: string[], onChange: (tags: string[]) => void, placeholder: string
+Type text → press Enter or comma → add as pill tag
+Pill tags are removable with X button
+Styled with Tailwind: grey pills with border
+ 
+Test: signup → workspace created → redirected to /onboarding → complete → /dashboard.
