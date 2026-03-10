@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 
 export default function AlertsSettingsPage() {
   const { toast } = useToast();
@@ -21,6 +21,7 @@ export default function AlertsSettingsPage() {
   const [slackWebhook, setSlackWebhook] = useState('');
   const [threshold, setThreshold] = useState([70]);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {
@@ -61,6 +62,31 @@ export default function AlertsSettingsPage() {
       toast({ title: 'Save failed', description: wsResult.error?.message ?? profResult.error?.message, variant: 'destructive' });
     } else {
       toast({ title: 'Settings saved', description: 'Your notification preferences have been updated.' });
+    }
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    try {
+      const res = await fetch('/api/alerts/test', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: 'Test failed', description: data.error ?? 'Unknown error', variant: 'destructive' });
+        return;
+      }
+      const channels = [];
+      if (data.sent?.email) channels.push('Email');
+      if (data.sent?.slack) channels.push('Slack');
+      if (channels.length > 0) {
+        toast({ title: 'Test sent!', description: `Notification sent via: ${channels.join(', ')}` });
+      } else {
+        const errorMsg = data.errors?.length ? data.errors.join(' · ') : 'No channels configured. Enable Email or Slack and save first.';
+        toast({ title: 'Nothing sent', description: errorMsg, variant: 'destructive' });
+      }
+    } catch {
+      toast({ title: 'Test failed', description: 'Could not reach the server.', variant: 'destructive' });
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -108,7 +134,7 @@ export default function AlertsSettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-foreground">Email Alerts</Label>
-                <p className="text-xs text-muted-foreground">Receive a daily digest of high-intent signals.</p>
+                <p className="text-xs text-muted-foreground">Receive a notification email for each high-intent signal.</p>
               </div>
               <Switch checked={emailAlerts} onCheckedChange={setEmailAlerts} data-testid="switch-email-alerts" />
             </div>
@@ -134,14 +160,25 @@ export default function AlertsSettingsPage() {
           </CardContent>
         </Card>
 
-        <Button
-          className="bg-primary hover:bg-primary/90"
-          onClick={handleSave}
-          disabled={saving || !initialised}
-          data-testid="button-save-alerts"
-        >
-          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</> : 'Save Settings'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            onClick={handleSave}
+            disabled={saving || !initialised}
+            data-testid="button-save-alerts"
+          >
+            {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</> : 'Save Settings'}
+          </Button>
+          <Button
+            variant="outline"
+            className="border-border text-foreground"
+            onClick={handleTest}
+            disabled={testing || !initialised}
+            data-testid="button-test-alerts"
+          >
+            {testing ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Sending...</> : <><Send className="h-4 w-4 mr-2" />Send Test</>}
+          </Button>
+        </div>
       </div>
     </div>
   );

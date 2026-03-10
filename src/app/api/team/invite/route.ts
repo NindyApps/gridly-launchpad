@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { sendInviteEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   const { email, role, workspace_id } = await request.json();
@@ -27,11 +28,11 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, workspace_id')
+    .select('role, workspace_id, full_name')
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.workspace_id !== workspace_id || profile.role !== 'admin') {
+  if (!profile || (profile.workspace_id as string) !== workspace_id || profile.role !== 'admin') {
     return NextResponse.json({ error: 'Only workspace admins can invite members' }, { status: 403 });
   }
 
@@ -46,14 +47,30 @@ export async function POST(request: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? `${new URL(request.url).origin}`;
+
+  const { data: inviteData, error } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: { workspace_id, role },
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/accept-invite`,
+    redirectTo: `${appUrl}/accept-invite`,
   });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true, user_id: data.user.id });
+  const { data: workspace } = await adminClient
+    .from('workspaces')
+    .select('name')
+    .eq('id', workspace_id)
+    .single();
+
+  const inviterName = (profile.full_name as string | null) ?? user.email ?? 'A teammate';
+  const workspaceName = (workspace?.name as string | undefined) ?? 'your workspace';
+  const inviteUrl = `${appUrl}/accept-invite`;
+
+  sendInviteEmail(email, inviterName, workspaceName, inviteUrl).catch((err) => {
+    console.error('[OCTOPILOT] Invite email failed:', err);
+  });
+
+  return NextResponse.json({ success: true, user_id: inviteData.user.id });
 }

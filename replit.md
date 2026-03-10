@@ -236,25 +236,30 @@ Do NOT install or import `framer-motion` — it has been removed.
 - ✅ Signal cards (intent badges, confidence, opener, feedback, dismiss, inject)
 - ✅ Tracker CRUD (create, edit via sheet, toggle, delete)
 - ✅ Analytics page — Recharts AreaChart (7-day timeline) + BarCharts (platform + category)
-- ✅ Settings pages (CRM, Alerts, Team invite, Billing UI)
-- ✅ HubSpot OAuth flow (connect + callback + token storage)
-- ✅ HubSpot connection status read from DB (`hubspot_token_enc` check) + disconnect button
-- ✅ Alert settings — persist to DB (`workspaces.alert_confidence_threshold`, `workspaces.slack_webhook_url`, `profiles.notification_prefs`)
-- ✅ Team settings — members list from DB via `/api/team/members` (admin auth, service role)
-- ✅ Team invite — calls real `/api/team/invite` endpoint (Supabase auth invite)
+- ✅ Settings pages (CRM, Alerts, Team invite, Billing)
+- ✅ HubSpot OAuth flow (connect + callback + token storage + refresh token + expiry)
+- ✅ HubSpot auto token refresh — `getValidHubSpotToken()` refreshes if expires < 5 min
+- ✅ HubSpot inject — uses `getValidHubSpotToken()` instead of raw token
+- ✅ Alert settings — persist to DB + "Send Test" button hits `/api/alerts/test`
+- ✅ Alert delivery — email via Resend + Slack Block Kit webhook
+- ✅ Team settings — members list from DB + real invite API
 - ✅ Signal feedback API (`/api/feedback`)
-- ✅ Stripe webhook handler
+- ✅ Stripe webhook handler — updates `workspaces.plan` + `stripe_subscription_id` from events
+- ✅ Stripe checkout flow — `/api/billing/checkout` creates real Checkout Session + redirect
+- ✅ Billing usage — real DB counts via `/api/billing/usage` (signals/month, trackers, members)
+- ✅ Signal Ingestion Engine — Reddit JSON API + Algolia HN API + OpenAI classify + dedup
+- ✅ Ingest API route — POST `/api/ingest/run` (auth: CRON_SECRET header)
+- ✅ Supabase Edge Function — `supabase/functions/ingest-signals/` (calls ingest every 15 min)
+- ✅ Email transactional — welcome email on signup, invite email on team invite
 - ✅ Dev seed route (`/api/dev/seed`)
+- ✅ `.env.example` — all environment variables documented
 
-### Partially Done
-- 🔄 Billing — usage and plan not read from Stripe/DB (hardcoded placeholder values)
-- 🔄 HubSpot token refresh — tokens stored/used but refresh logic not implemented
-
-### Not Started (next priorities)
-- ❌ Signal Ingestion Engine (P06) — Reddit crawler + HN crawler + OpenAI classify + scheduler
-- ❌ Email alerts via Resend when new high-confidence signals arrive
-- ❌ Stripe checkout session + customer portal flow
-- ❌ HubSpot token auto-refresh on expiry
+### Environment Variables Required
+See `.env.example` for complete list. Key additions:
+- `CRON_SECRET` — auth token for `/api/ingest/run` endpoint
+- `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — for email alerts
+- `STRIPE_PRO_PRICE_ID`, `STRIPE_GROWTH_PRICE_ID`, `STRIPE_ENTERPRISE_PRICE_ID` — Stripe price IDs
+- `NEXT_PUBLIC_APP_URL` — public URL for redirect links in emails
 
 ### CRITICAL MANUAL STEP REQUIRED
 **Run `supabase/schema.sql` in Supabase SQL Editor before ANY feature can work.**

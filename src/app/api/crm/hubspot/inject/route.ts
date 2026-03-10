@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { injectSignalToCRM } from '@/lib/hubspot';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
+import { getValidHubSpotToken, injectSignalToCRM } from '@/lib/hubspot';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -11,26 +11,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'signal_id and workspace_id required' }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: () => {},
-      },
-    }
+    { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('hubspot_token_enc')
-    .eq('id', workspace_id)
-    .single();
-
-  if (!workspace?.hubspot_token_enc) {
-    return NextResponse.json({ error: 'HubSpot not connected for this workspace' }, { status: 400 });
+  let accessToken: string;
+  try {
+    accessToken = await getValidHubSpotToken(workspace_id, supabase);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'HubSpot token error';
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const { data: signal } = await supabase
@@ -44,7 +36,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await injectSignalToCRM(workspace.hubspot_token_enc, signal);
+    const result = await injectSignalToCRM(accessToken, signal as unknown as Parameters<typeof injectSignalToCRM>[1]);
 
     await supabase
       .from('intent_signals')

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,14 @@ import { FullPageLoader } from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
 
 export default function AcceptInvitePage() {
+  return (
+    <Suspense fallback={<FullPageLoader />}>
+      <AcceptInviteContent />
+    </Suspense>
+  );
+}
+
+function AcceptInviteContent() {
   const router = useRouter();
   const params = useSearchParams();
   const supabase = createClient();

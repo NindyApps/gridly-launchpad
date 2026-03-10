@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const tokens = await exchangeHubSpotCode(code, clientId, clientSecret, redirectUri);
+    const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -43,7 +44,11 @@ export async function GET(request: NextRequest) {
     if (profile?.workspace_id) {
       await supabase
         .from('workspaces')
-        .update({ hubspot_token_enc: tokens.access_token })
+        .update({
+          hubspot_token_enc: tokens.access_token,
+          hubspot_refresh_token_enc: tokens.refresh_token,
+          hubspot_token_expires_at: expiresAt,
+        })
         .eq('id', profile.workspace_id);
     }
 

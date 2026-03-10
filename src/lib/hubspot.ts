@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
+
 const HUBSPOT_API_BASE = 'https://api.hubapi.com';
 
 export interface HubSpotContact {
@@ -73,6 +76,78 @@ export async function exchangeHubSpotCode(
   }
 
   return response.json();
+}
+
+export async function refreshHubSpotToken(
+  workspaceId: string,
+  supabaseAdmin: ReturnType<typeof createClient<Database>>
+): Promise<string> {
+  const { data: workspace } = await supabaseAdmin
+    .from('workspaces')
+    .select('hubspot_refresh_token_enc')
+    .eq('id', workspaceId)
+    .single();
+
+  if (!workspace?.hubspot_refresh_token_enc) {
+    throw new Error('No HubSpot refresh token found for workspace');
+  }
+
+  const response = await fetch(`${HUBSPOT_API_BASE}/oauth/v1/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: process.env.HUBSPOT_CLIENT_ID!,
+      client_secret: process.env.HUBSPOT_CLIENT_SECRET!,
+      redirect_uri: process.env.HUBSPOT_REDIRECT_URI!,
+      refresh_token: workspace.hubspot_refresh_token_enc,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`HubSpot token refresh failed: ${error}`);
+  }
+
+  const tokens: { access_token: string; refresh_token: string; expires_in: number } = await response.json();
+  const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
+
+  await supabaseAdmin
+    .from('workspaces')
+    .update({
+      hubspot_token_enc: tokens.access_token,
+      hubspot_refresh_token_enc: tokens.refresh_token,
+      hubspot_token_expires_at: expiresAt,
+    })
+    .eq('id', workspaceId);
+
+  console.log(`[OCTOPILOT] HubSpot token refreshed for workspace ${workspaceId}`);
+  return tokens.access_token;
+}
+
+export async function getValidHubSpotToken(
+  workspaceId: string,
+  supabaseAdmin: ReturnType<typeof createClient<Database>>
+): Promise<string> {
+  const { data: workspace } = await supabaseAdmin
+    .from('workspaces')
+    .select('hubspot_token_enc, hubspot_refresh_token_enc, hubspot_token_expires_at')
+    .eq('id', workspaceId)
+    .single();
+
+  if (!workspace?.hubspot_token_enc) {
+    throw new Error('HubSpot not connected for this workspace');
+  }
+
+  if (workspace.hubspot_token_expires_at) {
+    const expiresAt = new Date(workspace.hubspot_token_expires_at).getTime();
+    const fiveMinutesFromNow = Date.now() + 5 * 60 * 1000;
+    if (expiresAt < fiveMinutesFromNow) {
+      return refreshHubSpotToken(workspaceId, supabaseAdmin);
+    }
+  }
+
+  return workspace.hubspot_token_enc;
 }
 
 export async function createHubSpotContact(
