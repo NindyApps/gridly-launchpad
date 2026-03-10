@@ -1,0 +1,257 @@
+Scan the entire OCTOPILOT codebase in this Replit project.
+Read every file — components, pages, hooks, lib, types, Edge Functions,
+config files (package.json, vite.config, tailwind.config), and SQL schemas.
+ 
+After scanning, write a comprehensive project report in Bahasa Indonesia.
+The report must follow this exact structure and format.
+Be specific — cite actual file names and line counts where possible.
+Do NOT write generic descriptions. Base everything on what you ACTUALLY find in the code.
+ 
+══════════════════════════════════════════════════
+LAPORAN AUDIT OCTOPILOT — FORMAT RDP & MVP
+══════════════════════════════════════════════════
+ 
+## BAGIAN 1 — IDENTITAS PRODUK
+ 
+Tulis ringkasan berikut berdasarkan kode yang kamu temukan:
+ 
+### 1.1 Nama Produk & Deskripsi Satu Kalimat
+Apa yang dilakukan produk ini? Jelaskan dalam 1 kalimat teknis yang akurat.
+ 
+### 1.2 Tech Stack Aktual
+List tech stack NYATA yang ada di package.json dan config files:
+- Frontend framework + versi
+- Language + mode (TypeScript strict? atau tidak?)
+- CSS/styling approach
+- UI component library
+- Router (dan versi)
+- State management (apa yang dipakai?)
+- Database client
+- Apakah ada backend server? (Express, Next.js API, atau Edge Functions?)
+- Build tool + versi
+- Deploy target
+ 
+### 1.3 Struktur Folder Aktual
+Print tree struktur folder yang BENAR-BENAR ada (bukan yang seharusnya ada).
+Tandai setiap folder/file dengan:
+  [EXISTS] — file/folder ada dan berisi kode
+  [EMPTY]  — file/folder ada tapi kosong atau placeholder
+  [MISSING] — file yang seharusnya ada tapi tidak ditemukan
+ 
+══════════════════════════════════════════════════
+## BAGIAN 2 — RDP (REQUIREMENTS & DESIGN PLAN)
+══════════════════════════════════════════════════
+ 
+### 2.1 Tujuan Produk (berdasarkan kode yang ditemukan)
+Jelaskan dalam format:
+  MASALAH YANG DISELESAIKAN: [1-2 kalimat]
+  SOLUSI YANG DIBANGUN: [1-2 kalimat]
+  TARGET PENGGUNA: [siapa? berdasarkan copy/text yang ada di UI]
+  VALUE PROPOSITION: [apa keuntungan utama? berdasarkan landing page atau README]
+ 
+### 2.2 Arsitektur Sistem
+Gambarkan arsitektur dalam format teks:
+ 
+  [FRONTEND] → [KOMUNIKASI] → [BACKEND] → [DATABASE]
+ 
+Jelaskan:
+  - Bagaimana frontend berkomunikasi ke backend (fetch? supabase client? edge function?)
+  - Apakah ada API routes? Di mana?
+  - Bagaimana auth dihandle?
+  - Apakah ada background jobs? Bagaimana schedulingnya?
+  - Apakah ada realtime? Bagaimana implementasinya?
+ 
+### 2.3 Database Design (berdasarkan schema yang ditemukan)
+Untuk setiap tabel yang ADA di codebase (SQL files, migration, atau type definitions):
+  TABEL: [nama]
+  KOLOM: [list kolom dengan tipe data]
+  RELASI: [foreign keys yang ada]
+  RLS: [apakah ada Row Level Security? policy-nya apa?]
+  STATUS: [schema ada di SQL file / hanya ada di TypeScript types / belum ada]
+ 
+Jika tidak ada schema SQL ditemukan, tulis: CRITICAL MISSING — database schema not found.
+ 
+### 2.4 Authentication Design
+  AUTH PROVIDER: [Supabase Auth / custom / belum ada]
+  METODE LOGIN: [email+password / Google OAuth / magic link / tidak ada]
+  SESSION MANAGEMENT: [bagaimana session disimpan?]
+  PROTECTED ROUTES: [apakah ada route guard? bagaimana implementasinya?]
+  ROLES: [user roles yang didefinisikan di code]
+ 
+### 2.5 Fitur yang Dirancang vs Diimplementasi
+List SEMUA fitur yang bisa kamu identifikasi dari kode:
+  FITUR: [nama fitur]
+  STATUS: COMPLETE / PARTIAL / SKELETON / NOT STARTED
+  BUKTI: [file mana yang mengimplementasikannya]
+  CATATAN: [apa yang kurang jika PARTIAL atau SKELETON]
+ 
+══════════════════════════════════════════════════
+## BAGIAN 3 — MVP ASSESSMENT
+══════════════════════════════════════════════════
+ 
+### 3.1 Definisi MVP untuk Produk Ini
+Berdasarkan kode yang ada, tentukan apa MVP minimum untuk produk ini:
+  Core loop yang HARUS jalan untuk MVP:
+    1. [langkah 1 user journey]
+    2. [langkah 2]
+    ... dst
+  Pertanyaan kunci: 'Bisakah seorang SDR masuk, melihat sinyal, dan inject ke CRM?'
+  Jawab YA / TIDAK / PARTIAL — dan jelaskan kenapa.
+ 
+### 3.2 Status Setiap Modul (Progress Report)
+Untuk setiap modul berikut, berikan status berdasarkan scan kode:
+ 
+Format untuk setiap modul:
+  ─────────────────────────────────────
+  MODUL: [nama modul]
+  PROGRESS: [0% / 25% / 50% / 75% / 100%]
+  FILE YANG ADA: [list file yang relevan]
+  APA YANG SUDAH JALAN: [bullet list fungsi yang implemented]
+  APA YANG BELUM: [bullet list yang masih TODO/placeholder/missing]
+  BLOCKER: [apakah ada dependency yang belum ada?]
+  ─────────────────────────────────────
+ 
+Modul yang HARUS dievaluasi:
+  1. Landing Page
+  2. Autentikasi (Login/Signup/Session)
+  3. Onboarding Flow
+  4. App Shell (Sidebar + Layout + Navigation)
+  5. Dashboard & Signal Feed
+  6. Signal Card Component
+  7. Tracker Management (CRUD)
+  8. HubSpot CRM Integration
+  9. AI Signal Ingestion Engine
+ 10. Alert & Email System
+ 11. Analytics & Charts
+ 12. Billing (Polar/Stripe)
+ 13. Team Management
+ 14. Supabase Edge Functions
+ 15. Database Schema & RLS
+ 
+### 3.3 Tabel Ringkasan Progress
+Setelah semua modul dievaluasi, buat tabel ringkasan:
+ 
+| MODUL | PROGRESS | STATUS | PRIORITAS |
+|-------|----------|--------|-----------|
+| ... | 0-100% | ✅ Done / 🔄 In Progress / ❌ Not Started | P0/P1/P2 |
+ 
+Hitung: TOTAL PROGRESS = rata-rata semua modul (persentase)
+Tulis di akhir tabel: 'OVERALL PROJECT COMPLETION: X%'
+ 
+══════════════════════════════════════════════════
+## BAGIAN 4 — ANALISIS REAL (JUJUR)
+══════════════════════════════════════════════════
+ 
+### 4.1 Apa yang Benar-Benar Jalan Sekarang
+List HANYA fitur yang bisa dijalankan RIGHT NOW jika user membuka browser.
+Bukan yang 'hampir jadi', bukan yang 'tinggal connect'.
+Hanya yang benar-benar functional end-to-end.
+ 
+Format: '✅ [fitur] — [file/komponen yang mengimplementasikan]'
+ 
+### 4.2 Apa yang Ada Tapi Tidak Jalan
+File yang ada di codebase tapi broken, placeholder, atau incomplete.
+Format: '⚠️ [fitur] — [alasan tidak jalan]'
+ 
+### 4.3 Apa yang Sama Sekali Belum Ada
+Fitur yang 0% implemented — tidak ada file, tidak ada kode.
+Format: '❌ [fitur] — [mengapa ini penting]'
+ 
+### 4.4 Critical Issues (Blocker untuk Launch)
+List masalah yang HARUS diselesaikan sebelum bisa demo ke customer pertama.
+Urutkan dari yang paling critical.
+Format:
+  [CRITICAL/HIGH/MEDIUM] — [masalah] — [solusi yang dibutuhkan]
+ 
+### 4.5 Security Issues yang Ditemukan
+Scan untuk:
+  - Hardcoded API keys atau secrets di dalam kode (SANGAT BERBAHAYA)
+  - Endpoint yang tidak ada auth check
+  - RLS yang tidak aktif
+  - Input yang tidak divalidasi
+  - CORS yang terlalu permissive
+Laporkan setiap temuan dengan lokasi file yang spesifik.
+ 
+══════════════════════════════════════════════════
+## BAGIAN 5 — USER FLOW ANALYSIS
+══════════════════════════════════════════════════
+ 
+### 5.1 Flow yang Sudah Bisa Dijalankan
+Tulis user flow step-by-step yang BENAR-BENAR bisa dilakukan sekarang.
+Kalau ada step yang broken, tandai dengan [BLOCKED: alasan].
+ 
+FLOW 1 — Onboarding User Baru:
+  Buka URL → [langkah 1] → [langkah 2] → ... → [sampai mana flow ini jalan?]
+ 
+FLOW 2 — Daily SDR Workflow:
+  Login → Dashboard → [langkah berikutnya?] → ... → [sampai mana?]
+ 
+FLOW 3 — Signal to CRM:
+  Signal muncul → [bagaimana?] → Inject ke HubSpot → [jalan?]
+ 
+### 5.2 Flow yang Belum Bisa Dijalankan
+Flow yang dirancang tapi belum bisa dilakukan karena missing components.
+Jelaskan: apa yang hilang dan di mana break-pointnya.
+ 
+══════════════════════════════════════════════════
+## BAGIAN 6 — REKOMENDASI LANGKAH SELANJUTNYA
+══════════════════════════════════════════════════
+ 
+### 6.1 Untuk Mencapai Demo-Ready (bisa demo ke 1 customer)
+List MINIMUM hal yang harus diselesaikan.
+Urutkan berdasarkan dependency (apa yang harus selesai dulu).
+Estimasi: berapa sesi Replit Agent yang dibutuhkan per item.
+ 
+Format:
+  PRIORITAS 1 — [task] — estimasi [X] sesi Agent
+  PRIORITAS 2 — [task] — estimasi [X] sesi Agent
+  ...
+ 
+### 6.2 Untuk Mencapai MVP Launch (bisa onboard paying customer)
+Task tambahan di atas Demo-Ready yang diperlukan untuk real launch.
+ 
+### 6.3 Quick Wins (bisa selesai dalam 1 sesi Agent)
+List 3-5 hal kecil yang bisa langsung diperbaiki sekarang dengan effort minimal.
+ 
+══════════════════════════════════════════════════
+## BAGIAN 7 — RINGKASAN EKSEKUTIF
+══════════════════════════════════════════════════
+ 
+Tulis ringkasan 1 halaman untuk founder/CTO:
+ 
+  KONDISI PROJECT SAAT INI: [1 paragraf jujur]
+ 
+  ANGKA PENTING:
+    - Total files di project: [N]
+    - Files berisi kode nyata: [N]
+    - Files placeholder/empty: [N]
+    - Perkiraan % project selesai: [X%]
+    - Fitur yang fully functional: [N dari total]
+    - Critical blockers sebelum demo: [N issue]
+ 
+  BISA DEMO KE CUSTOMER SEKARANG? [YA / TIDAK / DENGAN CATATAN]
+  Penjelasan singkat: [kenapa YA atau TIDAK]
+ 
+  ESTIMASI WAKTU KE LAUNCH:
+    Demo-ready: [X hari dengan Replit Agent]
+    MVP launch: [X hari total]
+ 
+  3 HAL PALING MENDESAK YANG HARUS DILAKUKAN SEKARANG:
+    1. [hal pertama]
+    2. [hal kedua]
+    3. [hal ketiga]
+ 
+══════════════════════════════════════════════════
+CATATAN PENTING UNTUK REPLIT AGENT:
+══════════════════════════════════════════════════
+ 
+- Tulis laporan ini dalam Bahasa Indonesia.
+- Semua kode, nama file, nama variabel tetap dalam Bahasa Inggris.
+- Jangan skip bagian apapun — tulis semua 7 bagian.
+- Jujur: kalau ada yang kurang, bilang kurang. Jangan overpromise.
+- Spesifik: sebutkan nama file aktual, bukan deskripsi generik.
+- Jika menemukan sesuatu yang tidak terduga (baik atau buruk), tambahkan
+  di bagian 'Temuan Tambahan' di akhir laporan.
+- Setelah laporan selesai, SIMPAN ke file: OCTOPILOT_AUDIT_REPORT.md
+  di root folder project.
+
