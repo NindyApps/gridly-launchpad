@@ -206,6 +206,26 @@ ENCRYPTION_KEY                   ← 32-char key for encrypting HubSpot tokens
 
 ---
 
+## Stack Notes
+
+### Tailwind CSS — staying on v3 (v4 migration deferred)
+The project uses Tailwind CSS v3.4.17. Upgrading to v4 requires:
+- Rewriting `tailwind.config.ts` entirely into CSS `@theme` directives inside `globals.css`
+- Changing `@tailwind base/components/utilities` → `@import "tailwindcss"` in globals.css
+- Removing `postcss.config.js` content and replacing with `@tailwindcss/postcss`
+- Updating `components.json` `tailwind.config` from `"tailwind.config.ts"` to `""` (empty)
+This is a dedicated breaking-change session. Do NOT attempt it as part of any other feature work.
+
+### Animation — motion package (replaces framer-motion)
+The project uses `motion` (v12+), the official successor to `framer-motion`. Import from `'motion/react'`.
+All animation components must have `"use client"` at the top (Next.js App Router requirement).
+Do NOT install or import `framer-motion` — it has been removed.
+
+### components.json — new-york style
+`style: "new-york"` is set for future CLI installs. Existing components were generated with "default" style and are NOT retroactively changed. Only net-new components added via `shadcn add` will use new-york styling.
+
+---
+
 ## Build Status (as of March 2026)
 
 ### Completed (functional)
