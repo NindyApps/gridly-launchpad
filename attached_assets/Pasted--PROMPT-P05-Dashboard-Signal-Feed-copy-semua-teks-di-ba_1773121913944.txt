@@ -1,0 +1,99 @@
+📋  PROMPT P05 — Dashboard Signal Feed  — copy semua teks di bawah ini, paste ke Replit Agent
+Build the main Dashboard page at /dashboard.
+This is the primary daily-use page — the core value delivery of OCTOPILOT.
+ 
+1. SIGNAL CARD — src/components/signals/SignalCard.tsx:
+Props: signal: IntentSignal, onDismiss, onFeedback, onInject
+ 
+LEFT BORDER (4px) color based on intent_level:
+  high → border-red-500, medium → border-amber-500, low → border-slate-400
+ 
+HEADER: platform badge (icon+name) | time ago (date-fns) | URGENT badge if urgent
+  Confidence pill: >0.8 = green 'High 0.92', 0.6-0.8 = amber 'Med', <0.6 = slate 'Low'
+ 
+BODY:
+  Pain domain pill (grey) + Intent category pill (colored by category)
+  AI summary text (2-3 lines)
+  Collapsible 'Suggested opener' section (ChevronDown toggle):
+    Italic suggested_opener text + 'Copy' button (copies to clipboard)
+ 
+ACTION ROW:
+  'View Source' ghost button → opens post_url in new tab
+  'Inject to HubSpot' primary button:
+    If crm_injected = true: 'Injected ✓' green disabled button
+    If false: active button → calls onInject(signal.id)
+    Loading spinner while injecting
+  Feedback row (ghost small):
+    ThumbsUp 'Useful' → calls onFeedback(signal.id, 'useful')
+    ThumbsDown 'Not Useful' → calls onFeedback(signal.id, 'not_useful')
+  X icon dismiss → calls onDismiss(signal.id)
+ 
+On dismiss: card animates out (CSS transition opacity+translate)
+ 
+2. SIGNAL FEED — src/components/signals/SignalFeed.tsx:
+Props: filters: FilterState
+ 
+Fetch on mount:
+  supabase.from('intent_signals')
+    .select('*')
+    .eq('workspace_id', workspace.id)
+    .eq('dismissed', false)
+    .order('confidence_score', { ascending: false })
+    .limit(50)
+ 
+REALTIME: Subscribe to Supabase Realtime on intent_signals:
+  supabase.channel('signals').on('postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'intent_signals',
+      filter: `workspace_id=eq.${workspace.id}` },
+    (payload) => {
+      setNewCount(prev => prev + 1)
+    }
+  ).subscribe()
+Show banner: 'N new signals — click to refresh' when newCount > 0
+ 
+EMPTY STATES:
+  No trackers: 'Create your first tracker' → /trackers
+  Has trackers, no signals: 'Signals appear within 15 minutes of ingestion'
+  All dismissed: 'You are all caught up!' + Refresh button
+ 
+Loading state: 3 skeleton signal cards (shadcn Skeleton)
+ 
+3. FILTER BAR — src/components/signals/SignalFilters.tsx:
+State: FilterState { intentLevel, category, trackerId, platform, urgentOnly, sort }
+ 
+Controls:
+  Intent pills: All | High | Medium | Low
+  Category dropdown: All / Vendor Switch / New Purchase / Evaluation / Complaint
+  Tracker dropdown: All / [trackers from DB]
+  Platform dropdown: All / Reddit / Hacker News
+  Urgent toggle switch
+  Sort: Confidence ↓ (default) | Newest | Oldest
+  'Clear filters' button (show only when any filter active)
+  Result count: 'Showing 12 signals'
+All filtering applied client-side on loaded signals array.
+ 
+4. STATS ROW — top of dashboard:
+4 stat cards: Signals Today | High Intent | Injected Today | Acceptance Rate
+Data queried from intent_signals with date filter (today).
+ 
+5. FEEDBACK HANDLER — in DashboardPage.tsx:
+onFeedback(signalId, feedbackType):
+  supabase.from('human_feedback_loop').insert({
+    signal_id: signalId,
+    user_id: profile.id,
+    workspace_id: workspace.id,
+    feedback_type: feedbackType
+  })
+  If feedbackType is 'not_useful':
+    supabase.from('intent_signals').update({ dismissed: true })
+      .eq('id', signalId)
+ 
+onInject(signalId):
+  Call Supabase Edge Function 'hubspot-inject' (created in Phase P07)
+  For now: show toast 'HubSpot not connected — set up in Settings > CRM'
+ 
+6. SEED DATA for testing:
+Create src/lib/seedSignals.ts with function seedTestSignals().
+Insert 8 sample signals covering all intent levels + categories.
+Add a dev button in dashboard (only visible in development mode):
+  'Seed Test Signals' button → calls seedTestSignals()
