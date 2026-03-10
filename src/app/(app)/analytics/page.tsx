@@ -1,10 +1,42 @@
 "use client";
 
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useSignals } from '@/hooks/useSignals';
 import { useWorkspaces } from '@/hooks/use-workspaces';
 import { TrendingUp, Zap, Target, BarChart3 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  AreaChart,
+  Area,
+  CartesianGrid,
+} from 'recharts';
+
+const VIO = '#7C3AED';
+const VIO_MUTED = 'rgba(124,58,237,0.14)';
+const AXIS = '#64748B';
+const GRID = 'rgba(255,255,255,0.06)';
+
+function ChartTip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-card border border-border rounded-lg px-3 py-2 text-xs shadow-lg">
+      <p className="text-muted-foreground mb-0.5">{label}</p>
+      <p className="font-semibold text-foreground">{payload[0].value} signals</p>
+    </div>
+  );
+}
+
+const axisProps = {
+  tick: { fill: AXIS, fontSize: 11 },
+  axisLine: false as const,
+  tickLine: false as const,
+};
 
 export default function AnalyticsPage() {
   const { activeWorkspace } = useWorkspaces();
@@ -17,32 +49,52 @@ export default function AnalyticsPage() {
     ? Math.round((signals.reduce((acc, s) => acc + s.confidence_score, 0) / total) * 100)
     : 0;
 
-  const byPlatform = signals.reduce<Record<string, number>>((acc, s) => {
-    acc[s.platform] = (acc[s.platform] || 0) + 1;
-    return acc;
-  }, {});
-
-  const byCategory = signals.reduce<Record<string, number>>((acc, s) => {
-    acc[s.intent_category] = (acc[s.intent_category] || 0) + 1;
-    return acc;
-  }, {});
-
   const stats = [
-    { label: 'Total Signals', value: total, icon: BarChart3, color: 'text-indigo-400' },
-    { label: 'High Intent', value: highIntent, icon: TrendingUp, color: 'text-red-400' },
-    { label: 'Pushed to CRM', value: injected, icon: Zap, color: 'text-green-400' },
-    { label: 'Avg Confidence', value: `${avgConfidence}%`, icon: Target, color: 'text-yellow-400' },
+    { label: 'Total Signals', value: total, icon: BarChart3, color: 'text-primary' },
+    { label: 'High Intent', value: highIntent, icon: TrendingUp, color: 'text-rose-400' },
+    { label: 'Pushed to CRM', value: injected, icon: Zap, color: 'text-emerald-400' },
+    { label: 'Avg Confidence', value: `${avgConfidence}%`, icon: Target, color: 'text-amber-400' },
   ];
+
+  const byPlatformData = useMemo(() => {
+    const map: Record<string, number> = {};
+    signals.forEach((s) => { map[s.platform] = (map[s.platform] || 0) + 1; });
+    return Object.entries(map).map(([name, count]) => ({ name, count }));
+  }, [signals]);
+
+  const byCategoryData = useMemo(() => {
+    const map: Record<string, number> = {};
+    signals.forEach((s) => { map[s.intent_category] = (map[s.intent_category] || 0) + 1; });
+    return Object.entries(map)
+      .map(([name, count]) => ({ name: name.replace(/_/g, ' '), count }))
+      .sort((a, b) => b.count - a.count);
+  }, [signals]);
+
+  const timelineData = useMemo(() => {
+    const today = new Date();
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      return { label: d.toLocaleDateString('en-US', { weekday: 'short' }), date: d.toDateString(), count: 0 };
+    });
+    signals.forEach((s) => {
+      const slot = days.find((day) => day.date === new Date(s.created_at).toDateString());
+      if (slot) slot.count += 1;
+    });
+    return days;
+  }, [signals]);
+
+  const empty = <p className="text-sm text-muted-foreground py-8 text-center">No data yet</p>;
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
-            <Card key={stat.label} className="border border-white/10 bg-white/5" data-testid={`stat-${stat.label.toLowerCase().replace(' ', '-')}`}>
+            <Card key={stat.label} className="border border-border bg-card" data-testid={`stat-${stat.label.toLowerCase().replace(/ /g, '-')}`}>
               <CardContent className="pt-5">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-zinc-400">{stat.label}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                   <stat.icon className={`h-4 w-4 ${stat.color}`} />
                 </div>
                 <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -51,54 +103,68 @@ export default function AnalyticsPage() {
           ))}
         </div>
 
+        <Card className="border border-border bg-card" data-testid="chart-timeline">
+          <CardHeader>
+            <CardTitle className="text-sm text-foreground">Signals — Last 7 Days</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {total === 0 ? empty : (
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={timelineData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={VIO} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={VIO} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke={GRID} vertical={false} />
+                  <XAxis dataKey="label" {...axisProps} />
+                  <YAxis {...axisProps} allowDecimals={false} />
+                  <Tooltip content={<ChartTip />} cursor={{ stroke: GRID }} />
+                  <Area type="monotone" dataKey="count" stroke={VIO} strokeWidth={2}
+                    fill="url(#grad)" dot={{ fill: VIO, r: 3 }} activeDot={{ r: 5 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-card" data-testid="chart-platform">
             <CardHeader>
-              <CardTitle className="text-sm text-white">Signals by Platform</CardTitle>
+              <CardTitle className="text-sm text-foreground">Signals by Platform</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {Object.entries(byPlatform).length === 0 && (
-                <p className="text-sm text-zinc-500">No data yet</p>
+            <CardContent>
+              {byPlatformData.length === 0 ? empty : (
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={byPlatformData} layout="vertical" margin={{ top: 0, right: 8, left: 8, bottom: 0 }}>
+                    <CartesianGrid stroke={GRID} horizontal={false} />
+                    <XAxis type="number" {...axisProps} allowDecimals={false} />
+                    <YAxis dataKey="name" type="category" {...axisProps} width={62} />
+                    <Tooltip content={<ChartTip />} cursor={{ fill: VIO_MUTED }} />
+                    <Bar dataKey="count" fill={VIO} radius={[0, 4, 4, 0]} maxBarSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
-              {Object.entries(byPlatform).map(([platform, count]) => (
-                <div key={platform} className="flex items-center justify-between">
-                  <span className="text-sm capitalize text-zinc-300">{platform}</span>
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 bg-indigo-600/30 rounded-full overflow-hidden w-24">
-                      <div
-                        className="h-full bg-indigo-500 rounded-full"
-                        style={{ width: `${(count / total) * 100}%` }}
-                      />
-                    </div>
-                    <Badge variant="outline" className="text-xs border-white/10 text-zinc-300">{count}</Badge>
-                  </div>
-                </div>
-              ))}
             </CardContent>
           </Card>
 
-          <Card className="border border-white/10 bg-white/5">
+          <Card className="border border-border bg-card" data-testid="chart-category">
             <CardHeader>
-              <CardTitle className="text-sm text-white">Signals by Category</CardTitle>
+              <CardTitle className="text-sm text-foreground">Signals by Intent Category</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {Object.entries(byCategory).length === 0 && (
-                <p className="text-sm text-zinc-500">No data yet</p>
+            <CardContent>
+              {byCategoryData.length === 0 ? empty : (
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={byCategoryData} layout="vertical" margin={{ top: 0, right: 8, left: 8, bottom: 0 }}>
+                    <CartesianGrid stroke={GRID} horizontal={false} />
+                    <XAxis type="number" {...axisProps} allowDecimals={false} />
+                    <YAxis dataKey="name" type="category" {...axisProps} width={90} />
+                    <Tooltip content={<ChartTip />} cursor={{ fill: VIO_MUTED }} />
+                    <Bar dataKey="count" fill={VIO} radius={[0, 4, 4, 0]} maxBarSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
-              {Object.entries(byCategory).map(([category, count]) => (
-                <div key={category} className="flex items-center justify-between">
-                  <span className="text-sm capitalize text-zinc-300">{category.replace('_', ' ')}</span>
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 bg-indigo-600/30 rounded-full overflow-hidden w-24">
-                      <div
-                        className="h-full bg-indigo-500 rounded-full"
-                        style={{ width: `${(count / total) * 100}%` }}
-                      />
-                    </div>
-                    <Badge variant="outline" className="text-xs border-white/10 text-zinc-300">{count}</Badge>
-                  </div>
-                </div>
-              ))}
             </CardContent>
           </Card>
         </div>

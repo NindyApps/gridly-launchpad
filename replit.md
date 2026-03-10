@@ -234,29 +234,27 @@ Do NOT install or import `framer-motion` — it has been removed.
 - ✅ App shell (sidebar, topbar, breadcrumb, mobile drawer)
 - ✅ Dashboard page (stats cards, signal feed, filters)
 - ✅ Signal cards (intent badges, confidence, opener, feedback, dismiss, inject)
-- ✅ Tracker CRUD (create, toggle, delete)
-- ✅ Analytics page (stats cards, by-platform/category bars)
+- ✅ Tracker CRUD (create, edit via sheet, toggle, delete)
+- ✅ Analytics page — Recharts AreaChart (7-day timeline) + BarCharts (platform + category)
 - ✅ Settings pages (CRM, Alerts, Team invite, Billing UI)
 - ✅ HubSpot OAuth flow (connect + callback + token storage)
+- ✅ HubSpot connection status read from DB (`hubspot_token_enc` check) + disconnect button
+- ✅ Alert settings — persist to DB (`workspaces.alert_confidence_threshold`, `workspaces.slack_webhook_url`, `profiles.notification_prefs`)
+- ✅ Team settings — members list from DB via `/api/team/members` (admin auth, service role)
+- ✅ Team invite — calls real `/api/team/invite` endpoint (Supabase auth invite)
 - ✅ Signal feedback API (`/api/feedback`)
 - ✅ Stripe webhook handler
-- ✅ Team invite API
 - ✅ Dev seed route (`/api/dev/seed`)
 
 ### Partially Done
-- 🔄 HubSpot inject — logic exists but CRM connection status not read from DB
-- 🔄 Analytics — uses simple bars, not Recharts charts
-- 🔄 Team settings — member list is mocked, not from DB
-- 🔄 Billing — usage and plan not read from Stripe/DB
-- 🔄 Alert settings — saves to state only, not persisted to DB
+- 🔄 Billing — usage and plan not read from Stripe/DB (hardcoded placeholder values)
+- 🔄 HubSpot token refresh — tokens stored/used but refresh logic not implemented
 
 ### Not Started (next priorities)
 - ❌ Signal Ingestion Engine (P06) — Reddit crawler + HN crawler + OpenAI classify + scheduler
 - ❌ Email alerts via Resend when new high-confidence signals arrive
-- ❌ Recharts time-series charts in analytics
-- ❌ HubSpot token refresh logic
-- ❌ Edit tracker (update mutation)
-- ❌ Stripe checkout flow (create session, customer portal)
+- ❌ Stripe checkout session + customer portal flow
+- ❌ HubSpot token auto-refresh on expiry
 
 ### CRITICAL MANUAL STEP REQUIRED
 **Run `supabase/schema.sql` in Supabase SQL Editor before ANY feature can work.**
