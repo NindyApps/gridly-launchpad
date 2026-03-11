@@ -940,6 +940,12 @@ body{
 .mt-auto{
   margin-top: auto;
 }
+.line-clamp-2{
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 .block{
   display: block;
 }
@@ -1037,6 +1043,9 @@ body{
 .h-\[2px\]{
   height: 2px;
 }
+.h-\[420px\]{
+  height: 420px;
+}
 .h-\[500px\]{
   height: 500px;
 }
@@ -1066,6 +1075,9 @@ body{
 }
 .h-svh{
   height: 100svh;
+}
+.h-\[calc\(420px-40px\)\]{
+  height: calc(420px - 40px);
 }
 .max-h-96{
   max-height: 24rem;

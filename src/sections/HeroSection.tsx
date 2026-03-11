@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AnimatedDashboard from "@/components/AnimatedDashboard";
 
 const platforms = ["Reddit", "Hacker News"];
 
@@ -106,7 +107,7 @@ const HeroSection = () => {
           transition={{ duration: 0.7, delay: 0.4 }}
           className="mt-20 relative max-w-5xl mx-auto"
         >
-          <div className="relative rounded-2xl border border-[#2D5A3D] bg-[#132A1E] shadow-2xl shadow-[#6B8F71]/10 overflow-hidden">
+          <div className="relative rounded-2xl border border-[#2D5A3D] bg-[#132A1E] shadow-2xl shadow-[#6B8F71]/10 overflow-hidden h-[420px]">
             <div className="h-10 bg-[#0F2A1D] border-b border-[#2D5A3D] flex items-center px-4 gap-2">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-rose-500/80" />
@@ -114,13 +115,9 @@ const HeroSection = () => {
                 <div className="w-3 h-3 rounded-full bg-[#6B8F71]/80" />
               </div>
             </div>
-            <div className="relative">
-              <img
-                src="/refined-b-dashboard.png"
-                alt="OCTOPILOT Dashboard"
-                className="w-full h-auto opacity-90"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F2A1D] to-transparent" />
+            <div className="relative h-[calc(420px-40px)]">
+              <AnimatedDashboard />
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F2A1D] to-transparent pointer-events-none" />
             </div>
           </div>
         </motion.div>
