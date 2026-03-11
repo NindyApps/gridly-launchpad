@@ -7,7 +7,7 @@ const SeeItInAction = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tabs = [
     { label: "Reddit", image: "/reddit-leads-view.png" },
-    { label: "Hacker News", image: "/dashboard-view.png" },
+    { label: "Hacker News", image: "/reddit-leads-view.png" },
   ];
 
   return (
