@@ -1,0 +1,136 @@
+Scan semua file di project ini dari awal sampai akhir.
+Baca setiap komponen, halaman, hook, Edge Function, config, dan schema.
+
+Setelah kamu selesai membaca, lakukan hal berikut:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MISI: BAWA OCTOPILOT KE LEVEL 10/10
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Produk ini sudah diaudit dari 3 sudut pandang:
+investor, senior designer, dan klien (Head of Sales).
+Skor rata-rata saat ini: 5.8/10.
+
+Target kamu: identifikasi SEMUA gap yang membuat produk
+ini belum 10/10 — lalu fix semuanya sekarang.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 1 — SCAN DAN LIST SEMUA GAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sebelum fix apapun, tulis daftar lengkap semua masalah
+yang kamu temukan di kode. Format:
+
+[KRITIS] — masalah — lokasi file
+[TINGGI]  — masalah — lokasi file
+[MEDIUM]  — masalah — lokasi file
+[POLISH]  — masalah — lokasi file
+
+Kategorikan berdasarkan area:
+- Security (token, auth, RLS, input validation)
+- Functionality (fitur broken, placeholder, TODO)
+- UX (empty states, loading, error handling)
+- Data accuracy (formula salah, limit hardcode)
+- Landing page vs produk nyata (overpromise)
+- Performance (query tidak efisien, missing index)
+- Code quality (any, console.log, hardcoded values)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 2 — FIX SEMUA MASALAH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Setelah list selesai, fix semuanya satu per satu.
+Mulai dari KRITIS, lalu TINGGI, MEDIUM, lalu POLISH.
+
+Untuk setiap fix:
+- Sebutkan: "Fixing [nama masalah]..."
+- Edit file yang bersangkutan
+- Setelah selesai: "✅ Fixed — [nama masalah]"
+
+Jangan skip satu pun. Kalau ada yang butuh keputusan
+(misalnya: hapus fitur atau tandai coming soon?),
+ambil keputusan yang paling masuk akal untuk produk B2B SaaS
+dan lakukan — jangan tanya dulu.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STANDAR 10/10 YANG HARUS DICAPAI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECURITY — semua harus terpenuhi:
+□ Tidak ada API key atau secret hardcode di kode
+□ Semua OAuth token dienkripsi sebelum disimpan ke DB
+□ Semua Edge Functions verify JWT sebelum proses request
+□ RLS aktif di semua tabel Supabase
+□ Semua input di-sanitize dan di-validate sebelum ke DB
+□ Tidak ada console.log yang print sensitive data
+
+FUNCTIONALITY — semua harus jalan end-to-end:
+□ Signup → workspace otomatis terbuat → masuk onboarding
+□ Onboarding → selesai → dashboard tidak kosong (ada demo signals)
+□ Tracker → bisa create, edit, pause, delete
+□ Dashboard → signals muncul, filter jalan, real-time update
+□ Inject to HubSpot → jalan kalau connected, hint kalau belum
+□ Feedback (Useful/Not Useful) → tersimpan ke DB
+□ Analytics → semua chart render dengan data yang akurat
+□ Billing → checkout Polar jalan, webhook update plan di DB
+□ Team → invite, change role, remove member jalan
+□ Alerts → email dan Slack terkirim saat ada high intent signal
+
+UX — standar produk SaaS profesional:
+□ Setiap halaman punya loading state (skeleton, bukan blank)
+□ Setiap aksi punya error state dengan pesan yang jelas
+□ Setiap form punya validation dengan pesan inline
+□ Tidak ada tombol yang tidak berfungsi
+□ Tidak ada halaman yang bisa diakses tanpa login
+□ Mobile layout tidak berantakan (sidebar collapse jalan)
+□ Empty states semua ada dengan CTA yang actionable
+□ Toast notifications untuk semua aksi penting
+
+DATA ACCURACY:
+□ Semua stat di dashboard dihitung dengan formula yang benar
+□ Tidak ada .limit() hardcode tanpa pagination
+□ Signal feed punya Load More atau infinite scroll
+□ Tidak ada duplikasi inject ke CRM
+
+LANDING PAGE:
+□ Hero CTA terhubung ke /signup
+□ Hanya tampilkan fitur yang benar-benar ada di produk
+□ Platform yang belum ada diberi label "Coming Soon"
+□ Copy akurat — tidak overpromise
+
+CODE QUALITY:
+□ Tidak ada TypeScript 'any' yang tidak diperlukan
+□ Tidak ada console.log yang tertinggal di production code
+□ Tidak ada TODO comment yang belum dikerjakan
+□ Tidak ada dead code (fungsi/komponen yang tidak dipakai)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LANGKAH 3 — LAPORAN AKHIR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Setelah semua fix selesai, tulis laporan singkat:
+
+TOTAL MASALAH DITEMUKAN: [N]
+TOTAL MASALAH DIFIX: [N]
+
+Breakdown per kategori:
+- Security: N masalah → N difix
+- Functionality: N masalah → N difix
+- UX: N masalah → N difix
+- Data: N masalah → N difix
+- Landing page: N masalah → N difix
+- Code quality: N masalah → N difix
+
+SISA YANG BELUM BISA DIFIX SEKARANG:
+(list hal-hal yang butuh external setup seperti 
+API key baru, platform yang memang belum dibangun, dsb.)
+
+ESTIMASI SKOR SEKARANG:
+- Investor: X/10
+- Designer: X/10  
+- Klien: X/10
+- Rata-rata: X/10
+
+KONDISI PRODUK:
+Bisa demo ke customer pertama: YA / TIDAK
+Alasan: [satu kalimat]

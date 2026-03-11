@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { isToday } from 'date-fns';
-import { TrendingUp, Zap, Target, BarChart3, Radio } from 'lucide-react';
+import { TrendingUp, Zap, Target, BarChart3, Radio, Activity } from 'lucide-react';
 import { SignalFeed } from '@/components/signals/SignalFeed';
 import { SignalFilters } from '@/components/signals/SignalFilters';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,14 @@ import { useTrackers } from '@/hooks/useTrackers';
 import { useWorkspaces } from '@/hooks/use-workspaces';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import type { SignalFeedFilters } from '@/types/app';
+
+const DAILY_LIMITS: Record<string, number> = {
+  pro: 500,
+  growth: 2000,
+  enterprise: 99999,
+};
 
 function StatCard({
   label,
@@ -35,6 +42,69 @@ function StatCard({
   );
 }
 
+function DailyUsageStat({
+  today,
+  limit,
+}: {
+  today: number;
+  limit: number;
+}) {
+  const pct = limit >= 99999 ? 0 : Math.min(100, Math.round((today / limit) * 100));
+  const isUnlimited = limit >= 99999;
+  const atLimit = !isUnlimited && today >= limit;
+  const nearLimit = !isUnlimited && !atLimit && pct > 80;
+
+  const barColor = atLimit
+    ? 'bg-red-500'
+    : nearLimit
+    ? 'bg-amber-500'
+    : 'bg-indigo-500';
+
+  const textColor = atLimit
+    ? 'text-red-400'
+    : nearLimit
+    ? 'text-amber-400'
+    : 'text-zinc-400';
+
+  return (
+    <div
+      className="rounded-xl border border-white/10 bg-white/5 p-4 col-span-2 lg:col-span-1"
+      data-testid="stat-daily-usage"
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-xs text-zinc-400">Daily Usage</p>
+        <Activity className={`h-3.5 w-3.5 ${textColor}`} />
+      </div>
+
+      <div className="flex items-baseline gap-1 mb-2">
+        <span className={cn('text-2xl font-bold', textColor)}>{today}</span>
+        {!isUnlimited && (
+          <span className="text-xs text-zinc-500">/ {limit.toLocaleString()}</span>
+        )}
+        {isUnlimited && (
+          <span className="text-xs text-zinc-500">signals</span>
+        )}
+      </div>
+
+      {!isUnlimited && (
+        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className={cn('h-full rounded-full transition-all', barColor)}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
+
+      {atLimit && (
+        <p className="text-[10px] text-red-400 mt-1 font-medium">Daily limit reached</p>
+      )}
+      {nearLimit && (
+        <p className="text-[10px] text-amber-400 mt-1">{pct}% of daily limit</p>
+      )}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { activeWorkspace } = useWorkspaces();
   const workspaceId = activeWorkspace?.id ?? null;
@@ -46,6 +116,9 @@ export default function DashboardPage() {
   const [filters, setFilters] = useState<SignalFeedFilters>({});
   const [resultCount, setResultCount] = useState(0);
   const [triggering, setTriggering] = useState(false);
+
+  const plan = (activeWorkspace as { plan?: string } | null)?.plan ?? 'pro';
+  const dailyLimit = DAILY_LIMITS[plan] ?? 500;
 
   const stats = useMemo(() => {
     const today = signals.filter((s) => isToday(new Date(s.created_at)));
@@ -86,11 +159,12 @@ export default function DashboardPage() {
   return (
     <div className="h-full flex flex-col">
       {/* Stats row */}
-      <div className="px-4 pt-4 pb-2 grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="px-4 pt-4 pb-2 grid grid-cols-2 lg:grid-cols-5 gap-3">
         <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-indigo-400" />
         <StatCard label="High Intent" value={stats.highIntent} icon={TrendingUp} color="text-red-400" />
         <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-green-400" />
         <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-amber-400" />
+        <DailyUsageStat today={stats.today} limit={dailyLimit} />
       </div>
 
       {/* Manual trigger for dev / pre-first-real-signal */}

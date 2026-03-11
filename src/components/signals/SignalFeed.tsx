@@ -96,6 +96,7 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
   const injectSF = useInjectToSalesforce();
   const feedback = useFeedback();
 
+  const hubspotConnected = !!workspace?.hubspot_token_enc;
   const sfConnected = !!workspace?.sf_access_token_enc;
 
   const [newCount, setNewCount] = useState(0);
@@ -145,7 +146,13 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
       toast({ title: 'Injected to HubSpot', description: 'Signal created as a task in CRM.' });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      if (msg === 'reconnect_required') {
+      if (msg === 'already_injected') {
+        toast({
+          title: 'Already injected by a team member',
+          description: 'This signal has already been pushed to HubSpot.',
+        });
+        queryClient.invalidateQueries({ queryKey: ['signals', workspaceId] });
+      } else if (msg === 'reconnect_required') {
         toast({
           title: 'Security upgrade required',
           description: (
@@ -316,6 +323,7 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
           isDismissing={dismissSignal.isPending}
           isInjecting={injectingId === signal.id}
           isInjectingSF={injectingSFId === signal.id}
+          hubspotConnected={hubspotConnected}
           sfConnected={sfConnected}
         />
       ))}

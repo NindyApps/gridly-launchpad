@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,12 +16,6 @@ const INTENT_BORDER: Record<string, string> = {
   high: '#DC2626',
   medium: '#D97706',
   low: '#64748B',
-};
-
-const INTENT_LABEL: Record<string, string> = {
-  high: 'High',
-  medium: 'Med',
-  low: 'Low',
 };
 
 function getConfidenceStyle(score: number) {
@@ -68,6 +63,7 @@ interface SignalCardProps {
   isDismissing?: boolean;
   isInjecting?: boolean;
   isInjectingSF?: boolean;
+  hubspotConnected?: boolean;
   sfConnected?: boolean;
 }
 
@@ -80,9 +76,11 @@ export function SignalCard({
   isDismissing,
   isInjecting,
   isInjectingSF,
+  hubspotConnected,
   sfConnected,
 }: SignalCardProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [openerOpen, setOpenerOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -230,7 +228,7 @@ export function SignalCard({
 
               {/* Action row */}
               <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <a
                     href={signal.post_url}
                     target="_blank"
@@ -242,11 +240,12 @@ export function SignalCard({
                     View Source
                   </a>
 
+                  {/* HubSpot inject — conditional on connection */}
                   {signal.crm_injected ? (
                     <span className="inline-flex items-center gap-1 text-xs text-green-400 font-medium">
                       <Zap className="h-3.5 w-3.5" /> HubSpot ✓
                     </span>
-                  ) : (
+                  ) : hubspotConnected ? (
                     <Button
                       size="sm"
                       className="h-7 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3"
@@ -257,33 +256,48 @@ export function SignalCard({
                       <Zap className="h-3 w-3 mr-1" />
                       {isInjecting ? 'Injecting...' : 'HubSpot'}
                     </Button>
+                  ) : (
+                    <button
+                      onClick={() => router.push('/settings/crm')}
+                      className="text-xs text-slate-400 underline underline-offset-2 cursor-pointer hover:text-slate-300 transition-colors"
+                      data-testid={`connect-hubspot-hint-${signal.id}`}
+                    >
+                      Connect HubSpot to inject
+                    </button>
                   )}
 
-                  {sfConnected && (
-                    signal.sf_injected_at ? (
-                      <a
-                        href={signal.sf_record_url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-medium"
-                        style={{ color: '#00A1E0' }}
-                        data-testid={`sf-injected-badge-${signal.id}`}
-                      >
-                        <Cloud className="h-3.5 w-3.5" /> Pushed ✓
-                      </a>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="h-7 text-white text-xs px-3"
-                        style={{ background: '#00A1E0' }}
-                        onClick={() => onInjectSF?.(signal.id)}
-                        disabled={isInjectingSF}
-                        data-testid={`inject-sf-${signal.id}`}
-                      >
-                        <Cloud className="h-3 w-3 mr-1" />
-                        {isInjectingSF ? 'Pushing...' : 'Salesforce'}
-                      </Button>
-                    )
+                  {/* Salesforce inject — conditional on connection */}
+                  {signal.sf_injected_at ? (
+                    <a
+                      href={signal.sf_record_url ?? '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-medium"
+                      style={{ color: '#00A1E0' }}
+                      data-testid={`sf-injected-badge-${signal.id}`}
+                    >
+                      <Cloud className="h-3.5 w-3.5" /> Pushed ✓
+                    </a>
+                  ) : sfConnected ? (
+                    <Button
+                      size="sm"
+                      className="h-7 text-white text-xs px-3"
+                      style={{ background: '#00A1E0' }}
+                      onClick={() => onInjectSF?.(signal.id)}
+                      disabled={isInjectingSF}
+                      data-testid={`inject-sf-${signal.id}`}
+                    >
+                      <Cloud className="h-3 w-3 mr-1" />
+                      {isInjectingSF ? 'Pushing...' : 'Salesforce'}
+                    </Button>
+                  ) : (
+                    <button
+                      onClick={() => router.push('/settings/crm')}
+                      className="text-xs text-slate-400 underline underline-offset-2 cursor-pointer hover:text-slate-300 transition-colors"
+                      data-testid={`connect-sf-hint-${signal.id}`}
+                    >
+                      Connect Salesforce to inject
+                    </button>
                   )}
                 </div>
 

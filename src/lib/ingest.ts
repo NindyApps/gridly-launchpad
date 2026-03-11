@@ -92,10 +92,30 @@ export async function runIngestionForTracker(
     rawPosts.push(...posts);
   }
 
+  const DAILY_LIMITS: Record<string, number> = {
+    pro: 500,
+    growth: 2000,
+    enterprise: 99999,
+  };
+  const dailyLimit = DAILY_LIMITS[workspace?.plan ?? 'pro'] ?? 500;
+
   const found = rawPosts.length;
   let saved = 0;
 
   for (const post of rawPosts) {
+    // Check daily classification budget before each call to avoid overruns mid-batch
+    const todayStart = new Date().toISOString().split('T')[0] + 'T00:00:00.000Z';
+    const { count: todayCount } = await supabaseAdmin
+      .from('intent_signals')
+      .select('*', { count: 'exact', head: true })
+      .eq('workspace_id', tracker.workspace_id)
+      .gte('created_at', todayStart);
+
+    if ((todayCount ?? 0) >= dailyLimit) {
+      console.log(`[OCTOPILOT] Workspace ${tracker.workspace_id} hit daily limit (${dailyLimit}), skipping remaining posts`);
+      break;
+    }
+
     const { data: existing } = await supabaseAdmin
       .from('intent_signals')
       .select('id')

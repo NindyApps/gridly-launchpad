@@ -34,26 +34,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const { data: signal } = await supabase
+  // Atomic duplicate guard: claim the signal for injection only if not yet injected.
+  // This prevents two team members from creating duplicate CRM tasks simultaneously.
+  const { data: claimed } = await supabase
     .from('intent_signals')
-    .select('*')
+    .update({ crm_injected: true } as never)
     .eq('id', signal_id)
+    .eq('crm_injected', false)
+    .select('id, ai_summary, pain_domain, intent_level, confidence_score, post_url, author_handle, suggested_opener, urgency_tag')
     .single();
 
-  if (!signal) {
-    return NextResponse.json({ error: 'Signal not found' }, { status: 404 });
+  if (!claimed) {
+    return NextResponse.json(
+      {
+        error: 'already_injected',
+        message: 'This signal was already injected by another team member.',
+      },
+      { status: 409 }
+    );
   }
 
   try {
-    const result = await injectSignalToCRM(accessToken, signal as unknown as Parameters<typeof injectSignalToCRM>[1]);
+    const result = await injectSignalToCRM(accessToken, claimed as unknown as Parameters<typeof injectSignalToCRM>[1]);
 
     await supabase
       .from('intent_signals')
-      .update({ crm_injected: true, crm_task_id: result.task_id })
+      .update({ crm_task_id: result.task_id } as never)
       .eq('id', signal_id);
 
     return NextResponse.json({ success: true, task_id: result.task_id });
   } catch (err: unknown) {
+    // Rollback the optimistic lock so the user can retry
+    await supabase
+      .from('intent_signals')
+      .update({ crm_injected: false } as never)
+      .eq('id', signal_id);
+
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
