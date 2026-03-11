@@ -13,12 +13,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import type { SignalFeedFilters } from '@/types/app';
-
-const DAILY_LIMITS: Record<string, number> = {
-  pro: 500,
-  growth: 2000,
-  enterprise: 99999,
-};
+import { DAILY_LIMITS } from '@/lib/constants/plans';
 
 function StatCard({
   label,

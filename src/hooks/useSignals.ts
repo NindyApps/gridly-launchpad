@@ -3,12 +3,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import type { IntentSignal } from '@/types/app';
+import { useState, useCallback } from 'react';
+
+const PAGE_SIZE = 50;
 
 export function useSignals(workspaceId: string | null) {
   const supabase = createClient();
+  const [page, setPage] = useState(1);
 
   const { data: signals = [], isLoading, error } = useQuery({
-    queryKey: ['signals', workspaceId],
+    queryKey: ['signals', workspaceId, page],
     queryFn: async () => {
       if (!workspaceId) return [];
       const { data, error } = await supabase
@@ -18,14 +22,20 @@ export function useSignals(workspaceId: string | null) {
         .eq('dismissed', false)
         .order('confidence_score', { ascending: false })
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(page * PAGE_SIZE);
       if (error) throw error;
       return (data ?? []) as IntentSignal[];
     },
     enabled: !!workspaceId,
   });
 
-  return { signals, isLoading, error };
+  const hasMore = signals.length >= page * PAGE_SIZE;
+
+  const loadMore = useCallback(() => {
+    setPage((p) => p + 1);
+  }, []);
+
+  return { signals, isLoading, error, hasMore, loadMore };
 }
 
 export function useDismissSignal() {

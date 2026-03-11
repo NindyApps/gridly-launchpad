@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSignals } from '@/hooks/useSignals';
 import { useWorkspaces } from '@/hooks/use-workspaces';
 import { TrendingUp, Zap, Target, BarChart3, Cloud } from 'lucide-react';
@@ -38,9 +39,40 @@ const axisProps = {
   tickLine: false as const,
 };
 
+function StatSkeleton() {
+  return (
+    <Card className="border border-border bg-card">
+      <CardContent className="pt-5">
+        <div className="flex items-center justify-between mb-2">
+          <Skeleton className="h-3 w-20 bg-white/5" />
+          <Skeleton className="h-4 w-4 bg-white/5 rounded" />
+        </div>
+        <Skeleton className="h-8 w-16 bg-white/5" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChartSkeleton({ height = 180 }: { height?: number }) {
+  return (
+    <div className="space-y-3" style={{ height }}>
+      <div className="flex items-end gap-2 h-full">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="flex-1 flex flex-col justify-end h-full">
+            <Skeleton
+              className="w-full bg-white/5 rounded"
+              style={{ height: `${20 + Math.abs(Math.sin(i * 1.5)) * 60}%` }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AnalyticsPage() {
   const { activeWorkspace } = useWorkspaces();
-  const { signals } = useSignals(activeWorkspace?.id ?? null);
+  const { signals, isLoading } = useSignals(activeWorkspace?.id ?? null);
 
   const total = signals.length;
   const highIntent = signals.filter((s) => s.intent_level === 'high').length;
@@ -88,6 +120,36 @@ export default function AnalyticsPage() {
   }, [signals]);
 
   const empty = <p className="text-sm text-muted-foreground py-8 text-center">No data yet</p>;
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => <StatSkeleton key={i} />)}
+          </div>
+          <Card className="border border-border bg-card">
+            <CardHeader>
+              <Skeleton className="h-4 w-40 bg-white/5" />
+            </CardHeader>
+            <CardContent>
+              <ChartSkeleton />
+            </CardContent>
+          </Card>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card className="border border-border bg-card">
+              <CardHeader><Skeleton className="h-4 w-32 bg-white/5" /></CardHeader>
+              <CardContent><ChartSkeleton /></CardContent>
+            </Card>
+            <Card className="border border-border bg-card">
+              <CardHeader><Skeleton className="h-4 w-40 bg-white/5" /></CardHeader>
+              <CardContent><ChartSkeleton /></CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -171,6 +233,8 @@ export default function AnalyticsPage() {
             </CardContent>
           </Card>
         </div>
+
+        <p className="text-xs text-muted-foreground text-center pb-2">Showing up to 50 most recent signals</p>
       </div>
     </div>
   );

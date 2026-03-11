@@ -9,14 +9,16 @@ function getStripe() {
   });
 }
 
-const PLAN_MAP: Record<string, 'pro' | 'growth' | 'enterprise'> = {
-  [process.env.STRIPE_PRO_PRICE_ID ?? 'price_pro']: 'pro',
-  [process.env.STRIPE_GROWTH_PRICE_ID ?? 'price_growth']: 'growth',
-  [process.env.STRIPE_ENTERPRISE_PRICE_ID ?? 'price_enterprise']: 'enterprise',
-  price_pro: 'pro',
-  price_growth: 'growth',
-  price_enterprise: 'enterprise',
-};
+function buildPlanMap(): Record<string, 'pro' | 'growth' | 'enterprise'> {
+  const map: Record<string, 'pro' | 'growth' | 'enterprise'> = {};
+  const proPriceId = process.env.STRIPE_PRO_PRICE_ID;
+  const growthPriceId = process.env.STRIPE_GROWTH_PRICE_ID;
+  const enterprisePriceId = process.env.STRIPE_ENTERPRISE_PRICE_ID;
+  if (proPriceId) map[proPriceId] = 'pro';
+  if (growthPriceId) map[growthPriceId] = 'growth';
+  if (enterprisePriceId) map[enterprisePriceId] = 'enterprise';
+  return map;
+}
 
 function getAdminClient() {
   return createClient<Database>(
@@ -43,6 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = getAdminClient();
+  const PLAN_MAP = buildPlanMap();
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -55,7 +58,6 @@ export async function POST(request: NextRequest) {
           .from('workspaces')
           .update({ stripe_subscription_id: subscriptionId })
           .eq('stripe_customer_id', customerId);
-        console.log(`[Stripe] Checkout completed: customer=${customerId}, sub=${subscriptionId}`);
       }
       break;
     }
@@ -71,7 +73,6 @@ export async function POST(request: NextRequest) {
           .from('workspaces')
           .update({ plan, stripe_subscription_id: sub.id })
           .eq('stripe_customer_id', customerId);
-        console.log(`[Stripe] Subscription updated: customer=${customerId}, plan=${plan}`);
       }
       break;
     }
@@ -85,13 +86,12 @@ export async function POST(request: NextRequest) {
           .from('workspaces')
           .update({ plan: 'pro', stripe_subscription_id: null })
           .eq('stripe_customer_id', customerId);
-        console.log(`[Stripe] Subscription cancelled: customer=${customerId}`);
       }
       break;
     }
 
     default:
-      console.log('[Stripe] Unhandled event type:', event.type);
+      break;
   }
 
   return NextResponse.json({ received: true });

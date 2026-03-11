@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 const platforms = [
   { name: "Reddit", logo: "/reddit-logo.png" },
@@ -67,7 +66,7 @@ const HeroSection = () => {
 
       <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[80px] bg-accent/15 rounded-full blur-[60px]" />
 
-      <div className="container mx-auto px-4 pt-24 pb-8 relative z-10 text-center">
+      <div className="container mx-auto px-4 pt-24 pb-16 relative z-10 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -111,50 +110,27 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-8 text-base md:text-lg text-muted-foreground"
+          className="mt-8 text-base md:text-lg text-muted-foreground max-w-lg mx-auto"
         >
           Monitor Reddit and Hacker News for real buying signals — powered by AI.
+          Auto-inject leads into your CRM.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="mt-8 max-w-md mx-auto bg-card/80 backdrop-blur-sm rounded-2xl border border-border p-6 md:p-8"
-          style={{ boxShadow: "var(--shadow-card)" }}
+          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5 text-center">Your Product</label>
-              <div className="relative">
-                <Input
-                  placeholder="e.g., AI project management software"
-                  className="pr-10 rounded-full bg-secondary/50 border-border text-sm h-10"
-                  data-testid="input-product"
-                />
-                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-1.5 text-center">Target Customer</label>
-              <div className="relative">
-                <Input
-                  placeholder="e.g., Project managers"
-                  className="pr-10 rounded-full bg-secondary/50 border-border text-sm h-10"
-                  data-testid="input-target-customer"
-                />
-                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              </div>
-            </div>
-            <Button
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-11 text-sm font-semibold gap-2"
-              onClick={() => router.push('/signup')}
-              data-testid="hero-cta-button"
-            >
-              <Sparkles className="w-4 h-4" />
-              Start Free Trial
-            </Button>
-          </div>
+          <Button
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-12 px-8 text-base font-semibold gap-2"
+            onClick={() => router.push('/signup')}
+            data-testid="hero-cta-button"
+          >
+            <Sparkles className="w-5 h-5" />
+            Start Free Trial
+          </Button>
+          <p className="text-xs text-muted-foreground">14-day free trial · No credit card required</p>
         </motion.div>
       </div>
     </section>

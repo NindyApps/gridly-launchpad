@@ -251,11 +251,18 @@ Do NOT install or import `framer-motion` — it has been removed.
 - ✅ Dashboard injected today — counts both HubSpot (crm_injected) + Salesforce (sf_injected_at)
 - ✅ Alert settings — persist to DB + "Send Test" button hits `/api/alerts/test`
 - ✅ Alert delivery — email via Resend + Slack Block Kit webhook (both include SF deep links)
-- ✅ Team settings — members list from DB + real invite API
-- ✅ Signal feedback API (`/api/feedback`)
+- ✅ Team settings — members list from DB + real invite API + change role (admin only) + remove member (admin only)
+- ✅ Team settings — non-admin guard: invite form and action buttons hidden for non-admin users
+- ✅ Signal feedback API (`/api/feedback`) + error toast on failure
 - ✅ Stripe webhook handler — updates `workspaces.plan` + `stripe_subscription_id` from events
 - ✅ Stripe checkout flow — `/api/billing/checkout` creates real Checkout Session + redirect
-- ✅ Billing usage — real DB counts via `/api/billing/usage` (signals/month, trackers, members)
+- ✅ Billing usage — real DB counts via `/api/billing/usage` (signals/month, trackers, members) + skeleton loading + unlimited plan handling
+- ✅ HubSpot inject route — JWT auth + workspace ownership check + workspace-scoped signal queries (cross-tenant IDOR protection)
+- ✅ Signal feed — Load More pagination (50 per page) + feedback error toast
+- ✅ Analytics page — loading skeleton for stats and charts
+- ✅ Plan limits — unified DAILY_LIMITS exported from `plans.ts`, enterprise uses 99999 (not -1)
+- ✅ Stripe webhook — no console.log leaks, no duplicate PLAN_MAP keys
+- ✅ Landing page — pricing synced with plans.ts values, hero CTA simplified, SeeItInAction deduped, testimonials disclaimer
 - ✅ Signal Ingestion Engine — Reddit JSON API + Algolia HN API + OpenAI classify + dedup
 - ✅ Ingest API route — POST `/api/ingest/run` (auth: CRON_SECRET header)
 - ✅ Supabase Edge Function — `supabase/functions/ingest-signals/` (calls ingest every 15 min)

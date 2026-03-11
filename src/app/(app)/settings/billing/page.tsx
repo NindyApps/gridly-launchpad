@@ -9,7 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
-import { PLANS } from '@/lib/constants/plans';
+import { PLANS, UNLIMITED_THRESHOLD } from '@/lib/constants/plans';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { WorkspacePlan } from '@/types/app';
 
 interface UsageData {
@@ -95,8 +96,10 @@ function BillingContent() {
     }
   };
 
-  const signalPct = usage && signalLimit > 0 ? Math.min(100, Math.round((usage.signals_this_month / signalLimit) * 100)) : 0;
-  const seatPct = usage && seatLimit > 0 ? Math.min(100, Math.round((usage.members / seatLimit) * 100)) : 0;
+  const isUnlimited = signalLimit >= UNLIMITED_THRESHOLD;
+  const isUnlimitedSeats = seatLimit >= UNLIMITED_THRESHOLD;
+  const signalPct = usage && !isUnlimited ? Math.min(100, Math.round((usage.signals_this_month / signalLimit) * 100)) : 0;
+  const seatPct = usage && !isUnlimitedSeats ? Math.min(100, Math.round((usage.members / seatLimit) * 100)) : 0;
 
   const planEntries = Object.entries(PLANS) as [keyof typeof PLANS, (typeof PLANS)[keyof typeof PLANS]][];
 
@@ -111,24 +114,45 @@ function BillingContent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-zinc-300">Signals this month</span>
-                <span className="text-white font-medium">
-                  {usage ? `${usage.signals_this_month} / ${signalLimit > 0 ? signalLimit : '∞'}` : '—'}
-                </span>
+            {!usage ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-zinc-300">Signals this month</span>
+                    <Skeleton className="h-4 w-16 bg-white/5" />
+                  </div>
+                  <Skeleton className="h-2 w-full bg-white/5 rounded-full" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-zinc-300">Seats used</span>
+                    <Skeleton className="h-4 w-16 bg-white/5" />
+                  </div>
+                  <Skeleton className="h-2 w-full bg-white/5 rounded-full" />
+                </div>
               </div>
-              <Progress value={signalPct} className="h-2" data-testid="progress-signals" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-zinc-300">Seats used</span>
-                <span className="text-white font-medium">
-                  {usage ? `${usage.members} / ${seatLimit > 0 ? seatLimit : '∞'}` : '—'}
-                </span>
-              </div>
-              <Progress value={seatPct} className="h-2" data-testid="progress-seats" />
-            </div>
+            ) : (
+              <>
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-zinc-300">Signals this month</span>
+                    <span className="text-white font-medium">
+                      {isUnlimited ? `${usage.signals_this_month} (unlimited)` : `${usage.signals_this_month} / ${signalLimit}`}
+                    </span>
+                  </div>
+                  {!isUnlimited && <Progress value={signalPct} className="h-2" data-testid="progress-signals" />}
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-zinc-300">Seats used</span>
+                    <span className="text-white font-medium">
+                      {isUnlimitedSeats ? `${usage.members} (unlimited)` : `${usage.members} / ${seatLimit}`}
+                    </span>
+                  </div>
+                  {!isUnlimitedSeats && <Progress value={seatPct} className="h-2" data-testid="progress-seats" />}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

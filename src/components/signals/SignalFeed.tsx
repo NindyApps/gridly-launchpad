@@ -11,7 +11,7 @@ import { useTrackers } from '@/hooks/useTrackers';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import type { IntentSignal, SignalFeedFilters, SignalSort } from '@/types/app';
-import { Radio, RefreshCw, Inbox, Loader2 } from 'lucide-react';
+import { Radio, RefreshCw, Inbox, Loader2, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 function applyFilters(signals: IntentSignal[], filters: SignalFeedFilters): IntentSignal[] {
@@ -88,7 +88,7 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
   const supabase = createClient();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  const { signals, isLoading } = useSignals(workspaceId);
+  const { signals, isLoading, hasMore, loadMore } = useSignals(workspaceId);
   const { trackers } = useTrackers(workspaceId);
   const { workspace } = useAuth();
   const dismissSignal = useDismissSignal();
@@ -210,8 +210,9 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
   const handleFeedback = async (signalId: string, type: 'useful' | 'not_useful') => {
     try {
       await feedback.mutateAsync({ signalId, feedbackType: type });
-    } catch {
-      // silent
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not save feedback';
+      toast({ title: 'Feedback failed', description: msg, variant: 'destructive' });
     }
   };
 
@@ -327,6 +328,21 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
           sfConnected={sfConnected}
         />
       ))}
+
+      {hasMore && (
+        <div className="flex justify-center pt-2 pb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border text-zinc-400 hover:text-white"
+            onClick={loadMore}
+            data-testid="button-load-more"
+          >
+            <ChevronDown className="h-3.5 w-3.5 mr-1.5" />
+            Load More
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

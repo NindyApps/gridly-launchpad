@@ -1,15 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from 'motion/react';
 
 const SeeItInAction = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const tabs = [
-    { label: "Reddit", image: "/reddit-leads-view.png" },
-    { label: "Hacker News", image: "/reddit-leads-view.png" },
-  ];
-
   return (
     <section className="py-20 md:py-28 grid-bg">
       <div className="container mx-auto px-4">
@@ -25,23 +18,6 @@ const SeeItInAction = () => {
           <p className="mt-3 text-muted-foreground">A sneak peek inside the platform</p>
         </motion.div>
 
-        <div className="flex justify-center gap-2 mb-8">
-          {tabs.map((tab, i) => (
-            <button
-              key={tab.label}
-              onClick={() => setActiveTab(i)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                activeTab === i
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:text-foreground"
-              }`}
-              data-testid={`tab-${tab.label.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -50,13 +26,13 @@ const SeeItInAction = () => {
         >
           <div className="rounded-2xl overflow-hidden border border-border bg-card" style={{ boxShadow: "0 20px 60px -15px hsl(220 40% 13% / 0.12)" }}>
             <img
-              src={tabs[activeTab].image}
-              alt={`${tabs[activeTab].label} leads view`}
+              src="/reddit-leads-view.png"
+              alt="OCTOPILOT leads view showing AI-classified buying signals"
               className="w-full h-auto"
             />
           </div>
           <p className="text-center text-sm text-muted-foreground mt-4">
-            AI finds relevant buying signals across Reddit & Hacker News
+            AI finds relevant buying signals across Reddit & Hacker News and classifies them by intent level
           </p>
         </motion.div>
       </div>

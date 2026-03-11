@@ -10,6 +10,14 @@ export interface PlanConfig {
   };
 }
 
+export const DAILY_LIMITS: Record<string, number> = {
+  pro: 500,
+  growth: 2000,
+  enterprise: 99999,
+};
+
+export const UNLIMITED_THRESHOLD = 99999;
+
 export const PLANS: Record<'pro' | 'growth' | 'enterprise', PlanConfig> = {
   pro: {
     name: 'Pro',
@@ -49,6 +57,6 @@ export const PLANS: Record<'pro' | 'growth' | 'enterprise', PlanConfig> = {
       'Custom SLA',
       'Unlimited seats',
     ],
-    limits: { signals: -1, trackers: -1, members: -1 },
+    limits: { signals: 99999, trackers: 99999, members: 99999 },
   },
 };

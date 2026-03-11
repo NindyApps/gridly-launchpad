@@ -14,14 +14,15 @@ const PLANS = [
     description: 'Perfect for individual reps and small teams.',
     badge: null,
     features: [
-      '5 active trackers',
+      '10 active trackers',
       '500 signals per month',
       'HubSpot CRM integration',
       'Email alert digest',
       'AI-generated openers',
-      '1 workspace',
+      '5 team seats',
     ],
     cta: 'Start Free Trial',
+    ctaLink: '/signup',
     highlighted: false,
   },
   {
@@ -35,11 +36,11 @@ const PLANS = [
       '2,000 signals per month',
       'All CRM integrations',
       'Slack real-time alerts',
-      'Team collaboration (15 seats)',
-      'API access',
+      'Team collaboration (20 seats)',
       'Priority support',
     ],
     cta: 'Start Free Trial',
+    ctaLink: '/signup',
     highlighted: true,
   },
   {
@@ -58,6 +59,7 @@ const PLANS = [
       'Custom SLA & uptime guarantee',
     ],
     cta: 'Talk to Sales',
+    ctaLink: 'mailto:sales@octopilot.app',
     highlighted: false,
   },
 ];
@@ -119,7 +121,7 @@ export default function Pricing() {
                   variant={plan.highlighted ? 'default' : 'outline'}
                   data-testid={`pricing-cta-${plan.name.toLowerCase()}`}
                 >
-                  <Link href={plan.cta === 'Talk to Sales' ? '#contact' : '/signup'}>
+                  <Link href={plan.ctaLink}>
                     {plan.cta}
                   </Link>
                 </Button>

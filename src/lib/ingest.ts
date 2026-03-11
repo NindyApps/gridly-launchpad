@@ -5,6 +5,7 @@ import { fetchHNPosts } from './scrapers/hackernews';
 import { classifySignal } from './openai';
 import { sendAlertNotification } from './notifications';
 import type { IntentSignal, Workspace, Tracker } from '@/types/app';
+import { DAILY_LIMITS } from '@/lib/constants/plans';
 
 type SupabaseAdmin = ReturnType<typeof createClient<Database>>;
 
@@ -92,11 +93,6 @@ export async function runIngestionForTracker(
     rawPosts.push(...posts);
   }
 
-  const DAILY_LIMITS: Record<string, number> = {
-    pro: 500,
-    growth: 2000,
-    enterprise: 99999,
-  };
   const dailyLimit = DAILY_LIMITS[workspace?.plan ?? 'pro'] ?? 500;
 
   const found = rawPosts.length;
@@ -112,7 +108,7 @@ export async function runIngestionForTracker(
       .gte('created_at', todayStart);
 
     if ((todayCount ?? 0) >= dailyLimit) {
-      console.log(`[OCTOPILOT] Workspace ${tracker.workspace_id} hit daily limit (${dailyLimit}), skipping remaining posts`);
+      console.warn(`[OCTOPILOT] Workspace hit daily limit (${dailyLimit}), skipping remaining posts`);
       break;
     }
 
@@ -175,7 +171,7 @@ export async function runIngestionForTracker(
 
     const inserted = insertedRaw as unknown as IntentSignal;
     saved++;
-    console.log(`[OCTOPILOT] Saved signal: ${inserted.id} (${post.platform})`);
+    
 
     if (workspace) {
       try {
@@ -186,7 +182,7 @@ export async function runIngestionForTracker(
     }
   }
 
-  console.log(`[OCTOPILOT] Tracker ${trackerId}: found=${found}, saved=${saved}`);
+  
   return { found, saved, trackerId };
 }
 

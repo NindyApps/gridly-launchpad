@@ -47,7 +47,7 @@ export default function Testimonials() {
               data-testid={`testimonial-card-${i}`}
             >
               <CardContent className="pt-6 pb-6 space-y-4">
-                <p className="text-zinc-300 text-sm leading-relaxed">"{t.quote}"</p>
+                <p className="text-zinc-300 text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-2">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className={`${t.color} text-white text-xs font-semibold`}>
@@ -63,6 +63,9 @@ export default function Testimonials() {
             </Card>
           ))}
         </div>
+        <p className="text-center text-xs text-zinc-600 mt-8">
+          Results may vary. Testimonials represent individual experiences during early access.
+        </p>
       </div>
     </section>
   );
