@@ -1055,6 +1055,9 @@ body{
 .h-\[800px\]{
   height: 800px;
 }
+.h-\[calc\(420px-40px\)\]{
+  height: calc(420px - 40px);
+}
 .h-\[var\(--radix-navigation-menu-viewport-height\)\]{
   height: var(--radix-navigation-menu-viewport-height);
 }
@@ -1075,9 +1078,6 @@ body{
 }
 .h-svh{
   height: 100svh;
-}
-.h-\[calc\(420px-40px\)\]{
-  height: calc(420px - 40px);
 }
 .max-h-96{
   max-height: 24rem;
