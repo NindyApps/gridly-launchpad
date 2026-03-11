@@ -11,10 +11,10 @@ export function useSignals(workspaceId: string | null) {
   const supabase = createClient();
   const [page, setPage] = useState(1);
 
-  const { data: signals = [], isLoading, error } = useQuery({
+  const { data: queryResult = { signals: [] as IntentSignal[], hasMore: false }, isLoading, error } = useQuery({
     queryKey: ['signals', workspaceId, page],
     queryFn: async () => {
-      if (!workspaceId) return [];
+      if (!workspaceId) return { signals: [] as IntentSignal[], hasMore: false };
       const { data, error } = await supabase
         .from('intent_signals')
         .select('*')
@@ -22,14 +22,19 @@ export function useSignals(workspaceId: string | null) {
         .eq('dismissed', false)
         .order('confidence_score', { ascending: false })
         .order('created_at', { ascending: false })
-        .limit(page * PAGE_SIZE);
+        .limit(page * PAGE_SIZE + 1);
       if (error) throw error;
-      return (data ?? []) as IntentSignal[];
+      const all = (data ?? []) as IntentSignal[];
+      const limit = page * PAGE_SIZE;
+      return {
+        signals: all.slice(0, limit),
+        hasMore: all.length > limit,
+      };
     },
     enabled: !!workspaceId,
   });
 
-  const hasMore = signals.length >= page * PAGE_SIZE;
+  const { signals, hasMore } = queryResult;
 
   const loadMore = useCallback(() => {
     setPage((p) => p + 1);
