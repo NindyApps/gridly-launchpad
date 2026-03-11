@@ -27,6 +27,7 @@ export interface IntentSignal {
   sf_injected_at: string | null;
   sf_record_id: string | null;
   sf_record_url: string | null;
+  is_demo: boolean;
   created_at: string;
 }
 

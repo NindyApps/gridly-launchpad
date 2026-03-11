@@ -11,7 +11,7 @@ import { useTrackers } from '@/hooks/useTrackers';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import type { IntentSignal, SignalFeedFilters, SignalSort } from '@/types/app';
-import { Radio, RefreshCw, Inbox, Bell } from 'lucide-react';
+import { Radio, RefreshCw, Inbox, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 function applyFilters(signals: IntentSignal[], filters: SignalFeedFilters): IntentSignal[] {
@@ -43,6 +43,16 @@ function applyFilters(signals: IntentSignal[], filters: SignalFeedFilters): Inte
   }
 
   return result;
+}
+
+function hasActiveFilters(filters: SignalFeedFilters): boolean {
+  return !!(
+    (filters.intent_level && filters.intent_level !== 'all') ||
+    (filters.intent_category && filters.intent_category !== 'all') ||
+    (filters.platform && filters.platform !== 'all') ||
+    (filters.tracker_id && filters.tracker_id !== 'all') ||
+    filters.urgent_only
+  );
 }
 
 function SignalSkeleton() {
@@ -212,42 +222,67 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
 
   const hasTrackers = trackers.length > 0;
 
+  // State 1: No trackers at all
   if (!hasTrackers) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center" data-testid="empty-no-trackers">
         <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4">
           <Radio className="h-6 w-6 text-indigo-400" />
         </div>
-        <h3 className="text-base font-semibold text-white mb-2">No trackers set up</h3>
+        <h3 className="text-base font-semibold text-white mb-2">Create your first tracker to start monitoring</h3>
         <p className="text-sm text-zinc-400 max-w-xs mb-5">
-          Create your first tracker to start monitoring buying signals on Reddit and Hacker News.
+          Monitor Reddit and Hacker News for buying signals that match your ICP.
         </p>
         <Link href="/trackers">
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
-            Create your first tracker
+          <Button className="bg-indigo-600 hover:bg-indigo-700" data-testid="button-create-tracker-cta">
+            Create Tracker
           </Button>
         </Link>
       </div>
     );
   }
 
+  // State 2: Has trackers but no signals yet
   if (signals.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center" data-testid="empty-collecting">
         <div className="h-12 w-12 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
-          <Bell className="h-6 w-6 text-zinc-500" />
+          <Loader2 className="h-6 w-6 text-zinc-500 animate-spin" />
         </div>
-        <h3 className="text-base font-semibold text-white mb-2">Monitoring in progress</h3>
+        <h3 className="text-base font-semibold text-white mb-2">Signals are being collected</h3>
         <p className="text-sm text-zinc-400 max-w-xs">
-          Signals appear within 15 minutes. Your trackers are actively monitoring Reddit and Hacker News.
+          Your first signals will appear here within 15 minutes.
         </p>
       </div>
     );
   }
 
+  // State 3a: Signals exist but filters exclude all → "All caught up" or "No matches"
   if (filtered.length === 0) {
+    if (!hasActiveFilters(filters)) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center" data-testid="empty-all-caught-up">
+          <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center mb-3">
+            <Inbox className="h-5 w-5 text-green-400" />
+          </div>
+          <h3 className="text-sm font-medium text-white mb-1">All caught up!</h3>
+          <p className="text-xs text-zinc-500 mb-4">No pending signals. New signals will appear automatically.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border text-zinc-400 hover:text-white"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['signals', workspaceId] })}
+            data-testid="button-refresh-signals"
+          >
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            Refresh
+          </Button>
+        </div>
+      );
+    }
+
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center" data-testid="empty-no-filter-match">
         <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center mb-3">
           <Inbox className="h-5 w-5 text-zinc-500" />
         </div>

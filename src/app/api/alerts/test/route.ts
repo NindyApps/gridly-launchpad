@@ -25,6 +25,7 @@ const DUMMY_SIGNAL: Omit<IntentSignal, 'id' | 'workspace_id' | 'tracker_id' | 'c
   sf_injected_at: null,
   sf_record_id: null,
   sf_record_url: null,
+  is_demo: false,
 };
 
 export async function POST() {

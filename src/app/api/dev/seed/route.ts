@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { seedSignals } from '@/lib/seed-signals';
+import { seedDemoSignals } from '@/lib/seed-signals';
 
 export async function POST(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const seeded = await seedSignals(profile.workspace_id, trackers[0].id);
+    const seeded = await seedDemoSignals(profile.workspace_id, trackers[0].id);
     return NextResponse.json({ success: true, count: seeded?.length ?? 0 });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Seed failed';

@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TagInput } from "@/components/shared/TagInput";
 import { FullPageLoader } from "@/components/shared/LoadingSpinner";
+import { seedDemoSignals } from "@/lib/seed-signals";
 import { Zap, CheckCircle2, Plus, X } from "lucide-react";
 import type { UserRole } from "@/types/app";
 
@@ -36,6 +37,7 @@ export default function OnboardingPage() {
   const [subreddits, setSubreddits] = useState<string[]>([]);
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [trackerError, setTrackerError] = useState<string | null>(null);
+  const [createdTrackerId, setCreatedTrackerId] = useState<string | null>(null);
 
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<UserRole>("viewer");
@@ -69,6 +71,19 @@ export default function OnboardingPage() {
           .single();
         setHubspotConnected(!!ws?.hubspot_token_enc);
         setSfConnected(!!(ws as unknown as { sf_access_token_enc: string | null })?.sf_access_token_enc);
+
+        // Restore previously created tracker ID if user returns to onboarding
+        if (profile.onboarding_step && profile.onboarding_step >= 3) {
+          const { data: trackers } = await supabase
+            .from("trackers")
+            .select("id")
+            .eq("workspace_id", profile.workspace_id)
+            .order("created_at", { ascending: true })
+            .limit(1);
+          if (trackers && trackers.length > 0) {
+            setCreatedTrackerId(trackers[0].id);
+          }
+        }
       }
 
       if (profile?.onboarding_step) setStep(profile.onboarding_step);
@@ -94,7 +109,7 @@ export default function OnboardingPage() {
     if (!trackerName.trim()) { setTrackerError("Tracker name is required."); return; }
 
     setTrackerLoading(true);
-    const { error } = await supabase.from("trackers").insert({
+    const { data, error } = await supabase.from("trackers").insert({
       workspace_id: workspaceId,
       created_by: userId,
       name: trackerName,
@@ -103,9 +118,10 @@ export default function OnboardingPage() {
       subreddits,
       platforms: ["reddit", "hackernews"],
       is_active: true,
-    });
+    }).select("id").single();
     setTrackerLoading(false);
     if (error) { setTrackerError(error.message); return; }
+    if (data?.id) setCreatedTrackerId(data.id);
     await saveStep(3);
   };
 
@@ -130,12 +146,23 @@ export default function OnboardingPage() {
   };
 
   const handleFinish = async () => {
-    if (!userId) return;
+    if (!userId || !workspaceId) return;
     setFinishing(true);
+
     await supabase
       .from("profiles")
       .update({ onboarding_completed: true, onboarding_step: 3 })
       .eq("id", userId);
+
+    // Seed demo signals if the user created a tracker during onboarding
+    if (createdTrackerId) {
+      try {
+        await seedDemoSignals(workspaceId, createdTrackerId);
+      } catch {
+        // Non-blocking — demo signals are nice-to-have
+      }
+    }
+
     router.push("/dashboard");
   };
 
@@ -431,7 +458,7 @@ export default function OnboardingPage() {
                   disabled={finishing}
                   data-testid="button-go-to-dashboard"
                 >
-                  {finishing ? "Setting up..." : "Go to Dashboard →"}
+                  {finishing ? "Setting up your workspace..." : "Go to Dashboard →"}
                 </Button>
               </div>
             </CardContent>

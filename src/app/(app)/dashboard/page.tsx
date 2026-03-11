@@ -2,12 +2,15 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { isToday } from 'date-fns';
-import { TrendingUp, Zap, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Zap, Target, BarChart3, Radio } from 'lucide-react';
 import { SignalFeed } from '@/components/signals/SignalFeed';
 import { SignalFilters } from '@/components/signals/SignalFilters';
+import { Button } from '@/components/ui/button';
 import { useSignals } from '@/hooks/useSignals';
 import { useTrackers } from '@/hooks/useTrackers';
 import { useWorkspaces } from '@/hooks/use-workspaces';
+import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import type { SignalFeedFilters } from '@/types/app';
 
 function StatCard({
@@ -37,9 +40,12 @@ export default function DashboardPage() {
   const workspaceId = activeWorkspace?.id ?? null;
   const { signals } = useSignals(workspaceId);
   const { trackers } = useTrackers(workspaceId);
+  const { toast } = useToast();
+  const supabase = createClient();
 
   const [filters, setFilters] = useState<SignalFeedFilters>({});
   const [resultCount, setResultCount] = useState(0);
+  const [triggering, setTriggering] = useState(false);
 
   const stats = useMemo(() => {
     const today = signals.filter((s) => isToday(new Date(s.created_at)));
@@ -58,6 +64,21 @@ export default function DashboardPage() {
     };
   }, [signals]);
 
+  const hasRealSignals = signals.some((s) => !s.is_demo);
+  const showTriggerButton = process.env.NODE_ENV === 'development' || !hasRealSignals;
+
+  const handleTriggerScan = async () => {
+    setTriggering(true);
+    try {
+      await supabase.functions.invoke('ingest-signals');
+      toast({ title: 'Signal scan triggered', description: 'Check back in a few minutes for new signals.' });
+    } catch {
+      toast({ title: 'Trigger failed', description: 'Could not invoke the signal scan.', variant: 'destructive' });
+    } finally {
+      setTriggering(false);
+    }
+  };
+
   const handleResultCount = useCallback((count: number) => {
     setResultCount(count);
   }, []);
@@ -71,6 +92,24 @@ export default function DashboardPage() {
         <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-green-400" />
         <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-amber-400" />
       </div>
+
+      {/* Manual trigger for dev / pre-first-real-signal */}
+      {showTriggerButton && (
+        <div className="px-4 pb-2 flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border text-zinc-400 hover:text-white"
+            onClick={handleTriggerScan}
+            disabled={triggering}
+            data-testid="button-trigger-scan"
+          >
+            <Radio className="h-3.5 w-3.5 mr-1.5" />
+            {triggering ? 'Triggering...' : 'Trigger Signal Scan'}
+          </Button>
+          <span className="text-xs text-zinc-600">Manually trigger signal collection for testing</span>
+        </div>
+      )}
 
       {/* Sticky filter bar */}
       <SignalFilters

@@ -80,6 +80,7 @@ CREATE TABLE intent_signals (
   crm_injected boolean DEFAULT false,
   crm_task_id text,
   dismissed boolean DEFAULT false,
+  is_demo boolean DEFAULT false,
   created_at timestamptz DEFAULT now()
 );
 

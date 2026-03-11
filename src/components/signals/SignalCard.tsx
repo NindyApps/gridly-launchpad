@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ExternalLink, X, Zap, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Copy, Check, Cloud } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -135,6 +136,20 @@ export function SignalCard({
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-2 flex-wrap">
                   <PlatformBadge platform={signal.platform} postUrl={signal.post_url} />
+                  {signal.is_demo && (
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center rounded-full border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-400 cursor-default" data-testid={`demo-badge-${signal.id}`}>
+                            Demo
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-xs">
+                          This is a sample signal. Real signals will appear within 15 minutes.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                   <span className="text-xs text-zinc-500">
                     {formatDistanceToNow(new Date(signal.created_at), { addSuffix: true })}
                   </span>
