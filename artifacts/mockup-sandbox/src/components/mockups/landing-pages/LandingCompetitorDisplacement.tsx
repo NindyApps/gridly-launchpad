@@ -104,7 +104,7 @@ function HeroComparison() {
             Stop prospecting like it's 2019.
           </h1>
           <p className="text-xl text-[#94a3b8]">
-            Manual social selling is dead. Replace hours of scrolling with automated, real-time intent capture.
+            Manual social selling is dead. OCTOPILOT monitors <span className="text-white font-medium">Reddit</span> and <span className="text-white font-medium">Hacker News</span> for buying intent, classifies signals with AI, and auto-injects hot leads into your CRM.
           </p>
         </div>
 
@@ -165,10 +165,10 @@ function HeroComparison() {
 
               <div className="space-y-6 mb-12">
                 {[
-                  "Automated monitoring — 24/7 coverage",
-                  "Real-time alerts — respond in minutes",
+                  "Reddit & HN monitoring — 24/7 coverage",
+                  "AI-classified intent — respond in minutes",
                   "Warm outreach — 12% reply rate",
-                  "Full CRM injection — zero manual entry"
+                  "Auto CRM injection — Salesforce & HubSpot"
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4 text-emerald-50">
                     <CheckCircle2 className="w-6 h-6 text-[#3ECF8E] shrink-0 mt-0.5" />
