@@ -9,14 +9,14 @@ const TESTIMONIALS = [
     name: "Sarah Chen",
     title: "VP of Sales, Dataloop",
     initials: "SC",
-    color: "bg-indigo-600",
+    color: "bg-emerald-600",
   },
   {
     quote: "We replaced our manual Reddit monitoring workflow with OCTOPILOT. What used to take 4 hours a day now happens automatically with better results.",
     name: "Marcus Rivera",
     title: "Head of Growth, Forge Analytics",
     initials: "MR",
-    color: "bg-violet-600",
+    color: "bg-teal-600",
   },
   {
     quote: "The HubSpot integration is seamless. Our SDRs get a task with a ready-to-send opener right in their CRM. Pipeline velocity went up 34%.",

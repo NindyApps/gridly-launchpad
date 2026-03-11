@@ -161,7 +161,7 @@ export function TrackerForm({ initial, onSubmit, onCancel, workspaceId, isPendin
       <div className="flex gap-3 pt-2">
         <Button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white"
           disabled={isPending}
           data-testid="button-save-tracker"
         >

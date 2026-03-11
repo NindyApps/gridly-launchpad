@@ -34,7 +34,7 @@ const Navbar = () => {
           <Button asChild variant="ghost" className="text-sm font-medium text-muted-foreground hover:text-foreground">
             <Link href="/login">Login</Link>
           </Button>
-          <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 rounded-full">
+          <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-5 rounded-full">
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>
@@ -51,7 +51,7 @@ const Navbar = () => {
           <Button asChild variant="ghost" className="w-full text-sm">
             <Link href="/login">Login</Link>
           </Button>
-          <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-full">
+          <Button asChild className="w-full bg-emerald-500 hover:bg-emerald-600 text-black rounded-full">
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>

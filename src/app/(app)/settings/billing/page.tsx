@@ -164,14 +164,14 @@ function BillingContent() {
             return (
               <Card
                 key={planKey}
-                className={`border bg-white/5 ${isCurrent ? 'border-indigo-500/50' : 'border-white/10'}`}
+                className={`border bg-white/5 ${isCurrent ? 'border-emerald-500/50' : 'border-white/10'}`}
                 data-testid={`plan-card-${planKey}`}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-white text-base">{plan.name}</CardTitle>
                     {isCurrent && (
-                      <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-xs">Current</Badge>
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs">Current</Badge>
                     )}
                   </div>
                   <div className="flex items-end gap-1 mt-2">
@@ -183,13 +183,13 @@ function BillingContent() {
                   <ul className="space-y-1.5">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-xs text-zinc-300">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                         {f}
                       </li>
                     ))}
                   </ul>
                   <Button
-                    className={`w-full mt-2 ${isCurrent ? 'border-white/10' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                    className={`w-full mt-2 ${isCurrent ? 'border-white/10' : 'bg-emerald-500 hover:bg-emerald-600'}`}
                     variant={isCurrent ? 'outline' : 'default'}
                     size="sm"
                     disabled={isCurrent || isPlanLoading}

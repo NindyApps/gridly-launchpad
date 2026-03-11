@@ -100,7 +100,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 mx-auto mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 mx-auto mb-4">
             <Zap className="h-6 w-6 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Create your account</h1>
@@ -245,20 +245,20 @@ export default function SignupPage() {
               type="checkbox"
               checked={tosAccepted}
               onChange={(e) => setTosAccepted(e.target.checked)}
-              className="mt-0.5 rounded border-border bg-white/5 accent-indigo-600"
+              className="mt-0.5 rounded border-border bg-white/5 accent-emerald-500"
               data-testid="checkbox-tos"
             />
             <span className="text-xs text-zinc-400 leading-relaxed">
               I agree to the{" "}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300">Terms of Service</a>
+              <a href="#" className="text-emerald-400 hover:text-emerald-300">Terms of Service</a>
               {" "}and{" "}
-              <a href="#" className="text-indigo-400 hover:text-indigo-300">Privacy Policy</a>
+              <a href="#" className="text-emerald-400 hover:text-emerald-300">Privacy Policy</a>
             </span>
           </label>
 
           <Button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
             disabled={loading || success || !tosAccepted}
             data-testid="button-submit"
           >
@@ -268,7 +268,7 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-zinc-400">
           Already have an account?{" "}
-          <Link href="/login" className="text-indigo-400 hover:text-indigo-300 font-medium">
+          <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
             Sign in
           </Link>
         </p>

@@ -173,7 +173,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
       <div className="mb-8 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
           <Zap className="h-5 w-5 text-white" />
         </div>
         <span className="text-lg font-bold text-white tracking-tight">OCTOPILOT</span>
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg mb-6">
         <div className="flex items-center justify-between mb-2">
           {STEPS.map((s, i) => (
-            <span key={s} className={`text-xs ${i === step ? "text-indigo-400 font-medium" : i < step ? "text-green-400" : "text-zinc-500"}`}>
+            <span key={s} className={`text-xs ${i === step ? "text-emerald-400 font-medium" : i < step ? "text-green-400" : "text-zinc-500"}`}>
               {i < step ? "✓ " : ""}{s}
             </span>
           ))}
@@ -195,8 +195,8 @@ export default function OnboardingPage() {
           <Card className="border border-border bg-white/5">
             <CardContent className="pt-10 pb-8 text-center space-y-6">
               <div className="flex justify-center">
-                <div className="h-16 w-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                  <Zap className="h-8 w-8 text-indigo-400" />
+                <div className="h-16 w-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                  <Zap className="h-8 w-8 text-emerald-400" />
                 </div>
               </div>
               <div>
@@ -210,7 +210,7 @@ export default function OnboardingPage() {
                   <div key={f} className="rounded-lg border border-border bg-white/5 p-3 text-center">{f}</div>
                 ))}
               </div>
-              <Button className="bg-indigo-600 hover:bg-indigo-700 w-full text-white font-semibold" onClick={() => saveStep(1)} data-testid="button-get-started">
+              <Button className="bg-emerald-500 hover:bg-emerald-600 w-full text-white font-semibold" onClick={() => saveStep(1)} data-testid="button-get-started">
                 Get Started →
               </Button>
             </CardContent>
@@ -242,7 +242,7 @@ export default function OnboardingPage() {
                     </div>
                   ) : (
                     <Button
-                      className="bg-indigo-600 hover:bg-indigo-700 w-full"
+                      className="bg-emerald-500 hover:bg-emerald-600 w-full"
                       size="sm"
                       onClick={() => { window.location.href = "/api/crm/hubspot/connect"; }}
                       data-testid="button-connect-hubspot"
@@ -290,7 +290,7 @@ export default function OnboardingPage() {
                   ← Back
                 </Button>
                 <Button
-                  className={`flex-1 ${(hubspotConnected || sfConnected) ? "bg-indigo-600 hover:bg-indigo-700" : "border-border text-zinc-400"}`}
+                  className={`flex-1 ${(hubspotConnected || sfConnected) ? "bg-emerald-500 hover:bg-emerald-600" : "border-border text-zinc-400"}`}
                   variant={(hubspotConnected || sfConnected) ? "default" : "outline"}
                   onClick={() => saveStep(2)}
                   data-testid="button-next-or-skip"
@@ -374,7 +374,7 @@ export default function OnboardingPage() {
                   </Button>
                   <Button
                     type="submit"
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                    className="flex-1 bg-emerald-500 hover:bg-emerald-600"
                     disabled={trackerLoading}
                     data-testid="button-create-tracker"
                   >
@@ -423,7 +423,7 @@ export default function OnboardingPage() {
                   <Button
                     type="submit"
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 shrink-0"
+                    className="bg-emerald-500 hover:bg-emerald-600 shrink-0"
                     disabled={inviteLoading || !inviteEmail}
                     data-testid="button-send-invite"
                   >
@@ -453,7 +453,7 @@ export default function OnboardingPage() {
                   ← Back
                 </Button>
                 <Button
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
                   onClick={handleFinish}
                   disabled={finishing}
                   data-testid="button-go-to-dashboard"

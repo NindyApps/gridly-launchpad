@@ -84,23 +84,23 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-950 via-indigo-900 to-zinc-900 items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-900 to-zinc-900 items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-violet-500 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-teal-500 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 text-center px-12 space-y-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 mx-auto">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 mx-auto">
             <Zap className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white tracking-tight">OCTOPILOT</h1>
-          <p className="text-indigo-200 text-lg max-w-xs">
+          <p className="text-emerald-200 text-lg max-w-xs">
             Find B2B buyers the moment they say they need you.
           </p>
           <div className="grid grid-cols-2 gap-3 text-left max-w-xs mx-auto pt-4">
             {["Reddit monitoring", "HN signal detection", "HubSpot injection", "AI intent scoring"].map((f) => (
-              <div key={f} className="flex items-center gap-2 text-sm text-indigo-300">
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+              <div key={f} className="flex items-center gap-2 text-sm text-emerald-300">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 {f}
               </div>
             ))}
@@ -111,7 +111,7 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="lg:hidden flex items-center gap-2 justify-center mb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
               <Zap className="h-5 w-5 text-white" />
             </div>
             <span className="text-lg font-bold text-white">OCTOPILOT</span>
@@ -175,7 +175,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={handleForgotPassword}
                   disabled={forgotLoading}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
                   data-testid="button-forgot-password"
                 >
                   {forgotLoading ? "Sending..." : "Forgot password?"}
@@ -205,7 +205,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
               disabled={loading}
               data-testid="button-sign-in"
             >
@@ -215,7 +215,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-zinc-400">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 font-medium">
               Create one free
             </Link>
           </p>

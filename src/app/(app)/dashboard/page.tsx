@@ -53,7 +53,7 @@ function DailyUsageStat({
     ? 'bg-red-500'
     : nearLimit
     ? 'bg-amber-500'
-    : 'bg-indigo-500';
+    : 'bg-emerald-500';
 
   const textColor = atLimit
     ? 'text-red-400'
@@ -155,7 +155,7 @@ export default function DashboardPage() {
     <div className="h-full flex flex-col">
       {/* Stats row */}
       <div className="px-4 pt-4 pb-2 grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-indigo-400" />
+        <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-emerald-400" />
         <StatCard label="High Intent" value={stats.highIntent} icon={TrendingUp} color="text-red-400" />
         <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-green-400" />
         <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-amber-400" />

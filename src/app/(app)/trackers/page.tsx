@@ -56,7 +56,7 @@ export default function TrackersPage() {
           <p className="text-sm text-zinc-400">{trackers.length} tracker{trackers.length !== 1 ? 's' : ''} configured</p>
           <Button
             size="sm"
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-emerald-500 hover:bg-emerald-600"
             onClick={() => { setEditing(null); setSheetOpen(true); }}
             data-testid="button-new-tracker"
           >

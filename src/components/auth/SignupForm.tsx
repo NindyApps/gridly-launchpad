@@ -102,7 +102,7 @@ export function SignupForm() {
         <CardFooter className="flex flex-col gap-3">
           <Button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
             disabled={loading || success}
             data-testid="button-submit"
           >
@@ -110,7 +110,7 @@ export function SignupForm() {
           </Button>
           <p className="text-sm text-zinc-400 text-center">
             Already have an account?{' '}
-            <Link href="/login" className="text-indigo-400 hover:text-indigo-300">
+            <Link href="/login" className="text-emerald-400 hover:text-emerald-300">
               Sign in
             </Link>
           </p>

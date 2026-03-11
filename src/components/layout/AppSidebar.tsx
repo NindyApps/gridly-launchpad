@@ -47,7 +47,7 @@ const NAV_ITEMS = [
 const PLAN_COLORS: Record<string, string> = {
   free: 'bg-muted text-muted-foreground',
   pro: 'bg-primary/20 text-primary',
-  growth: 'bg-violet-600/20 text-violet-300',
+  growth: 'bg-teal-600/20 text-teal-300',
   enterprise: 'bg-amber-600/20 text-amber-300',
 };
 

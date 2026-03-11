@@ -77,7 +77,7 @@ export function LoginForm() {
         <CardFooter className="flex flex-col gap-3">
           <Button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
             disabled={loading}
             data-testid="button-submit"
           >
@@ -85,7 +85,7 @@ export function LoginForm() {
           </Button>
           <p className="text-sm text-zinc-400 text-center">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-indigo-400 hover:text-indigo-300">
+            <Link href="/signup" className="text-emerald-400 hover:text-emerald-300">
               Create one free
             </Link>
           </p>

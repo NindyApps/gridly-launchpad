@@ -179,7 +179,7 @@ export function SignalCard({
                     {signal.pain_domain}
                   </span>
                 )}
-                <span className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 text-[11px] text-indigo-400">
+                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[11px] text-emerald-400">
                   {categoryLabel}
                 </span>
               </div>
@@ -189,9 +189,9 @@ export function SignalCard({
 
               {/* Collapsible opener */}
               {signal.suggested_opener && (
-                <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/5">
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5">
                   <button
-                    className="flex w-full items-center justify-between px-3 py-2 text-xs text-indigo-400 hover:text-indigo-300"
+                    className="flex w-full items-center justify-between px-3 py-2 text-xs text-emerald-400 hover:text-emerald-300"
                     onClick={() => setOpenerOpen(!openerOpen)}
                     data-testid={`toggle-opener-${signal.id}`}
                   >
@@ -248,7 +248,7 @@ export function SignalCard({
                   ) : hubspotConnected ? (
                     <Button
                       size="sm"
-                      className="h-7 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3"
+                      className="h-7 bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3"
                       onClick={handleInject}
                       disabled={isInjecting}
                       data-testid={`inject-crm-${signal.id}`}

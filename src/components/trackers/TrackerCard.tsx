@@ -77,7 +77,7 @@ export function TrackerCard({ tracker, onEdit, onDelete, onToggle }: TrackerCard
         )}
         <div className="flex flex-wrap gap-1 pt-1">
           {tracker.platforms.map((p) => (
-            <Badge key={p} className="text-xs capitalize bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
+            <Badge key={p} className="text-xs capitalize bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
               {p}
             </Badge>
           ))}

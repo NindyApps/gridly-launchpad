@@ -82,14 +82,14 @@ export default function Pricing() {
               key={plan.name}
               className={`border bg-white/5 backdrop-blur-sm relative ${
                 plan.highlighted
-                  ? 'border-indigo-500/60 shadow-lg shadow-indigo-500/10'
+                  ? 'border-emerald-500/60 shadow-lg shadow-emerald-500/10'
                   : 'border-white/10'
               }`}
               data-testid={`pricing-card-${plan.name.toLowerCase()}`}
             >
               {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-indigo-600 text-white border-0 px-3 py-1 text-xs">
+                  <Badge className="bg-emerald-500 text-black border-0 px-3 py-1 text-xs">
                     {plan.badge}
                   </Badge>
                 </div>
@@ -106,7 +106,7 @@ export default function Pricing() {
                 <ul className="space-y-2.5">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                      <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                       {feature}
                     </li>
                   ))}
@@ -115,7 +115,7 @@ export default function Pricing() {
                   asChild
                   className={`w-full mt-4 ${
                     plan.highlighted
-                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                      ? 'bg-emerald-500 hover:bg-emerald-600 text-black'
                       : 'border-white/20 hover:bg-white/5 text-white'
                   }`}
                   variant={plan.highlighted ? 'default' : 'outline'}

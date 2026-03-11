@@ -107,7 +107,7 @@ function AcceptInviteContent() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
       <div className="mb-8 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
           <Zap className="h-5 w-5 text-white" />
         </div>
         <span className="text-lg font-bold text-white tracking-tight">OCTOPILOT</span>
@@ -196,7 +196,7 @@ function AcceptInviteContent() {
 
             <Button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
               disabled={loading}
               data-testid="button-submit"
             >
