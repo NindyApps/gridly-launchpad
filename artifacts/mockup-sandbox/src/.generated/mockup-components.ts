@@ -2,11 +2,14 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/landing-pages/BrutalistSignal.tsx": () => import("../components/mockups/landing-pages/BrutalistSignal.tsx"),
+  "./components/mockups/landing-pages/ClearHierarchy.tsx": () => import("../components/mockups/landing-pages/ClearHierarchy.tsx"),
   "./components/mockups/landing-pages/CommandCenter.tsx": () => import("../components/mockups/landing-pages/CommandCenter.tsx"),
   "./components/mockups/landing-pages/EditorialMinimal.tsx": () => import("../components/mockups/landing-pages/EditorialMinimal.tsx"),
+  "./components/mockups/landing-pages/MaxReadability.tsx": () => import("../components/mockups/landing-pages/MaxReadability.tsx"),
   "./components/mockups/landing-pages/PrecisionPolish.tsx": () => import("../components/mockups/landing-pages/PrecisionPolish.tsx"),
   "./components/mockups/landing-pages/PremiumDepth.tsx": () => import("../components/mockups/landing-pages/PremiumDepth.tsx"),
   "./components/mockups/landing-pages/RefinedA.tsx": () => import("../components/mockups/landing-pages/RefinedA.tsx"),
   "./components/mockups/landing-pages/RefinedB.tsx": () => import("../components/mockups/landing-pages/RefinedB.tsx"),
-  "./components/mockups/landing-pages/SocialProofFirst.tsx": () => import("../components/mockups/landing-pages/SocialProofFirst.tsx")
+  "./components/mockups/landing-pages/SocialProofFirst.tsx": () => import("../components/mockups/landing-pages/SocialProofFirst.tsx"),
+  "./components/mockups/landing-pages/StrongAffordances.tsx": () => import("../components/mockups/landing-pages/StrongAffordances.tsx")
 };
