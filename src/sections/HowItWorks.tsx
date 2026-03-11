@@ -1,69 +1,53 @@
 "use client";
 
-import { motion } from 'motion/react';
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Radar, BrainCircuit, Database } from "lucide-react";
 
 const steps = [
   {
-    num: "1",
-    title: "Define Your Offer",
-    description: "Tell us what you sell and who your ideal buyer is",
-    cta: "Define Your Offer",
+    icon: <Radar className="w-6 h-6 text-emerald-400" />,
+    title: "Define Trackers",
+    desc: "Set up keywords, competitor names, or topics. We monitor millions of posts in real-time.",
   },
   {
-    num: "2",
-    title: "AI Discovers High-Intent Buyers",
-    description: "We surface conversations where prospects are actively seeking solutions like yours",
-    cta: "AI Discovers Buyers",
+    icon: <BrainCircuit className="w-6 h-6 text-emerald-400" />,
+    title: "AI Analysis",
+    desc: "Our models score each mention for buying intent, filtering out noise and complaints.",
   },
   {
-    num: "3",
-    title: "Engage and Convert",
-    description: "Reach out with personalized messages and close deals directly from one dashboard",
-    cta: "Engage and Convert",
+    icon: <Database className="w-6 h-6 text-emerald-400" />,
+    title: "CRM Sync",
+    desc: "High-intent signals are automatically injected into HubSpot or Salesforce for your SDRs.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section id="about" className="py-20 md:py-28 bg-card">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground leading-tight">
-            From <span className="text-gradient">zero to qualified</span>{" "}
-            leads at <span className="text-gradient">warp speed</span>
+    <section id="how-it-works" className="py-24 relative z-10">
+      <div className="container mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 text-foreground">
+            Convert noise into pipeline
           </h2>
-        </motion.div>
+          <p className="text-zinc-400 text-lg">
+            Set up your intent signals in minutes and let our AI agents do the heavy lifting
+            of identifying your next customers.
+          </p>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 relative">
+          <div className="hidden md:block absolute top-[40px] left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+
           {steps.map((step, i) => (
-            <motion.div
-              key={step.num}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="relative bg-background rounded-2xl border border-border p-7 text-center hover:border-accent/30 transition-all group flex flex-col"
-              style={{ boxShadow: "var(--shadow-card)" }}
-            >
-              <div className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center mx-auto mb-4 text-sm font-bold">
-                {step.num}
+            <div key={i} className="relative group">
+              <div className="h-full bg-white/[0.02] border border-white/5 rounded-2xl p-8 hover:bg-white/[0.04] transition-colors relative overflow-hidden backdrop-blur-sm">
+                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="w-16 h-16 rounded-2xl bg-[#0a0d0f] border border-white/10 flex items-center justify-center mb-6 relative z-10 shadow-lg group-hover:border-emerald-500/30 transition-colors">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-foreground">{step.title}</h3>
+                <p className="text-zinc-400 leading-relaxed">{step.desc}</p>
               </div>
-              <h3 className="font-display font-bold text-base text-foreground mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-1">{step.description}</p>
-              <Button
-                variant="outline"
-                className="rounded-full text-xs font-medium gap-1 border-border text-foreground hover:bg-secondary mx-auto"
-              >
-                {step.cta} <ArrowRight className="w-3 h-3" />
-              </Button>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

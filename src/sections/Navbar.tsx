@@ -1,57 +1,52 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, Radar } from "lucide-react";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+    <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#0a0d0f]/60 backdrop-blur-xl supports-[backdrop-filter]:bg-[#0a0d0f]/40">
+      <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-accent-foreground">
-              <circle cx="12" cy="10" r="4" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.2"/>
-              <path d="M6 16C6 16 4 14 4 12C4 8 8 4 12 4C16 4 20 8 20 12C20 14 18 16 18 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M8 18L6 22M16 18L18 22M10 19L9 22M14 19L15 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+            <Radar className="w-5 h-5 text-emerald-400" />
           </div>
-          <span className="font-display font-bold text-lg text-foreground tracking-tight">OCTOPILOT</span>
+          <span className="font-display font-bold text-xl tracking-tight text-foreground">OCTOPILOT</span>
         </div>
 
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</a>
-          <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-            Resources <ChevronDown className="w-3.5 h-3.5" />
-          </button>
-          <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+          <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
+          <a href="#features" className="hover:text-white transition-colors">Features</a>
+          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Button asChild variant="ghost" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            <Link href="/login">Login</Link>
+        <div className="hidden md:flex items-center gap-4">
+          <Button asChild variant="ghost" className="text-zinc-300 hover:text-white hover:bg-white/5">
+            <Link href="/login">Log in</Link>
           </Button>
-          <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-5 rounded-full">
+          <Button asChild className="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-semibold rounded-full px-6">
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)} data-testid="mobile-menu-toggle">
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden bg-card border-b border-border px-4 pb-4 space-y-3">
-          <a href="#about" className="block text-sm font-medium text-muted-foreground">About</a>
-          <a href="#pricing" className="block text-sm font-medium text-muted-foreground">Pricing</a>
-          <Button asChild variant="ghost" className="w-full text-sm">
-            <Link href="/login">Login</Link>
+        <div className="md:hidden bg-[#0a0d0f] border-b border-white/5 px-6 pb-4 space-y-3">
+          <a href="#how-it-works" className="block text-sm font-medium text-zinc-400 hover:text-white">How it Works</a>
+          <a href="#features" className="block text-sm font-medium text-zinc-400 hover:text-white">Features</a>
+          <a href="#pricing" className="block text-sm font-medium text-zinc-400 hover:text-white">Pricing</a>
+          <Button asChild variant="ghost" className="w-full text-sm text-zinc-300">
+            <Link href="/login">Log in</Link>
           </Button>
-          <Button asChild className="w-full bg-emerald-500 hover:bg-emerald-600 text-black rounded-full">
+          <Button asChild className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 rounded-full font-semibold">
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>

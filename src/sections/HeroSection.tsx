@@ -3,49 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const platforms = [
-  { name: "Reddit", logo: "/reddit-logo.png" },
-  { name: "Hacker News", logo: null, text: "Y" },
-];
-
-const r = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
-const DOT_DATA = Array.from({ length: 30 }, (_, i) => ({
-  width: r(2 + Math.abs(Math.sin(i * 2.3)) * 8),
-  height: r(2 + Math.abs(Math.cos(i * 1.7)) * 8),
-  left: r(25 + Math.abs(Math.sin(i * 3.1)) * 50),
-  top: r(30 + Math.abs(Math.cos(i * 2.7)) * 30),
-  opacity: r(0.2 + Math.abs(Math.sin(i * 1.9)) * 0.5),
-  animationDelay: r(Math.abs(Math.sin(i * 4.1)) * 4),
-  animationDuration: r(2 + Math.abs(Math.cos(i * 5.3)) * 3),
-}));
-
-const FloatingDots = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {DOT_DATA.map((dot, i) => (
-      <div
-        key={i}
-        className="absolute rounded-full animate-pulse-dot"
-        style={{
-          width: `${dot.width}px`,
-          height: `${dot.height}px`,
-          left: `${dot.left}%`,
-          top: `${dot.top}%`,
-          backgroundColor: i % 3 === 0
-            ? "hsl(var(--accent))"
-            : i % 3 === 1
-              ? "hsl(var(--muted-foreground))"
-              : "hsl(var(--foreground) / 0.3)",
-          opacity: dot.opacity,
-          animationDelay: `${dot.animationDelay}s`,
-          animationDuration: `${dot.animationDuration}s`,
-        }}
-      />
-    ))}
-  </div>
-);
+const platforms = ["Reddit", "Hacker News"];
 
 const HeroSection = () => {
   const router = useRouter();
@@ -58,50 +19,50 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const currentPlatform = platforms[platformIndex];
-
   return (
-    <section className="relative grid-bg pt-16 overflow-hidden">
-      <FloatingDots />
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/refined-b-hero-bg.png"
+          alt=""
+          className="w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0d0f]/80 to-[#0a0d0f]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
+      </div>
 
-      <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[80px] bg-accent/15 rounded-full blur-[60px]" />
-
-      <div className="container mx-auto px-4 pt-24 pb-16 relative z-10 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+      <div className="container mx-auto px-6 relative z-10 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] font-bold tracking-tight text-foreground leading-[1.1]"
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>Now monitoring 50M+ tech conversations daily</span>
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 max-w-5xl mx-auto leading-[1.1] text-foreground"
         >
           Find People Looking For
           <br />
-          <span className="text-gradient">What You Offer</span>{" "}
-          <span className="text-foreground">on </span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">What You Offer</span>{" "}
+          on{" "}
           <AnimatePresence mode="wait">
             <motion.span
               key={platformIndex}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.4 }}
-              className="inline-flex items-center"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400"
             >
-              {currentPlatform.logo ? (
-                <img
-                  src={currentPlatform.logo}
-                  alt={currentPlatform.name}
-                  className="inline h-12 md:h-16 object-contain"
-                />
-              ) : (
-                <span className="inline-flex items-center gap-1">
-                  {"text" in currentPlatform && currentPlatform.text && (
-                    <span className="inline-flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded bg-orange-500 text-xl md:text-2xl font-bold text-white">
-                      {currentPlatform.text}
-                    </span>
-                  )}
-                  <span className="font-display text-foreground">{currentPlatform.name}</span>
-                </span>
-              )}
+              {platforms[platformIndex]}
             </motion.span>
           </AnimatePresence>
         </motion.h1>
@@ -109,28 +70,59 @@ const HeroSection = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-8 text-base md:text-lg text-muted-foreground max-w-lg mx-auto"
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10"
         >
-          Monitor Reddit and Hacker News for real buying signals — powered by AI.
-          Auto-inject leads into your CRM.
+          Stop missing high-intent conversations. OCTOPILOT monitors social channels
+          for buying signals and auto-injects hot leads directly into your CRM.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Button
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-12 px-8 text-base font-semibold gap-2"
+            size="lg"
+            className="h-12 px-8 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold rounded-full w-full sm:w-auto text-base transition-all shadow-[0_0_30px_-5px_rgba(52,211,153,0.4)] hover:shadow-[0_0_40px_-5px_rgba(52,211,153,0.6)]"
             onClick={() => router.push('/signup')}
             data-testid="hero-cta-button"
           >
-            <Sparkles className="w-5 h-5" />
-            Start Free Trial
+            Start Free Trial <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <p className="text-xs text-muted-foreground">14-day free trial · No credit card required</p>
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-12 px-8 border-white/10 hover:bg-white/5 font-semibold rounded-full w-full sm:w-auto text-base backdrop-blur-sm"
+          >
+            Book a Demo
+          </Button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-20 relative max-w-5xl mx-auto"
+        >
+          <div className="relative rounded-2xl border border-white/10 bg-[#0f1418] shadow-2xl shadow-emerald-500/10 overflow-hidden">
+            <div className="h-10 bg-[#151b21] border-b border-white/5 flex items-center px-4 gap-2">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+              </div>
+            </div>
+            <div className="relative">
+              <img
+                src="/refined-b-dashboard.png"
+                alt="OCTOPILOT Dashboard"
+                className="w-full h-auto opacity-90"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0d0f] to-transparent" />
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

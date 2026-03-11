@@ -1,70 +1,80 @@
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { useState } from "react";
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown } from "lucide-react";
 
-const FAQS = [
+const faqs = [
   {
-    question: 'How does OCTOPILOT find buying signals?',
-    answer:
-      "OCTOPILOT monitors public communities like Reddit and Hacker News in real-time using your defined keywords, competitors, and subreddits. When a post matches, our AI classifier analyzes the intent and confidence before surfacing it to your team.",
+    question: "How does OCTOPILOT find intent?",
+    answer: "Our AI agents continuously monitor relevant subreddits, HN discussions, and social feeds for specific keywords and buying patterns related to your product.",
   },
   {
-    question: 'Does OCTOPILOT post anything on my behalf?',
-    answer:
-      "Never. OCTOPILOT operates on a strict Zero-Write Architecture. We only read public data and surface signals to your sales team. We never interact with, post to, or engage on any platform on your behalf.",
+    question: "Which CRMs do you integrate with?",
+    answer: "We currently support direct integrations with Salesforce and HubSpot. You can also export data via CSV or connect via our API.",
   },
   {
-    question: 'How accurate are the AI intent classifications?',
-    answer:
-      "Our classifier uses GPT-4o-mini with structured prompts optimized for B2B buying signals. In internal testing, we achieve 87% precision on high-intent signals. You can also set a minimum confidence threshold to only see the signals you trust.",
+    question: "Is this compliant with platform terms?",
+    answer: "Yes, we only access public data through official APIs and standard web crawling practices that respect robots.txt.",
   },
   {
-    question: 'Which CRMs do you support?',
-    answer:
-      "Currently we support HubSpot with full OAuth integration — signals are injected as tasks with AI-generated openers. Salesforce support is coming Q2 2026, followed by Pipedrive and custom webhook support.",
+    question: "How long does setup take?",
+    answer: "You can be up and running in less than 5 minutes. Just enter your target keywords, connect your CRM, and signals will start flowing immediately.",
   },
   {
-    question: 'Can I try OCTOPILOT before paying?',
-    answer:
-      "Yes. Every plan includes a 14-day free trial with no credit card required. You get access to all features of your selected plan. We'll remind you before the trial ends.",
+    question: "Can I try it before buying?",
+    answer: "Yes, all plans come with a 14-day free trial so you can evaluate the quality of leads before committing.",
   },
 ];
 
-export default function FAQ() {
+const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   return (
-    <section className="py-24 px-6 bg-black/20">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+    <section className="py-24 border-t border-white/5">
+      <div className="container mx-auto px-6 max-w-3xl">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-foreground">
             Frequently asked questions
           </h2>
-          <p className="text-zinc-400 text-lg">
-            Everything you need to know before you start.
-          </p>
         </div>
-        <Accordion type="single" collapsible className="space-y-3">
-          {FAQS.map((faq, i) => (
-            <AccordionItem
+
+        <div className="space-y-4">
+          {faqs.map((faq, i) => (
+            <div
               key={i}
-              value={`faq-${i}`}
-              className="border border-white/10 rounded-lg px-5 bg-white/5 backdrop-blur-sm"
-              data-testid={`faq-item-${i}`}
+              className={`border border-white/5 rounded-xl overflow-hidden transition-colors ${openIndex === i ? "bg-white/[0.04]" : "bg-transparent hover:bg-white/[0.02]"}`}
             >
-              <AccordionTrigger className="text-white text-left py-4 hover:no-underline">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-zinc-400 text-sm leading-relaxed pb-4">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
+              <button
+                className="w-full flex items-center justify-between p-6 text-left"
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                data-testid={`faq-toggle-${i}`}
+              >
+                <span className="font-medium text-lg text-foreground">{faq.question}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-zinc-500 transition-transform ${openIndex === i ? "rotate-180 text-emerald-400" : ""}`}
+                />
+              </button>
+              <AnimatePresence>
+                {openIndex === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-6 pt-0 text-zinc-400 leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
-        </Accordion>
+        </div>
       </div>
     </section>
   );
-}
+};
+
+export default FAQ;

@@ -1,72 +1,72 @@
 "use client";
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { motion } from 'motion/react';
 
-const TESTIMONIALS = [
+const testimonials = [
   {
-    quote: "OCTOPILOT found us 3 enterprise deals in the first week that we would have completely missed. The AI summaries are scarily accurate.",
-    name: "Sarah Chen",
-    title: "VP of Sales, Dataloop",
-    initials: "SC",
-    color: "bg-emerald-600",
+    quote: "It's like having a team of 10 SDRs reading every relevant conversation on the internet. Our meeting booked rate jumped 40%.",
+    author: "Sarah Chen",
+    role: "VP Sales, CloudScale",
+    avatar: "SC",
   },
   {
-    quote: "We replaced our manual Reddit monitoring workflow with OCTOPILOT. What used to take 4 hours a day now happens automatically with better results.",
-    name: "Marcus Rivera",
-    title: "Head of Growth, Forge Analytics",
-    initials: "MR",
-    color: "bg-teal-600",
+    quote: "The CRM injection is flawless. We don't have to train reps on a new tool—the leads just show up in Salesforce with context.",
+    author: "Marcus Rivera",
+    role: "RevOps Director, Nexus",
+    avatar: "MR",
   },
   {
-    quote: "The HubSpot integration is seamless. Our SDRs get a task with a ready-to-send opener right in their CRM. Pipeline velocity went up 34%.",
-    name: "Priya Nambiar",
-    title: "RevOps Lead, Stackmesh",
-    initials: "PN",
-    color: "bg-pink-600",
+    quote: "We were missing so many buying signals on Reddit. OCTOPILOT surfaced 3 enterprise deals for us in the first month.",
+    author: "Priya Nambiar",
+    role: "Founding AE, DataStack",
+    avatar: "PN",
   },
 ];
 
-export default function Testimonials() {
+const Testimonials = () => {
   return (
-    <section className="py-24 px-6 bg-black/20">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Trusted by revenue teams
+    <section className="py-24 border-t border-white/5 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 text-foreground">
+            Trusted by fast-growing teams
           </h2>
-          <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-            See how B2B sales teams are closing deals faster with OCTOPILOT signal intelligence.
-          </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
-            <Card
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {testimonials.map((t, i) => (
+            <motion.div
               key={i}
-              className="border border-white/10 bg-white/5 backdrop-blur-sm"
-              data-testid={`testimonial-card-${i}`}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden group"
             >
-              <CardContent className="pt-6 pb-6 space-y-4">
-                <p className="text-zinc-300 text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-2">
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className={`${t.color} text-white text-xs font-semibold`}>
-                      {t.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{t.name}</p>
-                    <p className="text-xs text-zinc-400">{t.title}</p>
-                  </div>
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500/50 to-transparent" />
+              <div className="text-emerald-400 mb-6 opacity-50">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                </svg>
+              </div>
+              <p className="text-zinc-300 mb-8 text-lg leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+              <div className="flex items-center gap-4 mt-auto">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
+                  {t.avatar}
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <div className="font-semibold text-white">{t.author}</div>
+                  <div className="text-sm text-zinc-500">{t.role}</div>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
-        <p className="text-center text-xs text-zinc-600 mt-8">
-          Results may vary. Testimonials represent individual experiences during early access.
-        </p>
       </div>
     </section>
   );
-}
+};
+
+export default Testimonials;

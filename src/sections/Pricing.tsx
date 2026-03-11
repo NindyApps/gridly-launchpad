@@ -1,135 +1,128 @@
 "use client";
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2 } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const PLANS = [
-  {
-    name: 'Pro',
-    price: '$299',
-    period: '/month',
-    description: 'Perfect for individual reps and small teams.',
-    badge: null,
-    features: [
-      '10 active trackers',
-      '500 signals per month',
-      'HubSpot CRM integration',
-      'Email alert digest',
-      'AI-generated openers',
-      '5 team seats',
-    ],
-    cta: 'Start Free Trial',
-    ctaLink: '/signup',
-    highlighted: false,
-  },
-  {
-    name: 'Growth',
-    price: '$599',
-    period: '/month',
-    description: 'For scaling revenue teams that need more firepower.',
-    badge: 'Most Popular',
-    features: [
-      'Unlimited trackers',
-      '2,000 signals per month',
-      'All CRM integrations',
-      'Slack real-time alerts',
-      'Team collaboration (20 seats)',
-      'Priority support',
-    ],
-    cta: 'Start Free Trial',
-    ctaLink: '/signup',
-    highlighted: true,
-  },
-  {
-    name: 'Enterprise',
-    price: '$1,200',
-    period: '/month',
-    description: 'Custom workflows and SLAs for large organizations.',
-    badge: null,
-    features: [
-      'Everything in Growth',
-      'Unlimited signals',
-      'Unlimited seats',
-      'SSO / SAML',
-      'Dedicated account manager',
-      'Custom integrations',
-      'Custom SLA & uptime guarantee',
-    ],
-    cta: 'Talk to Sales',
-    ctaLink: 'mailto:sales@octopilot.app',
-    highlighted: false,
-  },
-];
+const Pricing = () => {
+  const router = useRouter();
 
-export default function Pricing() {
   return (
-    <section id="pricing" className="py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+    <section id="pricing" className="py-24 border-t border-white/5 bg-[#0f1418]/30 relative">
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 text-foreground">
             Simple, transparent pricing
           </h2>
-          <p className="text-zinc-400 text-lg max-w-xl mx-auto">
-            Start with a 14-day free trial. No credit card required.
-          </p>
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <span className="text-zinc-400 text-sm font-medium">Billed Monthly</span>
+            <div className="w-10 h-5 bg-emerald-500/20 rounded-full relative cursor-pointer">
+              <div className="absolute right-1 top-1 w-3 h-3 bg-emerald-400 rounded-full" />
+            </div>
+            <span className="text-white text-sm font-medium">
+              Billed Annually <span className="text-emerald-400 text-xs ml-1">(Save 20%)</span>
+            </span>
+          </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-3 items-start">
-          {PLANS.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`border bg-white/5 backdrop-blur-sm relative ${
-                plan.highlighted
-                  ? 'border-emerald-500/60 shadow-lg shadow-emerald-500/10'
-                  : 'border-white/10'
-              }`}
-              data-testid={`pricing-card-${plan.name.toLowerCase()}`}
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 backdrop-blur-sm flex flex-col mt-4">
+            <h3 className="text-xl font-bold mb-2 text-foreground">Pro</h3>
+            <div className="text-zinc-400 text-sm mb-6">For early stage startups</div>
+            <div className="mb-6">
+              <span className="text-4xl font-bold text-foreground">$299</span>
+              <span className="text-zinc-500">/mo</span>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full mb-8 border-white/10 hover:bg-white/5"
+              onClick={() => router.push("/signup")}
+              data-testid="pricing-pro-button"
             >
-              {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-emerald-500 text-black border-0 px-3 py-1 text-xs">
-                    {plan.badge}
-                  </Badge>
+              Start Free Trial
+            </Button>
+            <div className="space-y-4 flex-1">
+              {[
+                "3 Tracker topics",
+                "1,000 signals/month",
+                "Reddit & Hacker News",
+                "Basic filtering",
+                "Slack integration",
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-emerald-400" /> {f}
                 </div>
-              )}
-              <CardHeader className="pb-4 pt-8">
-                <CardTitle className="text-white text-xl">{plan.name}</CardTitle>
-                <p className="text-zinc-400 text-sm">{plan.description}</p>
-                <div className="flex items-end gap-1 mt-4">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
-                  <span className="text-zinc-400 text-sm mb-1.5">{plan.period}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-[#12181c] border border-emerald-500/50 rounded-2xl p-8 relative flex flex-col shadow-[0_0_40px_-10px_rgba(52,211,153,0.15)] transform md:-translate-y-4">
+            <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-emerald-500/0 via-emerald-400 to-emerald-500/0" />
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-emerald-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              Most Popular
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-foreground">Growth</h3>
+            <div className="text-zinc-400 text-sm mb-6">For scaling revenue teams</div>
+            <div className="mb-6">
+              <span className="text-4xl font-bold text-foreground">$599</span>
+              <span className="text-zinc-500">/mo</span>
+            </div>
+            <Button
+              className="w-full mb-8 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-semibold"
+              onClick={() => router.push("/signup")}
+              data-testid="pricing-growth-button"
+            >
+              Start Free Trial
+            </Button>
+            <div className="space-y-4 flex-1">
+              {[
+                "10 Tracker topics",
+                "5,000 signals/month",
+                "All data sources",
+                "Advanced AI filtering",
+                "Salesforce/HubSpot sync",
+                "AI Openers generation",
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-3 text-white text-sm">
+                  <Check className="w-4 h-4 text-emerald-400" /> {f}
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2.5">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  asChild
-                  className={`w-full mt-4 ${
-                    plan.highlighted
-                      ? 'bg-emerald-500 hover:bg-emerald-600 text-black'
-                      : 'border-white/20 hover:bg-white/5 text-white'
-                  }`}
-                  variant={plan.highlighted ? 'default' : 'outline'}
-                  data-testid={`pricing-cta-${plan.name.toLowerCase()}`}
-                >
-                  <Link href={plan.ctaLink}>
-                    {plan.cta}
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 backdrop-blur-sm flex flex-col mt-4">
+            <h3 className="text-xl font-bold mb-2 text-foreground">Enterprise</h3>
+            <div className="text-zinc-400 text-sm mb-6">For large organizations</div>
+            <div className="mb-6">
+              <span className="text-4xl font-bold text-foreground">$1,200</span>
+              <span className="text-zinc-500">/mo</span>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full mb-8 border-white/10 hover:bg-white/5"
+              data-testid="pricing-enterprise-button"
+            >
+              Contact Sales
+            </Button>
+            <div className="space-y-4 flex-1">
+              {[
+                "Unlimited topics",
+                "Unlimited signals",
+                "Custom integrations",
+                "Dedicated success manager",
+                "Custom AI training",
+                "SLA guarantees",
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <Check className="w-4 h-4 text-emerald-400" /> {f}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default Pricing;
