@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
+import { encrypt, decrypt } from '@/lib/encryption';
 
 const HUBSPOT_API_BASE = 'https://api.hubapi.com';
 
@@ -92,6 +93,13 @@ export async function refreshHubSpotToken(
     throw new Error('No HubSpot refresh token found for workspace');
   }
 
+  let refreshToken: string;
+  try {
+    refreshToken = await decrypt(workspace.hubspot_refresh_token_enc);
+  } catch {
+    throw new Error('reconnect_required');
+  }
+
   const response = await fetch(`${HUBSPOT_API_BASE}/oauth/v1/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -100,7 +108,7 @@ export async function refreshHubSpotToken(
       client_id: process.env.HUBSPOT_CLIENT_ID!,
       client_secret: process.env.HUBSPOT_CLIENT_SECRET!,
       redirect_uri: process.env.HUBSPOT_REDIRECT_URI!,
-      refresh_token: workspace.hubspot_refresh_token_enc,
+      refresh_token: refreshToken,
     }),
   });
 
@@ -112,11 +120,16 @@ export async function refreshHubSpotToken(
   const tokens: { access_token: string; refresh_token: string; expires_in: number } = await response.json();
   const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
+  const [encryptedAccess, encryptedRefresh] = await Promise.all([
+    encrypt(tokens.access_token),
+    encrypt(tokens.refresh_token),
+  ]);
+
   await supabaseAdmin
     .from('workspaces')
     .update({
-      hubspot_token_enc: tokens.access_token,
-      hubspot_refresh_token_enc: tokens.refresh_token,
+      hubspot_token_enc: encryptedAccess,
+      hubspot_refresh_token_enc: encryptedRefresh,
       hubspot_token_expires_at: expiresAt,
     })
     .eq('id', workspaceId);
@@ -147,7 +160,11 @@ export async function getValidHubSpotToken(
     }
   }
 
-  return workspace.hubspot_token_enc;
+  try {
+    return await decrypt(workspace.hubspot_token_enc);
+  } catch {
+    throw new Error('reconnect_required');
+  }
 }
 
 export async function createHubSpotContact(

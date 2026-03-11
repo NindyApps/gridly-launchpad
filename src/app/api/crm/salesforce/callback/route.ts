@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { exchangeSalesforceCode } from '@/lib/salesforce';
+import { encrypt } from '@/lib/encryption';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -35,6 +36,11 @@ export async function GET(request: NextRequest) {
       parseInt(tokenResponse.issued_at) + (tokenResponse.expires_in ?? 7200) * 1000
     ).toISOString();
 
+    const [encryptedAccess, encryptedRefresh] = await Promise.all([
+      encrypt(tokenResponse.access_token),
+      encrypt(tokenResponse.refresh_token),
+    ]);
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('workspace_id')
@@ -45,8 +51,8 @@ export async function GET(request: NextRequest) {
       await supabase
         .from('workspaces')
         .update({
-          sf_access_token_enc: tokenResponse.access_token,
-          sf_refresh_token_enc: tokenResponse.refresh_token,
+          sf_access_token_enc: encryptedAccess,
+          sf_refresh_token_enc: encryptedRefresh,
           sf_instance_url: tokenResponse.instance_url,
           sf_token_expires_at: expiresAt,
           sf_connected_at: new Date().toISOString(),

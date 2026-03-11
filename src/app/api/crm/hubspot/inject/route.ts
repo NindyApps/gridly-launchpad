@@ -22,6 +22,15 @@ export async function POST(request: NextRequest) {
     accessToken = await getValidHubSpotToken(workspace_id, supabase);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'HubSpot token error';
+    if (message === 'reconnect_required') {
+      return NextResponse.json(
+        {
+          error: 'reconnect_required',
+          message: 'Please reconnect HubSpot in Settings for security upgrade',
+        },
+        { status: 401 }
+      );
+    }
     return NextResponse.json({ error: message }, { status: 400 });
   }
 

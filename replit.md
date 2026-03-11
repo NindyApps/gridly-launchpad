@@ -201,7 +201,7 @@ RESEND_FROM_EMAIL                ← e.g. "alerts@octopilot.io"
 STRIPE_SECRET_KEY                ← Stripe server-side key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ← Stripe client-side key
 STRIPE_WEBHOOK_SECRET            ← Stripe webhook signing secret
-ENCRYPTION_KEY                   ← 32-char key for encrypting HubSpot tokens
+ENCRYPTION_KEY                   ← 32-char key for AES-GCM encryption of HubSpot + Salesforce tokens (also add to Supabase Edge Function Secrets)
 ```
 
 ---

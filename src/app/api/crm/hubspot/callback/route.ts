@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { exchangeHubSpotCode } from '@/lib/hubspot';
+import { encrypt } from '@/lib/encryption';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -19,6 +20,11 @@ export async function GET(request: NextRequest) {
   try {
     const tokens = await exchangeHubSpotCode(code, clientId, clientSecret, redirectUri);
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
+
+    const [encryptedAccess, encryptedRefresh] = await Promise.all([
+      encrypt(tokens.access_token),
+      encrypt(tokens.refresh_token),
+    ]);
 
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -45,8 +51,8 @@ export async function GET(request: NextRequest) {
       await supabase
         .from('workspaces')
         .update({
-          hubspot_token_enc: tokens.access_token,
-          hubspot_refresh_token_enc: tokens.refresh_token,
+          hubspot_token_enc: encryptedAccess,
+          hubspot_refresh_token_enc: encryptedRefresh,
           hubspot_token_expires_at: expiresAt,
         })
         .eq('id', profile.workspace_id);

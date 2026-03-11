@@ -91,6 +91,15 @@ export async function POST(request: NextRequest) {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown Salesforce error';
+    if (message === 'reconnect_required') {
+      return NextResponse.json(
+        {
+          error: 'reconnect_required',
+          message: 'Please reconnect Salesforce in Settings for security upgrade',
+        },
+        { status: 401 }
+      );
+    }
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

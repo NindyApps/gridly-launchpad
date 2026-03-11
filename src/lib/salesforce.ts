@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 import type { IntentSignal } from '@/types/app';
+import { encrypt, decrypt } from '@/lib/encryption';
 
 const SF_AUTH_URL = 'https://login.salesforce.com/services/oauth2/authorize';
 const SF_TOKEN_URL = 'https://login.salesforce.com/services/oauth2/token';
@@ -61,6 +62,13 @@ export async function refreshSalesforceToken(
     throw new Error('No Salesforce refresh token found for workspace');
   }
 
+  let refreshToken: string;
+  try {
+    refreshToken = await decrypt(workspace.sf_refresh_token_enc);
+  } catch {
+    throw new Error('reconnect_required');
+  }
+
   const res = await fetch(SF_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -68,7 +76,7 @@ export async function refreshSalesforceToken(
       grant_type: 'refresh_token',
       client_id: process.env.SALESFORCE_CLIENT_ID!,
       client_secret: process.env.SALESFORCE_CLIENT_SECRET!,
-      refresh_token: workspace.sf_refresh_token_enc,
+      refresh_token: refreshToken,
     }),
   });
 
@@ -82,10 +90,12 @@ export async function refreshSalesforceToken(
     parseInt(tokens.issued_at) + (tokens.expires_in ?? 7200) * 1000
   ).toISOString();
 
+  const encryptedAccess = await encrypt(tokens.access_token);
+
   await supabaseAdmin
     .from('workspaces')
     .update({
-      sf_access_token_enc: tokens.access_token,
+      sf_access_token_enc: encryptedAccess,
       sf_token_expires_at: expiresAt,
     } as never)
     .eq('id', workspaceId);
@@ -115,14 +125,27 @@ export async function getValidSalesforceToken(
       .select('sf_access_token_enc, sf_instance_url')
       .eq('id', workspaceId)
       .single();
+    let decryptedAccess: string;
+    try {
+      decryptedAccess = await decrypt(refreshed!.sf_access_token_enc!);
+    } catch {
+      throw new Error('reconnect_required');
+    }
     return {
-      accessToken: refreshed!.sf_access_token_enc!,
+      accessToken: decryptedAccess,
       instanceUrl: (refreshed as unknown as { sf_instance_url: string }).sf_instance_url,
     };
   }
 
+  let accessToken: string;
+  try {
+    accessToken = await decrypt(workspace.sf_access_token_enc);
+  } catch {
+    throw new Error('reconnect_required');
+  }
+
   return {
-    accessToken: workspace.sf_access_token_enc,
+    accessToken,
     instanceUrl: (workspace as unknown as { sf_instance_url: string }).sf_instance_url,
   };
 }
@@ -140,11 +163,20 @@ export async function revokeSalesforceToken(
 
     if (workspace?.sf_access_token_enc && workspace.sf_instance_url) {
       const instanceUrl = (workspace as unknown as { sf_instance_url: string }).sf_instance_url;
-      await fetch(`${instanceUrl}/services/oauth2/revoke`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ token: workspace.sf_access_token_enc }),
-      });
+      let tokenToRevoke: string;
+      try {
+        tokenToRevoke = await decrypt(workspace.sf_access_token_enc);
+      } catch {
+        // Token was stored before encryption was added — skip revoke, proceed with DB clear
+        tokenToRevoke = '';
+      }
+      if (tokenToRevoke) {
+        await fetch(`${instanceUrl}/services/oauth2/revoke`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ token: tokenToRevoke }),
+        });
+      }
     }
   } catch (err) {
     console.error('[OCTOPILOT] Salesforce revoke failed (continuing with DB clear):', err);
@@ -162,7 +194,6 @@ export async function revokeSalesforceToken(
 }
 
 function buildDescription(signal: IntentSignal): string {
-  const title = signal.ai_summary.substring(0, 120);
   return [
     `Platform: ${signal.platform}`,
     `Confidence: ${Math.round(signal.confidence_score * 100)}%`,

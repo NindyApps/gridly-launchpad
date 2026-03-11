@@ -135,7 +135,20 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
       toast({ title: 'Injected to HubSpot', description: 'Signal created as a task in CRM.' });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      if (msg.includes('CRM') || msg.includes('HubSpot') || msg.includes('connect')) {
+      if (msg === 'reconnect_required') {
+        toast({
+          title: 'Security upgrade required',
+          description: (
+            <>
+              Please reconnect HubSpot in{' '}
+              <Link href="/settings/crm" className="underline font-medium">
+                Settings → CRM
+              </Link>
+            </>
+          ),
+          variant: 'destructive',
+        });
+      } else if (msg.includes('CRM') || msg.includes('HubSpot') || msg.includes('connect')) {
         toast({
           title: 'HubSpot not connected',
           description: 'Connect HubSpot first in Settings → CRM.',
@@ -156,7 +169,22 @@ export function SignalFeed({ workspaceId, filters, onResultCount }: SignalFeedPr
       toast({ title: 'Pushed to Salesforce', description: 'Signal created as a record in Salesforce.' });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      toast({ title: 'Salesforce inject failed', description: msg, variant: 'destructive' });
+      if (msg === 'reconnect_required') {
+        toast({
+          title: 'Security upgrade required',
+          description: (
+            <>
+              Please reconnect Salesforce in{' '}
+              <Link href="/settings/crm" className="underline font-medium">
+                Settings → CRM
+              </Link>
+            </>
+          ),
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: 'Salesforce inject failed', description: msg, variant: 'destructive' });
+      }
     } finally {
       setInjectingSFId(null);
     }
