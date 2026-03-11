@@ -31,10 +31,10 @@ const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="py-24 border-t border-white/5">
+    <section className="py-24 border-t border-[#2D5A3D]">
       <div className="container mx-auto px-6 max-w-3xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-foreground">
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-[#EAF0E2]">
             Frequently asked questions
           </h2>
         </div>
@@ -43,16 +43,16 @@ const FAQ = () => {
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className={`border border-white/5 rounded-xl overflow-hidden transition-colors ${openIndex === i ? "bg-white/[0.04]" : "bg-transparent hover:bg-white/[0.02]"}`}
+              className={`border border-[#2D5A3D] rounded-xl overflow-hidden transition-colors ${openIndex === i ? "bg-[#132A1E]" : "bg-transparent hover:bg-[#132A1E]/30"}`}
             >
               <button
                 className="w-full flex items-center justify-between p-6 text-left"
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 data-testid={`faq-toggle-${i}`}
               >
-                <span className="font-medium text-lg text-foreground">{faq.question}</span>
+                <span className="font-medium text-lg text-[#EAF0E2]">{faq.question}</span>
                 <ChevronDown
-                  className={`w-5 h-5 text-zinc-500 transition-transform ${openIndex === i ? "rotate-180 text-emerald-400" : ""}`}
+                  className={`w-5 h-5 text-[#A3B18A] transition-transform ${openIndex === i ? "rotate-180 text-[#6B8F71]" : ""}`}
                 />
               </button>
               <AnimatePresence>
@@ -63,7 +63,7 @@ const FAQ = () => {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="p-6 pt-0 text-zinc-400 leading-relaxed">
+                    <div className="p-6 pt-0 text-[#A3B18A] leading-relaxed">
                       {faq.answer}
                     </div>
                   </motion.div>

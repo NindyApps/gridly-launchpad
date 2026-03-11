@@ -99,16 +99,20 @@ src/
 
 ## Design System Rules
 
-### Color Tokens (ALWAYS use CSS variables — NEVER hardcode hex colors)
+### Color Tokens — Forest Green Theme
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `bg-background` | #0B0D0F | Page backgrounds, sidebar, topbar |
-| `bg-surface` / `bg-card` | #11151A | Card backgrounds, panels, dropdowns |
-| `bg-primary` | #7C3AED (violet) | CTA buttons, active states, badges |
-| `text-foreground` | #F8FAFC | Primary text |
-| `text-muted-foreground` | #94A3B8 | Secondary/helper text |
-| `border-border` | rgba(255,255,255,0.08) | All borders and dividers |
+| `bg-background` | #0F2A1D | Page backgrounds, sidebar, topbar |
+| `bg-surface` / `bg-card` | #132A1E | Card backgrounds, panels, dropdowns |
+| `bg-primary` / `bg-accent` | #6B8F71 | CTA buttons, active states, badges |
+| `text-foreground` | #EAF0E2 | Primary text (headings) |
+| `text-muted-foreground` | #A3B18A | Secondary/helper text |
+| `border-border` | #2D5A3D | All borders and dividers |
+| Hover accent | #7DA383 | Hover state for primary buttons |
+| Footer bg | #0B1F14 | Darker footer background |
+
+Landing page sections use explicit hex values matching the forest green palette above. CSS variables in globals.css also reflect these values in HSL format.
 
 ### Typography
 - **Display/Headings:** `font-display` → Space Grotesk
