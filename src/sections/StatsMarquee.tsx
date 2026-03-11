@@ -1,13 +1,9 @@
 "use client";
 
-
-
-
 const StatsMarquee = () => {
   const items = [
     { logo: "/reddit-logo.png", label: "Reddit", stat: "100K+ posts/day" },
-    { logo: "/linkedin-logo.png", label: "LinkedIn", stat: "2M+ posts/day" },
-    { text: "𝕏", label: "X", stat: "500M+ posts/day" },
+    { text: "Y", label: "Hacker News", stat: "10K+ posts/day" },
   ];
 
   const doubled = [...items, ...items, ...items, ...items];
@@ -16,10 +12,10 @@ const StatsMarquee = () => {
     <section className="py-16 bg-primary overflow-hidden">
       <div className="text-center mb-8">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground">
-          Scan Millions of Posts Daily
+          Scan Thousands of Posts Daily
         </h2>
         <p className="mt-2 text-primary-foreground/60 text-sm">
-          2M+ LinkedIn posts • 500M+ X posts • 100K+ Reddit posts — every day
+          100K+ Reddit posts • 10K+ Hacker News posts — monitored every day
         </p>
       </div>
 
@@ -33,7 +29,7 @@ const StatsMarquee = () => {
               {item.logo ? (
                 <img src={item.logo} alt={item.label} className="w-5 h-5 object-contain" />
               ) : (
-                <span className="text-lg text-primary-foreground font-bold">{item.text}</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-orange-500 text-xs font-bold text-white">{item.text}</span>
               )}
               <span className="font-medium text-primary-foreground text-sm">{item.label}</span>
               <span className="text-primary-foreground/60 text-xs">{item.stat}</span>

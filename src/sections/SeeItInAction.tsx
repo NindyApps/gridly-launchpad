@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { motion } from 'motion/react';
+
 const SeeItInAction = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tabs = [
     { label: "Reddit", image: "/reddit-leads-view.png" },
-    { label: "LinkedIn", image: "/linkedin-leads-view.png" },
+    { label: "Hacker News", image: "/dashboard-view.png" },
   ];
 
   return (
@@ -24,7 +25,6 @@ const SeeItInAction = () => {
           <p className="mt-3 text-muted-foreground">A sneak peek inside the platform</p>
         </motion.div>
 
-        {/* Tab switcher */}
         <div className="flex justify-center gap-2 mb-8">
           {tabs.map((tab, i) => (
             <button
@@ -35,6 +35,7 @@ const SeeItInAction = () => {
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-muted-foreground hover:text-foreground"
               }`}
+              data-testid={`tab-${tab.label.toLowerCase().replace(/\s+/g, '-')}`}
             >
               {tab.label}
             </button>
@@ -55,7 +56,7 @@ const SeeItInAction = () => {
             />
           </div>
           <p className="text-center text-sm text-muted-foreground mt-4">
-            AI finds relevant leads across Reddit & LinkedIn
+            AI finds relevant buying signals across Reddit & Hacker News
           </p>
         </motion.div>
       </div>

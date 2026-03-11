@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-
-
 const platforms = [
-  { name: "LinkedIn", logo: "/linkedin-logo.png" },
   { name: "Reddit", logo: "/reddit-logo.png" },
-  { name: "𝕏", logo: null },
+  { name: "Hacker News", logo: null, text: "Y" },
 ];
 
 const r = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
@@ -51,6 +49,7 @@ const FloatingDots = () => (
 );
 
 const HeroSection = () => {
+  const router = useRouter();
   const [platformIndex, setPlatformIndex] = useState(0);
 
   useEffect(() => {
@@ -66,7 +65,6 @@ const HeroSection = () => {
     <section className="relative grid-bg pt-16 overflow-hidden">
       <FloatingDots />
 
-      {/* Gradient glow under text */}
       <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[80px] bg-accent/15 rounded-full blur-[60px]" />
 
       <div className="container mx-auto px-4 pt-24 pb-8 relative z-10 text-center">
@@ -96,7 +94,14 @@ const HeroSection = () => {
                   className="inline h-12 md:h-16 object-contain"
                 />
               ) : (
-                <span className="font-display text-foreground">{currentPlatform.name}</span>
+                <span className="inline-flex items-center gap-1">
+                  {"text" in currentPlatform && currentPlatform.text && (
+                    <span className="inline-flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded bg-orange-500 text-xl md:text-2xl font-bold text-white">
+                      {currentPlatform.text}
+                    </span>
+                  )}
+                  <span className="font-display text-foreground">{currentPlatform.name}</span>
+                </span>
               )}
             </motion.span>
           </AnimatePresence>
@@ -108,10 +113,9 @@ const HeroSection = () => {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-8 text-base md:text-lg text-muted-foreground"
         >
-          Find users urgently searching to buy your product now.
+          Monitor Reddit and Hacker News for real buying signals — powered by AI.
         </motion.p>
 
-        {/* Form card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,6 +130,7 @@ const HeroSection = () => {
                 <Input
                   placeholder="e.g., AI project management software"
                   className="pr-10 rounded-full bg-secondary/50 border-border text-sm h-10"
+                  data-testid="input-product"
                 />
                 <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
@@ -136,13 +141,18 @@ const HeroSection = () => {
                 <Input
                   placeholder="e.g., Project managers"
                   className="pr-10 rounded-full bg-secondary/50 border-border text-sm h-10"
+                  data-testid="input-target-customer"
                 />
                 <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
             </div>
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-11 text-sm font-semibold gap-2">
+            <Button
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-11 text-sm font-semibold gap-2"
+              onClick={() => router.push('/signup')}
+              data-testid="hero-cta-button"
+            >
               <Sparkles className="w-4 h-4" />
-              Watch the Magic
+              Start Free Trial
             </Button>
           </div>
         </motion.div>
