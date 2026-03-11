@@ -41,7 +41,7 @@ export const PLANS: Record<'pro' | 'growth' | 'enterprise', PlanConfig> = {
       '2,000 signals/mo',
       'All CRM integrations',
       'Slack alerts',
-      'API access',
+      'Priority support',
       '20 team seats',
     ],
     limits: { signals: 2000, trackers: 50, members: 20 },
