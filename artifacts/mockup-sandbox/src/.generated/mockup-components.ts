@@ -4,5 +4,7 @@ export const modules: ModuleMap = {
   "./components/mockups/landing-pages/BrutalistSignal.tsx": () => import("../components/mockups/landing-pages/BrutalistSignal.tsx"),
   "./components/mockups/landing-pages/CommandCenter.tsx": () => import("../components/mockups/landing-pages/CommandCenter.tsx"),
   "./components/mockups/landing-pages/EditorialMinimal.tsx": () => import("../components/mockups/landing-pages/EditorialMinimal.tsx"),
+  "./components/mockups/landing-pages/RefinedA.tsx": () => import("../components/mockups/landing-pages/RefinedA.tsx"),
+  "./components/mockups/landing-pages/RefinedB.tsx": () => import("../components/mockups/landing-pages/RefinedB.tsx"),
   "./components/mockups/landing-pages/SocialProofFirst.tsx": () => import("../components/mockups/landing-pages/SocialProofFirst.tsx")
 };
