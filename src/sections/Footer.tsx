@@ -1,23 +1,19 @@
 "use client";
 
-import { Radar } from "lucide-react";
-
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-card/50 pt-16 pb-8">
+    <footer className="pt-16 pb-8" style={{ background: '#111111', borderTop: '1px solid #2A2A2A' }}>
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-                <Radar className="w-4 h-4 text-primary" />
-              </div>
-              <span className="font-display font-bold text-lg tracking-tight text-foreground">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-xl">🐙</span>
+              <span className="font-bold text-lg tracking-tight" style={{ color: '#F0F0F0' }}>
                 OCTOPILOT
               </span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: '#606060' }}>
               B2B revenue signal intelligence. Find buying intent before your
               competitors do.
             </p>
@@ -25,12 +21,15 @@ const Footer = () => {
 
           {/* Product */}
           <div>
-            <h4 className="font-semibold mb-5 text-foreground">Product</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-5" style={{ color: '#F0F0F0' }}>Product</h4>
+            <ul className="space-y-3 text-sm" style={{ color: '#606060' }}>
               <li>
                 <a
                   href="#features"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Features
                 </a>
@@ -38,7 +37,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Integrations
                 </a>
@@ -46,7 +48,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#pricing"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Pricing
                 </a>
@@ -54,7 +59,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Changelog
                 </a>
@@ -64,12 +72,15 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold mb-5 text-foreground">Company</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-5" style={{ color: '#F0F0F0' }}>Company</h4>
+            <ul className="space-y-3 text-sm" style={{ color: '#606060' }}>
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   About
                 </a>
@@ -77,7 +88,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Blog
                 </a>
@@ -85,7 +99,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Careers
                 </a>
@@ -93,7 +110,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Contact
                 </a>
@@ -103,12 +123,15 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="font-semibold mb-5 text-foreground">Legal</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-5" style={{ color: '#F0F0F0' }}>Legal</h4>
+            <ul className="space-y-3 text-sm" style={{ color: '#606060' }}>
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Privacy Policy
                 </a>
@@ -116,7 +139,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Terms of Service
                 </a>
@@ -124,7 +150,10 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="hover:text-foreground transition-colors duration-200"
+                  className="transition-colors duration-200"
+                  style={{ color: '#606060' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
                 >
                   Cookie Policy
                 </a>
@@ -134,16 +163,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground/70">
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #2A2A2A' }}>
+          <p className="text-sm" style={{ color: '#606060' }}>
             &copy; {new Date().getFullYear()} Octopilot Inc. All rights
             reserved.
           </p>
-          <div className="flex items-center gap-5 text-muted-foreground">
+          <div className="flex items-center gap-5" style={{ color: '#606060' }}>
             <a
               href="#"
-              className="hover:text-foreground transition-colors duration-200"
+              className="transition-colors duration-200"
               aria-label="Twitter"
+              onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
             >
               <svg
                 className="w-5 h-5"
@@ -156,8 +187,10 @@ const Footer = () => {
             </a>
             <a
               href="#"
-              className="hover:text-foreground transition-colors duration-200"
+              className="transition-colors duration-200"
               aria-label="GitHub"
+              onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
             >
               <svg
                 className="w-5 h-5"
@@ -174,8 +207,10 @@ const Footer = () => {
             </a>
             <a
               href="#"
-              className="hover:text-foreground transition-colors duration-200"
+              className="transition-colors duration-200"
               aria-label="LinkedIn"
+              onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
             >
               <svg
                 className="w-5 h-5"

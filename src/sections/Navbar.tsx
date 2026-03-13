@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Radar } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -21,36 +21,34 @@ const Navbar = () => {
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-background/20"
+          ? "bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#2A2A2A]"
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Radar className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-xl tracking-tight text-foreground">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl">🐙</span>
+          <span className="font-semibold text-[#F0F0F0] tracking-tight">
             OCTOPILOT
           </span>
-        </div>
+        </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#A0A0A0]">
           <a
             href="#how-it-works"
-            className="hover:text-foreground transition-colors duration-200"
+            className="hover:text-[#F0F0F0] transition-colors duration-200"
           >
             How it Works
           </a>
           <a
             href="#features"
-            className="hover:text-foreground transition-colors duration-200"
+            className="hover:text-[#F0F0F0] transition-colors duration-200"
           >
             Features
           </a>
           <a
             href="#pricing"
-            className="hover:text-foreground transition-colors duration-200"
+            className="hover:text-[#F0F0F0] transition-colors duration-200"
           >
             Pricing
           </a>
@@ -60,20 +58,20 @@ const Navbar = () => {
           <Button
             asChild
             variant="ghost"
-            className="text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+            className="text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-transparent"
           >
             <Link href="/login">Log in</Link>
           </Button>
           <Button
             asChild
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-5"
+            className="gradient-primary text-white font-semibold rounded-[10px] px-5 hover:opacity-90 transition-opacity"
           >
             <Link href="/signup">Get Started</Link>
           </Button>
         </div>
 
         <button
-          className="md:hidden text-foreground p-2"
+          className="md:hidden text-[#F0F0F0] p-2"
           onClick={() => setMobileOpen(!mobileOpen)}
           data-testid="mobile-menu-toggle"
         >
@@ -82,22 +80,22 @@ const Navbar = () => {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden bg-background/98 backdrop-blur-xl border-b border-border px-6 pb-6 pt-2 space-y-4">
+        <div className="md:hidden bg-[#0A0A0A]/98 backdrop-blur-md border-b border-[#2A2A2A] px-6 pb-6 pt-2 space-y-4">
           <a
             href="#how-it-works"
-            className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
+            className="block text-sm font-medium text-[#A0A0A0] hover:text-[#F0F0F0] py-2"
           >
             How it Works
           </a>
           <a
             href="#features"
-            className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
+            className="block text-sm font-medium text-[#A0A0A0] hover:text-[#F0F0F0] py-2"
           >
             Features
           </a>
           <a
             href="#pricing"
-            className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
+            className="block text-sm font-medium text-[#A0A0A0] hover:text-[#F0F0F0] py-2"
           >
             Pricing
           </a>
@@ -105,13 +103,13 @@ const Navbar = () => {
             <Button
               asChild
               variant="ghost"
-              className="w-full text-sm text-muted-foreground"
+              className="w-full text-sm text-[#A0A0A0]"
             >
               <Link href="/login">Log in</Link>
             </Button>
             <Button
               asChild
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-semibold"
+              className="w-full gradient-primary text-white rounded-[10px] font-semibold"
             >
               <Link href="/signup">Get Started</Link>
             </Button>

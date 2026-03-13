@@ -1,167 +1,147 @@
 "use client";
 
 import { motion } from "motion/react";
-import { BarChart3, MessageSquare, Check } from "lucide-react";
+import { MessageCircle, TrendingUp, Brain, Link2, Bell, Linkedin } from "lucide-react";
+
+const features = [
+  {
+    title: "Reddit Monitoring",
+    desc: "Track thousands of subreddits for buying signals 24/7",
+    icon: MessageCircle,
+    comingSoon: false,
+  },
+  {
+    title: "Hacker News Intelligence",
+    desc: "Catch technical buyers when they're actively evaluating",
+    icon: TrendingUp,
+    comingSoon: false,
+  },
+  {
+    title: "AI Signal Classifier",
+    desc: "GPT-4o-mini rates each signal by intent and confidence",
+    icon: Brain,
+    comingSoon: false,
+  },
+  {
+    title: "HubSpot Injection",
+    desc: "One-click: turn a signal into a HubSpot task instantly",
+    icon: Link2,
+    comingSoon: false,
+  },
+  {
+    title: "Team Alerts",
+    desc: "Email and Slack notifications for high-intent signals",
+    icon: Bell,
+    comingSoon: false,
+  },
+  {
+    title: "LinkedIn Monitor",
+    desc: "Track LinkedIn for buying signals and engage faster",
+    icon: Linkedin,
+    comingSoon: true,
+  },
+];
 
 const Features = () => {
   return (
     <section
       id="features"
-      className="py-24 md:py-32 relative border-t border-border bg-secondary/30"
+      className="py-24 md:py-32 relative"
+      style={{ background: "#0A0A0A" }}
     >
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-20">
+        <div className="text-center max-w-2xl mx-auto mb-16">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+            className="text-xs font-semibold tracking-[0.12em] uppercase mb-4"
+            style={{ color: "#00C96A" }}
           >
-            Features
+            FEATURES
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-5 text-foreground text-balance"
+            className="text-4xl font-bold mb-5"
+            style={{ color: "#F0F0F0" }}
           >
-            Built for revenue teams
+            Everything your SDR team needs
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-lg"
+            style={{ color: "#A0A0A0" }}
+            className="text-lg"
           >
-            Everything you need to operationalize social selling at scale.
+            Operationalize social selling at scale with our complete toolkit.
           </motion.p>
         </div>
 
-        {/* Feature Blocks */}
-        <div className="space-y-24 lg:space-y-32">
-          {/* Feature 1: Intent Analytics */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
-          >
-            <div className="order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-6">
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>Intent Analytics</span>
+        {/* Feature Cards Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, i) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className={`relative p-7 rounded-[16px] transition-all duration-200 ${
+                feature.comingSoon ? "opacity-50" : ""
+              }`}
+              style={{
+                background: "#111111",
+                border: "1px solid #2A2A2A",
+              }}
+              onMouseEnter={(e) => {
+                if (!feature.comingSoon) {
+                  e.currentTarget.style.borderColor = "rgba(0, 201, 106, 0.3)";
+                  e.currentTarget.style.boxShadow = "0 0 24px rgba(0,201,106,0.15)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#2A2A2A";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              {feature.comingSoon && (
+                <span
+                  className="absolute top-4 right-4 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  style={{
+                    background: "#1F1F1F",
+                    color: "#606060",
+                    border: "1px solid #2A2A2A",
+                  }}
+                >
+                  Coming Soon
+                </span>
+              )}
+              <div
+                className="w-10 h-10 rounded-[6px] flex items-center justify-center mb-4"
+                style={{
+                  background: "rgba(0, 201, 106, 0.12)",
+                }}
+              >
+                <feature.icon className="w-5 h-5" style={{ color: "#00C96A" }} />
               </div>
-              <h3 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-5 text-foreground">
-                Measure the pulse of your market
+              <h3
+                className="text-base font-semibold mb-2"
+                style={{ color: "#F0F0F0" }}
+              >
+                {feature.title}
               </h3>
-              <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                Track topic velocity, sentiment trends, and share of voice
-                against competitors. Identify macro shifts before they show up
-                in search volume.
+              <p className="text-sm leading-relaxed" style={{ color: "#A0A0A0" }}>
+                {feature.desc}
               </p>
-              <ul className="space-y-4">
-                {[
-                  "Real-time volume tracking by keyword",
-                  "Sentiment analysis on brand mentions",
-                  "Competitor mention comparisons",
-                  "Exportable reports for leadership",
-                ].map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-3 text-foreground"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-primary" />
-                    </div>
-                    <span className="text-sm md:text-base">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="relative rounded-2xl border border-border bg-card p-2 shadow-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent z-0" />
-                <img
-                  src="/refined-b-feature-analytics.png"
-                  alt="Signal Analytics Dashboard"
-                  className="rounded-xl relative z-10 w-full"
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Feature 2: AI Openers */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
-          >
-            <div>
-              <div className="relative rounded-2xl border border-border bg-card p-2 shadow-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent z-0" />
-                <img
-                  src="/refined-b-feature-ai.png"
-                  alt="AI-Generated Openers"
-                  className="rounded-xl relative z-10 w-full"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-6">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>AI Openers</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-5 text-foreground">
-                Contextual outreach at scale
-              </h3>
-              <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                Our LLMs generate highly contextual, non-salesy opening messages
-                based on the exact thread the prospect posted.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  "Thread-aware context generation",
-                  "Adjustable tone (helpful, direct, casual)",
-                  "One-click copy to clipboard",
-                  "Automatic CRM logging",
-                ].map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-3 text-foreground"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-primary" />
-                    </div>
-                    <span className="text-sm md:text-base">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
-
-        {/* Coming Soon */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-24 text-center"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border text-sm text-muted-foreground">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/50 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary/50"></span>
-            </span>
-            Coming soon: X (Twitter), LinkedIn monitoring & Competitor
-            intelligence
-          </div>
-        </motion.div>
       </div>
     </section>
   );

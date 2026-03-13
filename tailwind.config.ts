@@ -22,7 +22,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "Inter", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -31,9 +31,17 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         surface: "hsl(var(--surface))",
+        elevated: "hsl(var(--elevated))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#00C96A",
+          hover: "#00E57A",
+          muted: "rgba(0, 201, 106, 0.12)",
           foreground: "hsl(var(--primary-foreground))",
+        },
+        accent: {
+          DEFAULT: "#7C3AED",
+          muted: "rgba(124, 58, 237, 0.12)",
+          foreground: "hsl(var(--accent-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -46,10 +54,6 @@ export default {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -69,15 +73,30 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Semantic colors
+        mintlify: {
+          green: "#00C96A",
+          "green-hover": "#00E57A",
+          violet: "#7C3AED",
+        },
       },
       borderRadius: {
-        xs: "calc(var(--radius) - 6px)",
+        xs: "6px",
         sm: "calc(var(--radius) - 4px)",
-        md: "calc(var(--radius) - 2px)",
+        md: "10px",
         lg: "var(--radius)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
-        "3xl": "calc(var(--radius) + 12px)",
+        xl: "16px",
+        "2xl": "24px",
+      },
+      backgroundImage: {
+        "gradient-primary": "linear-gradient(135deg, #00C96A 0%, #7C3AED 100%)",
+        "gradient-card": "linear-gradient(135deg, rgba(0,201,106,0.08) 0%, rgba(124,58,237,0.08) 100%)",
+      },
+      boxShadow: {
+        glow: "0 0 24px rgba(0,201,106,0.15)",
+        "glow-sm": "0 0 12px rgba(0,201,106,0.1)",
+        sm: "0 1px 3px rgba(0,0,0,0.4)",
+        md: "0 4px 16px rgba(0,0,0,0.5)",
       },
       keyframes: {
         "accordion-down": {

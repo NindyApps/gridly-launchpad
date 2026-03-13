@@ -22,7 +22,10 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-foreground">
+    <div 
+      className="min-h-screen font-sans antialiased"
+      style={{ background: '#0A0A0A', color: '#F0F0F0' }}
+    >
       <Navbar />
       <HeroSection />
       <HowItWorks />

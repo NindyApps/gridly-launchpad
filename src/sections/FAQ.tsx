@@ -36,7 +36,7 @@ const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="py-24 md:py-32 border-t border-border">
+    <section className="py-24 md:py-32" style={{ background: '#0A0A0A', borderTop: '1px solid #2A2A2A' }}>
       <div className="container mx-auto px-6 max-w-3xl">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -44,7 +44,8 @@ const FAQ = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+            className="text-xs font-semibold tracking-[0.12em] uppercase mb-4"
+            style={{ color: '#00C96A' }}
           >
             FAQ
           </motion.p>
@@ -53,7 +54,8 @@ const FAQ = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl font-display font-bold text-foreground"
+            className="text-4xl font-bold"
+            style={{ color: '#F0F0F0' }}
           >
             Frequently asked questions
           </motion.h2>
@@ -68,22 +70,25 @@ const FAQ = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className={`border border-border rounded-xl overflow-hidden transition-colors duration-200 ${
-                openIndex === i ? "bg-card" : "bg-transparent hover:bg-card/50"
-              }`}
+              className="rounded-[16px] overflow-hidden transition-colors duration-200"
+              style={{ 
+                border: '1px solid #2A2A2A',
+                background: openIndex === i ? '#111111' : 'transparent'
+              }}
             >
               <button
                 className="w-full flex items-center justify-between p-5 md:p-6 text-left"
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 data-testid={`faq-toggle-${i}`}
               >
-                <span className="font-medium text-base md:text-lg text-foreground pr-4">
+                <span className="font-medium text-base md:text-lg pr-4" style={{ color: '#F0F0F0' }}>
                   {faq.question}
                 </span>
                 <ChevronDown
-                  className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
-                    openIndex === i ? "rotate-180 text-primary" : ""
+                  className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${
+                    openIndex === i ? "rotate-180" : ""
                   }`}
+                  style={{ color: openIndex === i ? '#00C96A' : '#606060' }}
                 />
               </button>
               <AnimatePresence>
@@ -95,7 +100,7 @@ const FAQ = () => {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 md:px-6 pb-5 md:pb-6 text-muted-foreground leading-relaxed">
+                    <div className="px-5 md:px-6 pb-5 md:pb-6 leading-relaxed" style={{ color: '#A0A0A0' }}>
                       {faq.answer}
                     </div>
                   </motion.div>

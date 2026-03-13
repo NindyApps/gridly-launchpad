@@ -26,7 +26,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 md:py-32 relative z-10">
+    <section id="how-it-works" className="py-24 md:py-32 relative z-10" style={{ background: '#0A0A0A' }}>
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
@@ -34,7 +34,8 @@ const HowItWorks = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+            className="text-xs font-semibold tracking-[0.12em] uppercase mb-4"
+            style={{ color: '#00C96A' }}
           >
             How it works
           </motion.p>
@@ -43,7 +44,8 @@ const HowItWorks = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-5 text-foreground text-balance"
+            className="text-4xl font-bold mb-5 text-balance"
+            style={{ color: '#F0F0F0' }}
           >
             Convert noise into pipeline
           </motion.h2>
@@ -52,7 +54,8 @@ const HowItWorks = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-lg"
+            className="text-lg"
+            style={{ color: '#A0A0A0' }}
           >
             Set up your intent signals in minutes and let our AI agents identify
             your next customers.
@@ -70,22 +73,39 @@ const HowItWorks = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group relative"
             >
-              <div className="h-full bg-card border border-border rounded-2xl p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+              <div 
+                className="h-full rounded-[16px] p-8 transition-all duration-200"
+                style={{ background: '#111111', border: '1px solid #2A2A2A' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(0, 201, 106, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 0 24px rgba(0,201,106,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#2A2A2A';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 {/* Step Number */}
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center transition-colors duration-300 group-hover:bg-primary/10">
-                    <step.icon className="w-6 h-6 text-primary" />
+                  <div 
+                    className="w-14 h-14 rounded-xl flex items-center justify-center transition-colors duration-300"
+                    style={{ background: 'rgba(0, 201, 106, 0.12)' }}
+                  >
+                    <step.icon className="w-6 h-6" style={{ color: '#00C96A' }} />
                   </div>
-                  <span className="text-4xl font-display font-bold text-border group-hover:text-primary/30 transition-colors duration-300">
+                  <span 
+                    className="text-4xl font-bold transition-colors duration-300"
+                    style={{ color: '#2A2A2A' }}
+                  >
                     {step.step}
                   </span>
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold mb-3 text-foreground">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#F0F0F0' }}>
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="leading-relaxed" style={{ color: '#A0A0A0' }}>
                   {step.desc}
                 </p>
               </div>

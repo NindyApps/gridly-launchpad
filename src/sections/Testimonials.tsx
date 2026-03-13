@@ -28,9 +28,9 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-24 md:py-32 border-t border-border relative overflow-hidden">
+    <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: '#0A0A0A', borderTop: '1px solid #2A2A2A' }}>
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full blur-[150px] pointer-events-none" style={{ background: 'rgba(0, 201, 106, 0.08)' }} />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -39,7 +39,8 @@ const Testimonials = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+            className="text-xs font-semibold tracking-[0.12em] uppercase mb-4"
+            style={{ color: '#00C96A' }}
           >
             Testimonials
           </motion.p>
@@ -48,7 +49,8 @@ const Testimonials = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground text-balance"
+            className="text-4xl font-bold text-balance"
+            style={{ color: '#F0F0F0' }}
           >
             Trusted by fast-growing teams
           </motion.h2>
@@ -65,9 +67,20 @@ const Testimonials = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group"
             >
-              <div className="h-full bg-card border border-border rounded-2xl p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 flex flex-col">
+              <div 
+                className="h-full rounded-[16px] p-8 transition-all duration-200 flex flex-col"
+                style={{ background: '#111111', border: '1px solid #2A2A2A' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(0, 201, 106, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 0 24px rgba(0,201,106,0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#2A2A2A';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 {/* Quote Icon */}
-                <div className="text-primary/30 mb-6">
+                <div className="mb-6" style={{ color: 'rgba(0, 201, 106, 0.3)' }}>
                   <svg
                     width="32"
                     height="32"
@@ -79,20 +92,23 @@ const Testimonials = () => {
                 </div>
 
                 {/* Quote */}
-                <p className="text-foreground text-lg leading-relaxed mb-8 flex-1">
+                <p className="text-lg leading-relaxed mb-8 flex-1" style={{ color: '#F0F0F0' }}>
                   {t.quote}
                 </p>
 
                 {/* Author */}
-                <div className="flex items-center gap-4 pt-6 border-t border-border/50">
-                  <div className="w-11 h-11 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
+                <div className="flex items-center gap-4 pt-6" style={{ borderTop: '1px solid #1F1F1F' }}>
+                  <div 
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold"
+                    style={{ background: 'rgba(0, 201, 106, 0.12)', border: '1px solid rgba(0, 201, 106, 0.2)', color: '#00C96A' }}
+                  >
                     {t.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">
+                    <div className="font-semibold" style={{ color: '#F0F0F0' }}>
                       {t.author}
                     </div>
-                    <div className="text-sm text-muted-foreground">{t.role}</div>
+                    <div className="text-sm" style={{ color: '#606060' }}>{t.role}</div>
                   </div>
                 </div>
               </div>

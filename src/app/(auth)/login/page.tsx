@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Zap, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -83,24 +83,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-950 via-emerald-900 to-zinc-900 items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-teal-500 rounded-full blur-3xl" />
+    <div className="min-h-screen flex" style={{ background: '#0A0A0A' }}>
+      {/* Left panel - branding */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, rgba(0,201,106,0.15) 0%, rgba(124,58,237,0.15) 100%)' }}
+      >
+        {/* Gradient glow circles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px]" style={{ background: 'rgba(0,201,106,0.3)' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[150px]" style={{ background: 'rgba(124,58,237,0.25)' }} />
         </div>
         <div className="relative z-10 text-center px-12 space-y-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 mx-auto">
-            <Zap className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-white tracking-tight">OCTOPILOT</h1>
-          <p className="text-emerald-200 text-lg max-w-xs">
+          <div className="text-6xl mb-4">🐙</div>
+          <h1 className="text-4xl font-bold tracking-tight" style={{ color: '#F0F0F0' }}>OCTOPILOT</h1>
+          <p className="text-lg max-w-xs" style={{ color: '#A0A0A0' }}>
             Find B2B buyers the moment they say they need you.
           </p>
           <div className="grid grid-cols-2 gap-3 text-left max-w-xs mx-auto pt-4">
             {["Reddit monitoring", "HN signal detection", "HubSpot injection", "AI intent scoring"].map((f) => (
-              <div key={f} className="flex items-center gap-2 text-sm text-emerald-300">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <div key={f} className="flex items-center gap-2 text-sm" style={{ color: '#A0A0A0' }}>
+                <div className="h-1.5 w-1.5 rounded-full" style={{ background: '#00C96A' }} />
                 {f}
               </div>
             ))}
@@ -108,22 +110,24 @@ export default function LoginPage() {
         </div>
       </div>
 
+      {/* Right panel - form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="lg:hidden flex items-center gap-2 justify-center mb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
-              <Zap className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">OCTOPILOT</span>
+            <span className="text-2xl">🐙</span>
+            <span className="text-lg font-bold" style={{ color: '#F0F0F0' }}>OCTOPILOT</span>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-white">Welcome back</h2>
-            <p className="text-zinc-400 mt-1 text-sm">Sign in to your account</p>
+            <h2 className="text-2xl font-bold" style={{ color: '#F0F0F0' }}>Welcome back</h2>
+            <p className="mt-1 text-sm" style={{ color: '#606060' }}>Sign in to your account</p>
           </div>
 
           {error && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+            <div 
+              className="rounded-[10px] px-4 py-3 text-sm"
+              style={{ background: 'rgba(248, 113, 113, 0.12)', border: '1px solid rgba(248, 113, 113, 0.2)', color: '#F87171' }}
+            >
               {error}
             </div>
           )}
@@ -132,7 +136,8 @@ export default function LoginPage() {
             onClick={handleGoogleLogin}
             disabled={googleLoading}
             variant="outline"
-            className="w-full border-border bg-white/5 text-white hover:bg-white/10 gap-2"
+            className="w-full gap-2 hover:border-[#00C96A] hover:text-[#00C96A]"
+            style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#F0F0F0' }}
             data-testid="button-google-login"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -145,16 +150,16 @@ export default function LoginPage() {
           </Button>
 
           <div className="flex items-center gap-3">
-            <Separator className="flex-1 bg-white/10" />
-            <span className="text-xs text-zinc-500">or</span>
-            <Separator className="flex-1 bg-white/10" />
+            <Separator className="flex-1" style={{ background: '#2A2A2A' }} />
+            <span className="text-xs" style={{ color: '#606060' }}>or</span>
+            <Separator className="flex-1" style={{ background: '#2A2A2A' }} />
           </div>
 
           <form onSubmit={handlePasswordLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-300 text-sm">Email</Label>
+              <Label htmlFor="email" className="text-sm" style={{ color: '#A0A0A0' }}>Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#606060' }} />
                 <Input
                   id="email"
                   type="email"
@@ -162,7 +167,8 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
+                  className="pl-10"
+                  style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#F0F0F0' }}
                   data-testid="input-email"
                 />
               </div>
@@ -170,19 +176,20 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-zinc-300 text-sm">Password</Label>
+                <Label htmlFor="password" className="text-sm" style={{ color: '#A0A0A0' }}>Password</Label>
                 <button
                   type="button"
                   onClick={handleForgotPassword}
                   disabled={forgotLoading}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                  className="text-xs transition-colors"
+                  style={{ color: '#00C96A' }}
                   data-testid="button-forgot-password"
                 >
                   {forgotLoading ? "Sending..." : "Forgot password?"}
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#606060' }} />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -190,13 +197,15 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 pr-10 border-border bg-white/5 text-white placeholder:text-zinc-500"
+                  className="pl-10 pr-10"
+                  style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#F0F0F0' }}
                   data-testid="input-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: '#606060' }}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -205,7 +214,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold"
+              className="w-full font-semibold gradient-primary text-white hover:opacity-90"
               disabled={loading}
               data-testid="button-sign-in"
             >
@@ -213,9 +222,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-zinc-400">
+          <p className="text-center text-sm" style={{ color: '#606060' }}>
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 font-medium">
+            <Link href="/signup" className="font-medium" style={{ color: '#00C96A' }}>
               Create one free
             </Link>
           </p>

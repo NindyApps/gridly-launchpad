@@ -9,14 +9,12 @@ import {
   Target,
   BarChart2,
   Settings,
-  Zap,
   ChevronDown,
   ChevronLeft,
   LogOut,
   X,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/badge';
 import {
   Sheet,
   SheetContent,
@@ -45,10 +43,10 @@ const NAV_ITEMS = [
 ] as const;
 
 const PLAN_COLORS: Record<string, string> = {
-  free: 'bg-muted text-muted-foreground',
-  pro: 'bg-primary/20 text-primary',
-  growth: 'bg-teal-600/20 text-teal-300',
-  enterprise: 'bg-amber-600/20 text-amber-300',
+  free: 'bg-[#1A1A1A] text-[#606060]',
+  pro: 'bg-[rgba(0,201,106,0.12)] text-[#00C96A]',
+  growth: 'bg-[rgba(124,58,237,0.12)] text-[#7C3AED]',
+  enterprise: 'bg-[rgba(251,191,36,0.12)] text-[#FBBF24]',
 };
 
 function SidebarContent({
@@ -79,25 +77,30 @@ function SidebarContent({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn(
-        'flex h-full flex-col border-r border-border bg-background transition-all duration-300',
+        'flex h-full flex-col transition-all duration-300',
         collapsed ? 'w-16' : 'w-60'
-      )}>
+      )}
+      style={{
+        background: '#0A0A0A',
+        borderRight: '1px solid #2A2A2A',
+      }}
+      >
         {/* Logo */}
         <div className={cn(
-          'flex h-14 items-center border-b border-border shrink-0',
+          'flex h-14 items-center shrink-0',
           collapsed ? 'justify-center px-0' : 'gap-2 px-4'
-        )}>
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <Zap className="h-4 w-4 text-primary-foreground" />
-          </div>
+        )}
+        style={{ borderBottom: '1px solid #2A2A2A' }}
+        >
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-sm font-bold text-foreground tracking-tight">OCTOPILOT</span>
-              <span className="text-[10px] text-muted-foreground border border-border rounded px-1">v1.0</span>
+              <span className="text-lg">🐙</span>
+              <span className="text-sm font-bold text-[#F0F0F0] tracking-tight">OCTOPILOT</span>
             </div>
           )}
+          {collapsed && <span className="text-lg">🐙</span>}
           {onClose && (
-            <button onClick={onClose} className="ml-auto text-muted-foreground hover:text-foreground">
+            <button onClick={onClose} className="ml-auto text-[#606060] hover:text-[#F0F0F0]">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -116,8 +119,10 @@ function SidebarContent({
                     <TooltipTrigger asChild>
                       <button
                         className={cn(
-                          'flex w-full items-center justify-center rounded-lg p-2 text-sm transition-colors',
-                          isActive ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                          'flex w-full items-center justify-center rounded-[6px] p-2 text-sm transition-colors',
+                          isActive 
+                            ? 'bg-[rgba(0,201,106,0.12)] text-[#00C96A]' 
+                            : 'text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A]'
                         )}
                         onClick={() => setSettingsOpen(!settingsOpen)}
                         data-testid="nav-settings"
@@ -134,8 +139,8 @@ function SidebarContent({
                 <div key={item.label}>
                   <button
                     className={cn(
-                      'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
-                      isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      'flex w-full items-center gap-2.5 rounded-[6px] px-3 py-2 text-sm font-medium transition-colors',
+                      isActive ? 'text-[#F0F0F0]' : 'text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A]'
                     )}
                     onClick={() => setSettingsOpen(!isOpen)}
                     data-testid="nav-settings"
@@ -153,10 +158,10 @@ function SidebarContent({
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'block rounded-md px-3 py-1.5 text-xs transition-colors',
+                              'block rounded-[6px] px-3 py-1.5 text-xs transition-colors',
                               childActive
-                                ? 'bg-primary/15 text-primary border-l-2 border-primary'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                ? 'bg-[rgba(0,201,106,0.12)] text-[#00C96A] font-semibold'
+                                : 'text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A]'
                             )}
                             data-testid={`nav-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
@@ -175,15 +180,15 @@ function SidebarContent({
               <Link
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors relative',
+                  'flex items-center gap-2.5 rounded-[6px] px-3 py-2 text-sm font-medium transition-colors relative',
                   collapsed ? 'justify-center px-0 py-2.5' : '',
                   isActive
-                    ? 'bg-primary/15 text-primary border-l-2 border-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    ? 'bg-[rgba(0,201,106,0.12)] text-[#00C96A]'
+                    : 'text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A]'
                 )}
                 data-testid={`nav-${item.label.toLowerCase()}`}
               >
-                <item.icon className={cn('shrink-0', collapsed ? 'h-5 w-5' : 'h-4 w-4')} />
+                <item.icon className={cn('shrink-0', collapsed ? 'h-5 w-5' : 'h-4 w-4', isActive && 'text-[#00C96A]')} />
                 {!collapsed && item.label}
               </Link>
             );
@@ -202,26 +207,32 @@ function SidebarContent({
         </nav>
 
         {/* Bottom: workspace + user + signout */}
-        <div className="border-t border-border p-2 space-y-1 shrink-0">
+        <div className="p-3 space-y-2 shrink-0" style={{ borderTop: '1px solid #2A2A2A' }}>
           {!collapsed && workspace && (
-            <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-xs text-foreground/80 truncate max-w-[120px]">{workspace.name}</span>
-              <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', PLAN_COLORS[plan] ?? PLAN_COLORS.free)}>
+            <div 
+              className="flex items-center justify-between px-2.5 py-2 rounded-[6px]"
+              style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
+            >
+              <span className="text-sm font-medium text-[#F0F0F0] truncate max-w-[120px]">{workspace.name}</span>
+              <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', PLAN_COLORS[plan] ?? PLAN_COLORS.free)}>
                 {planLabel}
               </span>
             </div>
           )}
 
           {!collapsed && (
-            <div className="flex items-center gap-2.5 px-3 py-1.5">
-              <div className="h-6 w-6 shrink-0 rounded-full bg-primary flex items-center justify-center text-[10px] text-primary-foreground font-semibold">
+            <div className="flex items-center gap-2.5 px-2.5 py-1.5">
+              <div 
+                className="h-6 w-6 shrink-0 rounded-full flex items-center justify-center text-[10px] font-semibold"
+                style={{ background: '#00C96A', color: '#0A0A0A' }}
+              >
                 {user?.email?.[0].toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-foreground truncate">
+                <p className="text-xs text-[#F0F0F0] truncate">
                   {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+                <p className="text-[10px] text-[#606060] truncate">{user?.email}</p>
               </div>
             </div>
           )}
@@ -231,7 +242,7 @@ function SidebarContent({
               <TooltipTrigger asChild>
                 <button
                   onClick={handleSignOut}
-                  className="flex w-full items-center justify-center rounded-lg p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  className="flex w-full items-center justify-center rounded-[6px] p-2.5 text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A] transition-colors"
                   data-testid="button-sign-out"
                 >
                   <LogOut className="h-5 w-5" />
@@ -242,7 +253,7 @@ function SidebarContent({
           ) : (
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="flex w-full items-center gap-2.5 rounded-[6px] px-3 py-2 text-sm text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1A1A1A] transition-colors"
               data-testid="button-sign-out"
             >
               <LogOut className="h-4 w-4 shrink-0" />
@@ -253,7 +264,7 @@ function SidebarContent({
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="flex w-full items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="flex w-full items-center justify-center rounded-[6px] p-1.5 text-[#606060] hover:text-[#F0F0F0] hover:bg-[#1A1A1A] transition-colors"
               data-testid="button-collapse-sidebar"
             >
               <ChevronLeft className={cn('h-4 w-4 transition-transform duration-300', collapsed && 'rotate-180')} />
@@ -293,7 +304,11 @@ export function AppSidebar({ mobileOpen, onMobileClose }: AppSidebarProps) {
 
       {/* Mobile drawer */}
       <Sheet open={mobileOpen} onOpenChange={onMobileClose}>
-        <SheetContent side="left" className="p-0 w-60 border-r border-border bg-background">
+        <SheetContent 
+          side="left" 
+          className="p-0 w-60"
+          style={{ background: '#0A0A0A', border: 'none', borderRight: '1px solid #2A2A2A' }}
+        >
           <SidebarContent collapsed={false} onClose={onMobileClose} />
         </SheetContent>
       </Sheet>

@@ -61,7 +61,8 @@ const Pricing = () => {
   return (
     <section
       id="pricing"
-      className="py-24 md:py-32 border-t border-border bg-secondary/30 relative"
+      className="py-24 md:py-32 relative"
+      style={{ background: '#111111', borderTop: '1px solid #2A2A2A' }}
     >
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -70,7 +71,8 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+            className="text-xs font-semibold tracking-[0.12em] uppercase mb-4"
+            style={{ color: '#00C96A' }}
           >
             Pricing
           </motion.p>
@@ -79,7 +81,8 @@ const Pricing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-5 text-foreground text-balance"
+            className="text-4xl font-bold mb-5 text-balance"
+            style={{ color: '#F0F0F0' }}
           >
             Simple, transparent pricing
           </motion.h2>
@@ -90,15 +93,18 @@ const Pricing = () => {
             transition={{ delay: 0.2 }}
             className="flex items-center justify-center gap-3 mt-8"
           >
-            <span className="text-muted-foreground text-sm font-medium">
+            <span className="text-sm font-medium" style={{ color: '#606060' }}>
               Billed Monthly
             </span>
-            <div className="w-11 h-6 bg-primary/20 rounded-full relative cursor-pointer border border-primary/30">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full" />
+            <div 
+              className="w-11 h-6 rounded-full relative cursor-pointer"
+              style={{ background: 'rgba(0, 201, 106, 0.2)', border: '1px solid rgba(0, 201, 106, 0.3)' }}
+            >
+              <div className="absolute right-1 top-1 w-4 h-4 rounded-full" style={{ background: '#00C96A' }} />
             </div>
-            <span className="text-foreground text-sm font-medium">
+            <span className="text-sm font-medium" style={{ color: '#F0F0F0' }}>
               Billed Annually{" "}
-              <span className="text-primary text-xs ml-1">(Save 20%)</span>
+              <span className="text-xs ml-1" style={{ color: '#00C96A' }}>(Save 20%)</span>
             </span>
           </motion.div>
         </div>
@@ -117,44 +123,53 @@ const Pricing = () => {
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                  <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+                  <span 
+                    className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide"
+                    style={{ background: '#00C96A', color: '#0A0A0A' }}
+                  >
                     Most Popular
                   </span>
                 </div>
               )}
 
               <div
-                className={`h-full flex flex-col rounded-2xl p-8 transition-all duration-300 ${
-                  plan.popular
-                    ? "bg-card border-2 border-primary shadow-xl shadow-primary/10"
-                    : "bg-card border border-border hover:border-primary/30"
-                }`}
+                className="h-full flex flex-col rounded-[16px] p-8 transition-all duration-200"
+                style={{ 
+                  background: '#0A0A0A',
+                  border: plan.popular ? '2px solid #00C96A' : '1px solid #2A2A2A',
+                  boxShadow: plan.popular ? '0 0 24px rgba(0,201,106,0.15)' : 'none'
+                }}
               >
                 {/* Plan Header */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-1 text-foreground">
+                  <h3 className="text-xl font-semibold mb-1" style={{ color: '#F0F0F0' }}>
                     {plan.name}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm" style={{ color: '#606060' }}>
                     {plan.description}
                   </p>
                 </div>
 
                 {/* Price */}
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-foreground">
+                  <span className="text-4xl font-bold" style={{ color: '#F0F0F0' }}>
                     {plan.price}
                   </span>
-                  <span className="text-muted-foreground">/mo</span>
+                  <span style={{ color: '#606060' }}>/mo</span>
                 </div>
 
                 {/* CTA Button */}
                 <Button
-                  className={`w-full mb-8 ${
+                  className={`w-full mb-8 font-semibold ${
                     plan.popular
-                      ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                      : "bg-secondary hover:bg-secondary/80 text-foreground border border-border"
+                      ? "gradient-primary text-white hover:opacity-90"
+                      : ""
                   }`}
+                  style={!plan.popular ? { 
+                    background: '#1A1A1A', 
+                    border: '1px solid #2A2A2A',
+                    color: '#F0F0F0'
+                  } : undefined}
                   onClick={() =>
                     plan.cta === "Contact Sales"
                       ? null
@@ -170,11 +185,10 @@ const Pricing = () => {
                   {plan.features.map((feature, fi) => (
                     <div
                       key={fi}
-                      className={`flex items-center gap-3 text-sm ${
-                        plan.popular ? "text-foreground" : "text-muted-foreground"
-                      }`}
+                      className="flex items-center gap-3 text-sm"
+                      style={{ color: plan.popular ? '#F0F0F0' : '#A0A0A0' }}
                     >
-                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#00C96A' }} />
                       {feature}
                     </div>
                   ))}

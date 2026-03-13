@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Bell, HelpCircle, Menu, User, LogOut, Settings } from 'lucide-react';
+import { Search, Bell, HelpCircle, Menu, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -65,28 +65,43 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
 
   return (
     <>
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/80 backdrop-blur-sm px-4 gap-3">
+      <header 
+        className="flex h-14 shrink-0 items-center justify-between px-4 gap-3 sticky top-0 z-40"
+        style={{ 
+          background: 'rgba(10, 10, 10, 0.8)', 
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid #2A2A2A'
+        }}
+      >
         {/* Left: hamburger + title */}
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onMenuClick}
-            className="md:hidden text-muted-foreground hover:text-foreground transition-colors"
+            className="md:hidden transition-colors"
+            style={{ color: '#606060' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#F0F0F0'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#606060'}
             data-testid="button-hamburger"
           >
             <Menu className="h-5 w-5" />
           </button>
           <div className="min-w-0">
-            <h1 className="text-sm font-semibold text-foreground truncate">{pageTitle}</h1>
-            {subtitle && <p className="text-[10px] text-muted-foreground truncate">{subtitle}</p>}
+            <h1 className="text-[15px] font-semibold truncate" style={{ color: '#F0F0F0' }}>{pageTitle}</h1>
+            {subtitle && <p className="text-[10px] truncate" style={{ color: '#606060' }}>{subtitle}</p>}
           </div>
         </div>
 
         {/* Center: search */}
         <div className="relative hidden sm:block flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: '#606060' }} />
           <Input
             placeholder="Search signals, trackers..."
-            className="pl-8 h-8 text-xs border-border bg-surface text-foreground placeholder:text-muted-foreground w-full"
+            className="pl-8 h-8 text-xs w-full"
+            style={{ 
+              background: '#1A1A1A', 
+              border: '1px solid #2A2A2A',
+              color: '#F0F0F0'
+            }}
             data-testid="input-search"
           />
         </div>
@@ -97,7 +112,8 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            className="h-8 w-8 p-0 hover:bg-[#1A1A1A]"
+            style={{ color: '#606060' }}
             onClick={() => setHelpOpen(true)}
             data-testid="button-help"
           >
@@ -108,12 +124,16 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="relative h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            className="relative h-8 w-8 p-0 hover:bg-[#1A1A1A]"
+            style={{ color: '#606060' }}
             data-testid="button-notifications"
           >
             <Bell className="h-4 w-4" />
             {notifCount > 0 && (
-              <span className="absolute top-1 right-1 h-3.5 w-3.5 rounded-full bg-destructive flex items-center justify-center text-[9px] text-destructive-foreground font-bold leading-none">
+              <span 
+                className="absolute top-1 right-1 h-3.5 w-3.5 rounded-full flex items-center justify-center text-[9px] font-bold leading-none"
+                style={{ background: '#00C96A', color: '#0A0A0A' }}
+              >
                 {notifCount > 9 ? '9+' : notifCount}
               </span>
             )}
@@ -123,7 +143,14 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground font-semibold hover:bg-primary/90 transition-colors ml-1"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ml-1 transition-all"
+                style={{ 
+                  background: '#00C96A', 
+                  color: '#0A0A0A',
+                  border: '2px solid #2A2A2A'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = '#00C96A'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = '#2A2A2A'}
                 data-testid="button-user-menu"
               >
                 {initials}
@@ -131,26 +158,29 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-52 border border-border bg-card text-foreground"
+              className="w-52"
+              style={{ background: '#111111', border: '1px solid #2A2A2A' }}
             >
               <DropdownMenuLabel className="font-normal">
-                <p className="text-sm font-medium text-foreground truncate">
+                <p className="text-sm font-medium truncate" style={{ color: '#F0F0F0' }}>
                   {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                <p className="text-xs truncate" style={{ color: '#606060' }}>{user?.email}</p>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-border" />
+              <DropdownMenuSeparator style={{ background: '#2A2A2A' }} />
               <DropdownMenuItem
-                className="gap-2 text-foreground/80 hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                className="gap-2 cursor-pointer"
+                style={{ color: '#A0A0A0' }}
                 onClick={() => router.push('/settings/team')}
                 data-testid="menu-profile-settings"
               >
                 <User className="h-4 w-4" />
                 Profile Settings
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border" />
+              <DropdownMenuSeparator style={{ background: '#2A2A2A' }} />
               <DropdownMenuItem
-                className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                className="gap-2 cursor-pointer"
+                style={{ color: '#F87171' }}
                 onClick={handleSignOut}
                 data-testid="menu-sign-out"
               >
@@ -164,10 +194,13 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
 
       {/* Help modal */}
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
-        <DialogContent className="border border-border bg-card text-foreground max-w-md">
+        <DialogContent 
+          className="max-w-md"
+          style={{ background: '#111111', border: '1px solid #2A2A2A' }}
+        >
           <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <HelpCircle className="h-5 w-5 text-primary" />
+            <DialogTitle className="flex items-center gap-2" style={{ color: '#F0F0F0' }}>
+              <HelpCircle className="h-5 w-5" style={{ color: '#00C96A' }} />
               Help & Resources
             </DialogTitle>
           </DialogHeader>
@@ -180,10 +213,13 @@ export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
             ].map((item) => (
               <div
                 key={item.title}
-                className="rounded-lg border border-border bg-surface px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                className="rounded-[10px] px-4 py-3 cursor-pointer transition-colors"
+                style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#2A2A2A'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#1A1A1A'}
               >
-                <p className="text-sm font-medium text-foreground">{item.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                <p className="text-sm font-medium" style={{ color: '#F0F0F0' }}>{item.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#606060' }}>{item.desc}</p>
               </div>
             ))}
           </div>

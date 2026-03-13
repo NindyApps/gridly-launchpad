@@ -20,19 +20,29 @@ function StatCard({
   value,
   icon: Icon,
   color,
+  highlight,
 }: {
   label: string;
   value: string | number;
   icon: React.ElementType;
   color: string;
+  highlight?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4" data-testid={`stat-${label.toLowerCase().replace(/\s+/g, '-')}`}>
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-xs text-zinc-400">{label}</p>
-        <Icon className={`h-3.5 w-3.5 ${color}`} />
+    <div 
+      className="rounded-[16px] p-5 transition-all"
+      style={{ 
+        background: '#111111', 
+        border: '1px solid #2A2A2A',
+        boxShadow: highlight ? '0 0 0 1px rgba(0, 201, 106, 0.15) inset' : 'none'
+      }}
+      data-testid={`stat-${label.toLowerCase().replace(/\s+/g, '-')}`}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-semibold tracking-[0.08em] uppercase" style={{ color: '#606060' }}>{label}</p>
+        <Icon className={`h-4 w-4 ${color}`} />
       </div>
-      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      <p className={`text-[32px] font-bold font-mono ${color}`}>{value}</p>
     </div>
   );
 }
@@ -50,51 +60,52 @@ function DailyUsageStat({
   const nearLimit = !isUnlimited && !atLimit && pct > 80;
 
   const barColor = atLimit
-    ? 'bg-red-500'
+    ? '#F87171'
     : nearLimit
-    ? 'bg-amber-500'
-    : 'bg-emerald-500';
+    ? '#FBBF24'
+    : '#00C96A';
 
   const textColor = atLimit
-    ? 'text-red-400'
+    ? 'text-[#F87171]'
     : nearLimit
-    ? 'text-amber-400'
-    : 'text-zinc-400';
+    ? 'text-[#FBBF24]'
+    : 'text-[#606060]';
 
   return (
     <div
-      className="rounded-xl border border-white/10 bg-white/5 p-4 col-span-2 lg:col-span-1"
+      className="rounded-[16px] p-5 col-span-2 lg:col-span-1"
+      style={{ background: '#111111', border: '1px solid #2A2A2A' }}
       data-testid="stat-daily-usage"
     >
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-xs text-zinc-400">Daily Usage</p>
-        <Activity className={`h-3.5 w-3.5 ${textColor}`} />
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-semibold tracking-[0.08em] uppercase" style={{ color: '#606060' }}>Daily Usage</p>
+        <Activity className={`h-4 w-4 ${textColor}`} />
       </div>
 
       <div className="flex items-baseline gap-1 mb-2">
-        <span className={cn('text-2xl font-bold', textColor)}>{today}</span>
+        <span className={cn('text-[32px] font-bold font-mono', textColor)}>{today}</span>
         {!isUnlimited && (
-          <span className="text-xs text-zinc-500">/ {limit.toLocaleString()}</span>
+          <span className="text-xs" style={{ color: '#606060' }}>/ {limit.toLocaleString()}</span>
         )}
         {isUnlimited && (
-          <span className="text-xs text-zinc-500">signals</span>
+          <span className="text-xs" style={{ color: '#606060' }}>signals</span>
         )}
       </div>
 
       {!isUnlimited && (
-        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: '#1A1A1A' }}>
           <div
-            className={cn('h-full rounded-full transition-all', barColor)}
-            style={{ width: `${pct}%` }}
+            className="h-full rounded-full transition-all"
+            style={{ width: `${pct}%`, background: barColor }}
           />
         </div>
       )}
 
       {atLimit && (
-        <p className="text-[10px] text-red-400 mt-1 font-medium">Daily limit reached</p>
+        <p className="text-[10px] mt-1 font-medium" style={{ color: '#F87171' }}>Daily limit reached</p>
       )}
       {nearLimit && (
-        <p className="text-[10px] text-amber-400 mt-1">{pct}% of daily limit</p>
+        <p className="text-[10px] mt-1" style={{ color: '#FBBF24' }}>{pct}% of daily limit</p>
       )}
     </div>
   );
@@ -152,13 +163,13 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" style={{ background: '#0A0A0A' }}>
       {/* Stats row */}
       <div className="px-4 pt-4 pb-2 grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-emerald-400" />
-        <StatCard label="High Intent" value={stats.highIntent} icon={TrendingUp} color="text-red-400" />
-        <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-green-400" />
-        <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-amber-400" />
+        <StatCard label="Signals Today" value={stats.today} icon={BarChart3} color="text-[#00C96A]" />
+        <StatCard label="High Intent" value={stats.highIntent} icon={TrendingUp} color="text-[#F87171]" highlight />
+        <StatCard label="Injected Today" value={stats.injectedToday} icon={Zap} color="text-[#4ADE80]" />
+        <StatCard label="Acceptance Rate" value={`${stats.acceptanceRate}%`} icon={Target} color="text-[#FBBF24]" />
         <DailyUsageStat today={stats.today} limit={dailyLimit} />
       </div>
 
@@ -168,7 +179,8 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            className="border-border text-zinc-400 hover:text-white"
+            className="hover:border-[#00C96A] hover:text-[#00C96A]"
+            style={{ border: '1px solid #2A2A2A', color: '#606060', background: 'transparent' }}
             onClick={handleTriggerScan}
             disabled={triggering}
             data-testid="button-trigger-scan"
@@ -176,7 +188,7 @@ export default function DashboardPage() {
             <Radio className="h-3.5 w-3.5 mr-1.5" />
             {triggering ? 'Triggering...' : 'Trigger Signal Scan'}
           </Button>
-          <span className="text-xs text-zinc-600">Manually trigger signal collection for testing</span>
+          <span className="text-xs" style={{ color: '#606060' }}>Manually trigger signal collection for testing</span>
         </div>
       )}
 
