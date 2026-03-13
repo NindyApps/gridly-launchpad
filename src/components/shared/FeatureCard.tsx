@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'motion/react';
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,13 +12,19 @@ interface FeatureCardProps {
   className?: string;
 }
 
-export function FeatureCard({ icon, title, description, badge, className }: FeatureCardProps) {
+export function FeatureCard({
+  icon,
+  title,
+  description,
+  badge,
+  className,
+}: FeatureCardProps) {
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: "var(--shadow-card-hover)" }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "bg-surface border border-border/50 rounded-xl p-6 flex flex-col gap-4 group",
+        "bg-card border border-border rounded-xl p-6 flex flex-col gap-4 group transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
         className
       )}
     >
@@ -36,9 +42,11 @@ export function FeatureCard({ icon, title, description, badge, className }: Feat
           )}
         </div>
       )}
-      <div className="space-y-1.5">
-        <h3 className="font-display font-semibold text-foreground text-base">{title}</h3>
-        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+      <div className="space-y-2">
+        <h3 className="font-semibold text-foreground text-base">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {description}
+        </p>
       </div>
     </motion.div>
   );

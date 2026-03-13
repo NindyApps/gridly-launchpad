@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'motion/react';
+import { motion } from "motion/react";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function CTAButton({
     sizeClasses[size],
     variant === "primary"
       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
-      : "border border-border text-foreground hover:bg-surface",
+      : "border border-border text-foreground hover:bg-secondary/50",
     className
   );
 
@@ -48,7 +48,7 @@ export function CTAButton({
 
   if (href) {
     return (
-      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Link href={href} className={baseClasses}>
           {inner}
         </Link>
@@ -58,8 +58,8 @@ export function CTAButton({
 
   return (
     <motion.button
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className={baseClasses}
       onClick={onClick}
     >
