@@ -1,53 +1,95 @@
 "use client";
 
+import { motion } from "motion/react";
 import { Radar, BrainCircuit, Database } from "lucide-react";
 
 const steps = [
   {
-    icon: <Radar className="w-6 h-6 text-[#6B8F71]" />,
+    icon: Radar,
+    step: "01",
     title: "Define Trackers",
-    desc: "Set up keywords, competitor names, or topics. We monitor millions of posts in real-time.",
+    desc: "Set up keywords, competitor names, or topics. We monitor millions of posts in real-time across Reddit and Hacker News.",
   },
   {
-    icon: <BrainCircuit className="w-6 h-6 text-[#6B8F71]" />,
+    icon: BrainCircuit,
+    step: "02",
     title: "AI Analysis",
-    desc: "Our models score each mention for buying intent, filtering out noise and complaints.",
+    desc: "Our models score each mention for buying intent, filtering out noise, complaints, and irrelevant discussions.",
   },
   {
-    icon: <Database className="w-6 h-6 text-[#6B8F71]" />,
+    icon: Database,
+    step: "03",
     title: "CRM Sync",
-    desc: "High-intent signals are automatically injected into HubSpot or Salesforce for your SDRs.",
+    desc: "High-intent signals are automatically injected into HubSpot or Salesforce for your SDRs to action.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 relative z-10">
+    <section id="how-it-works" className="py-24 md:py-32 relative z-10">
       <div className="container mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 text-[#EAF0E2]">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-primary text-sm font-medium tracking-wide uppercase mb-4"
+          >
+            How it works
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-5 text-foreground text-balance"
+          >
             Convert noise into pipeline
-          </h2>
-          <p className="text-[#A3B18A] text-lg">
-            Set up your intent signals in minutes and let our AI agents do the heavy lifting
-            of identifying your next customers.
-          </p>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-lg"
+          >
+            Set up your intent signals in minutes and let our AI agents identify
+            your next customers.
+          </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          <div className="hidden md:block absolute top-[40px] left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-[#6B8F71]/30 to-transparent" />
-
+        {/* Steps Grid */}
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {steps.map((step, i) => (
-            <div key={i} className="relative group">
-              <div className="h-full bg-[#132A1E]/50 border border-[#2D5A3D] rounded-2xl p-8 hover:bg-[#132A1E] transition-colors relative overflow-hidden backdrop-blur-sm">
-                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#6B8F71]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="w-16 h-16 rounded-2xl bg-[#0F2A1D] border border-[#2D5A3D] flex items-center justify-center mb-6 relative z-10 shadow-lg group-hover:border-[#6B8F71]/40 transition-colors">
-                  {step.icon}
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="group relative"
+            >
+              <div className="h-full bg-card border border-border rounded-2xl p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+                {/* Step Number */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center transition-colors duration-300 group-hover:bg-primary/10">
+                    <step.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <span className="text-4xl font-display font-bold text-border group-hover:text-primary/30 transition-colors duration-300">
+                    {step.step}
+                  </span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-[#EAF0E2]">{step.title}</h3>
-                <p className="text-[#A3B18A] leading-relaxed">{step.desc}</p>
+
+                {/* Content */}
+                <h3 className="text-xl font-semibold mb-3 text-foreground">
+                  {step.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {step.desc}
+                </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

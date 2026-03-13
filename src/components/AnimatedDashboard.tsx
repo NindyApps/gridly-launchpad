@@ -14,19 +14,19 @@ import {
 } from "lucide-react";
 
 const COLORS = {
-  bg: "#0F2A1D",
-  bgCard: "#132A1E",
-  accent: "#6B8F71",
-  accentLight: "#7DA383",
-  text: "#EAF0E2",
-  textMuted: "#A3B18A",
-  border: "#2D5A3D",
+  bg: "#0A1F15",
+  bgCard: "#0D2519",
+  accent: "#5C9E72",
+  accentLight: "#6DAF82",
+  text: "#F0F5EE",
+  textMuted: "#8FA89A",
+  border: "#1E3D2E",
 };
 
 const INTENT_COLORS: Record<string, { bg: string; text: string }> = {
-  HIGH: { bg: "rgba(107,143,113,0.25)", text: "#7DA383" },
+  HIGH: { bg: "rgba(92,158,114,0.25)", text: "#6DAF82" },
   MEDIUM: { bg: "rgba(217,179,76,0.2)", text: "#D9B34C" },
-  LOW: { bg: "rgba(168,162,158,0.15)", text: "#A8A29E" },
+  LOW: { bg: "rgba(143,168,154,0.15)", text: "#8FA89A" },
 };
 
 const PLATFORM_COLORS: Record<string, { bg: string; text: string }> = {
